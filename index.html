@@ -9,11 +9,16 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=4">
+<link rel="stylesheet" href="app.css?v=5">
 <title>Briefing</title>
 </head>
 <body>
 <div id="oldBrowser">이 브라우저는 지원되지 않는 기능이 있어요. <b>Chrome</b>으로 열어 주세요.</div>
+
+<div id="splash">
+  <div class="sp-mark"><i class="sp-sun"></i><i class="sp-line"></i></div>
+  <div class="sp-name">Briefing</div>
+</div>
 
 <div id="root">
   <div id="stage">
@@ -27,6 +32,7 @@
       </div>
       <div class="hactions">
         <span class="pill acc" id="countdown"></span>
+        <button class="pill" id="refreshBtn" title="새로고침">↻</button>
         <button class="pill" id="allBtn" hidden>전체 보기</button>
         <button class="pill" id="modeBtn"></button>
         <button class="pill" id="setBtn">설정</button>
@@ -83,6 +89,6 @@
   </div>
 </div>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
