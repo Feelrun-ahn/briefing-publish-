@@ -18,9 +18,10 @@ html,body{margin:0;padding:0;background:var(--rootBg);color:var(--tx);
   font-family:'Space Grotesk',"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
 html,body{overflow-x:hidden}
-/* 데스크톱·태블릿: 한 화면 고정 */
-body:not(.phone){overflow:hidden;height:100%}
-html:has(body:not(.phone)){overflow:hidden;height:100%}
+/* 한 화면 고정 여부는 JS가 html에 클래스로 지정 (:has() 미지원 대비) */
+html.fixed,html.fixed body{overflow:hidden;height:100%}
+html.scrollable{overflow-y:auto;height:auto}
+html.scrollable body{overflow-y:visible;height:auto;min-height:100%}
 *{box-sizing:border-box}
 input,button,select,textarea,a{font-family:inherit;color:inherit}
 button{cursor:pointer}
@@ -462,8 +463,33 @@ body.phone .segbar button{padding:8px 12px;font-size:12px}
 .fld input:focus,.fld textarea:focus{border-color:var(--accBd)}
 
 /* 모달 */
-.modal{animation:fadeIn .22s var(--ease) both}
-.modal .mbox{animation:popIn .32s var(--easeOut) both}
+@keyframes modalIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes navIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@keyframes bodyIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.modal{animation:fadeIn .2s var(--ease) both}
+.modal .mbox{animation:modalIn .34s var(--easeOut) both}
+#settings .setnav{animation:navIn .34s .04s var(--easeOut) both}
+#settings .setnav button{animation:rowIn .3s var(--easeOut) both}
+#settings .setnav button:nth-child(2){animation-delay:.04s}
+#settings .setnav button:nth-child(3){animation-delay:.08s}
+#settings .setnav button:nth-child(4){animation-delay:.12s}
+#settings .setnav button:nth-child(5){animation-delay:.16s}
+#settings .setnav button:nth-child(6){animation-delay:.2s}
+#settings .setnav button:nth-child(7){animation-delay:.24s}
+#setBody{animation:bodyIn .3s var(--easeOut) both}
+#setBody .fld,#setBody .cardrow,#setBody .faq details{animation:slideUp .3s var(--easeOut) both}
+#setBody .cardrow:nth-child(2){animation-delay:.03s}
+#setBody .cardrow:nth-child(3){animation-delay:.06s}
+#setBody .cardrow:nth-child(4){animation-delay:.09s}
+#setBody .cardrow:nth-child(5){animation-delay:.12s}
+#setBody .cardrow:nth-child(6){animation-delay:.15s}
+#setBody .sectitle{animation:slideUp .3s var(--easeOut) both}
+.mclose{transition:background .18s var(--ease), transform .15s var(--spring)}
+.mclose:active{transform:rotate(90deg) scale(.9)}
+/* 닫힐 때 */
+@keyframes modalOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(10px) scale(.97)}}
+.modal.closing{animation:fadeIn .2s var(--ease) reverse both}
+.modal.closing .mbox{animation:modalOut .2s var(--ease) both}
 
 /* 할 일 · 목록 */
 .td,.cal-ev,.ex,.hb,.nw,.tt{animation:rowIn .28s var(--easeOut) both}
@@ -537,7 +563,6 @@ body.phone .segbar button{padding:8px 12px;font-size:12px}
 
 /* 설정 */
 .setnav button{transition:background .18s var(--ease), color .18s var(--ease)}
-#setBody{animation:slideUp .26s var(--easeOut)}
 .cardrow{transition:opacity .25s var(--ease), border-color .2s var(--ease)}
 .sw{transition:background .22s var(--ease), border-color .22s var(--ease)}
 .sw::after{transition:left .24s var(--spring), background .2s var(--ease)}
