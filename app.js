@@ -608,6 +608,9 @@ function fit(){
   const phone = innerWidth < 760;
   const was = document.body.classList.contains('phone');
   document.body.classList.toggle('phone', phone);
+  /* 스크롤 잠금/해제를 html 클래스로 확실히 제어 */
+  document.documentElement.classList.toggle('scrollable', phone);
+  document.documentElement.classList.toggle('fixed', !phone);
   $('allBtn').hidden = !phone;
   if(phone){
     document.body.classList.toggle('showall', !!C.phoneAll);
@@ -1114,7 +1117,10 @@ function openEvent(id, dateStr){
   $('evEdit').classList.add('show');
   setTimeout(() => $('evT').focus(), 100);
 }
-function closeEvent(){ $('evEdit').classList.remove('show'); editingId = null; }
+function closeEvent(){
+  if(typeof closeModal === 'function') closeModal($('evEdit'), () => { editingId = null; });
+  else { $('evEdit').classList.remove('show'); editingId = null; }
+}
 
 function saveEvent(){
   const title = $('evT').value.trim();
@@ -1726,10 +1732,13 @@ function openSettings(tab){
   renderSettings();
   $('settings').classList.add('show');
 }
+function closeModal(el, after){
+  el.classList.add('closing');
+  setTimeout(() => { el.classList.remove('show','closing'); if(after) after(); }, 200);
+}
 function closeSettings(){
   saveSettingsInputs();
-  $('settings').classList.remove('show');
-  build(); paint(); loadWeather(true); loadGames(false); loadNews(false);
+  closeModal($('settings'), () => { build(); paint(); loadWeather(true); loadGames(false); loadNews(false); });
 }
 function saveSettingsInputs(){
   document.querySelectorAll('#setBody [data-k]').forEach(inp => {
