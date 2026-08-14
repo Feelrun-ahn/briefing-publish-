@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080a14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<title>Briefing</title>
+</head>
+<body>
+<div id="oldBrowser">이 브라우저는 지원되지 않는 기능이 있어요. <b>Chrome</b>으로 열어 주세요.</div>
+
+<div id="root">
+  <div id="stage">
+    <div class="blob" id="b1"></div><div class="blob" id="b2"></div>
+
+    <header>
+      <div class="brandwrap">
+        <span class="dot"></span>
+        <span class="brand" id="brandLabel">MORNING</span>
+        <span class="greet" id="greeting"></span>
+      </div>
+      <div class="hactions">
+        <span class="pill acc" id="countdown"></span>
+        <button class="pill" id="allBtn" hidden>전체 보기</button>
+        <button class="pill" id="modeBtn"></button>
+        <button class="pill" id="setBtn">설정</button>
+      </div>
+    </header>
+
+    <main id="grid"></main>
+  </div>
+</div>
+
+<!-- ─────────── 온보딩 ─────────── -->
+<div class="modal" id="onboard">
+  <div class="mbox ob">
+    <div class="obsteps" id="obDots"></div>
+    <div id="obBody"></div>
+    <div class="obnav">
+      <button class="btn ghost" id="obBack">이전</button>
+      <button class="btn primary" id="obNext">다음</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── 설정 ─────────── -->
+<div class="modal" id="settings">
+  <div class="mbox set">
+    <aside class="setnav">
+      <div class="sethead">설정</div>
+      <button class="on" data-tab="general">일반</button>
+      <button data-tab="cards">카드 구성</button>
+      <button data-tab="schedule">시간</button>
+      <button data-tab="link">기기 연결</button>
+      <button data-tab="data">데이터</button>
+      <button data-tab="help">도움말</button>
+      <div class="setfoot"><span id="buildTag"></span></div>
+    </aside>
+    <section class="setbody" id="setBody"></section>
+    <button class="mclose" id="setClose">×</button>
+  </div>
+</div>
+
+<!-- ─────────── 일정 편집 ─────────── -->
+<div class="modal" id="evEdit">
+  <div class="mbox ev">
+    <div class="mtitle"><span id="evTitle">일정 추가</span><button class="mclose sm" id="evClose">×</button></div>
+    <div id="evBody"></div>
+    <div class="mfoot">
+      <button class="btn danger" id="evDelete" hidden>삭제</button>
+      <span style="flex:1"></span>
+      <button class="btn ghost" id="evCancel">취소</button>
+      <button class="btn primary" id="evSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/saju.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/core.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/cards/clock.js"></script>
+<script src="js/cards/weather.js"></script>
+<script src="js/cards/calendar.js"></script>
+<script src="js/cards/todo.js"></script>
+<script src="js/cards/exam.js"></script>
+<script src="js/cards/baseball.js"></script>
+<script src="js/cards/fortune.js"></script>
+<script src="js/cards/sleep.js"></script>
+<script src="js/cards/quote.js"></script>
+<script src="js/cards/news.js"></script>
+<script src="js/cards/habit.js"></script>
+<script src="js/cards/water.js"></script>
+<script src="js/cards/timetable.js"></script>
+<script src="js/cards/countdown.js"></script>
+<script src="js/boot.js"></script>
+</body>
+</html>
