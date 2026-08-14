@@ -59,9 +59,11 @@ header{position:relative;display:flex;align-items:center;justify-content:space-b
 main{position:relative;display:grid;gap:14px;min-height:0}
 .col{display:flex;flex-direction:column;gap:14px;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:2px}
 .col::-webkit-scrollbar{width:0}
-.card{flex:0 0 auto;border-radius:22px;border:1px solid var(--bd);background:var(--card);backdrop-filter:blur(22px);
-  padding:18px 22px;display:flex;flex-direction:column;min-height:0;animation:rise .45s ease both}
-.card.grow{flex:1 1 auto}
+.card{border-radius:22px;border:1px solid var(--bd);background:var(--card);backdrop-filter:blur(22px);
+  padding:18px 22px;display:flex;flex-direction:column;min-height:0;overflow:hidden;
+  flex:0 0 auto;animation:rise .45s ease both}
+/* 늘어나는 카드도 내용보다 작아지지 않게 (내용이 새어 아래 카드를 덮는 문제 방지) */
+.card.grow{flex:1 1 auto;min-height:min-content}
 .card.accent{border-color:var(--accBd);background:var(--cardAcc)}
 .card.violet{border-color:var(--violetBd);background:var(--violet)}
 .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px;flex:0 0 auto}
@@ -601,3 +603,69 @@ body.phone .lk-qrtxt .btn{align-self:center}
 .searchres button b{font-weight:500;font-size:14px}
 .searchres button .tiny{flex:1}
 .searchres button .km{font-size:11px;color:var(--acc);font-style:normal;white-space:nowrap}
+
+/* ═══════════ 시작 화면 (스플래시) ═══════════ */
+#splash{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:22px;background:var(--rootBg);
+  transition:opacity .5s var(--ease), visibility .5s}
+#splash.gone{opacity:0;visibility:hidden;pointer-events:none}
+.sp-mark{position:relative;width:190px;height:120px}
+/* 해: 아래에서 뿅 떠오름 */
+.sp-sun{position:absolute;left:50%;margin-left:-52px;bottom:34px;z-index:1;width:104px;height:52px;border-radius:104px 104px 0 0;
+  background:linear-gradient(180deg,#e0faf3,#6ee7d4);
+  transform:translateY(52px) scale(.7);opacity:0;
+  animation:sunRise 1.05s .25s cubic-bezier(.34,1.56,.64,1) forwards}
+.sp-sun::after{content:"";position:absolute;inset:-24px -24px 0 -24px;border-radius:120px 120px 0 0;
+  background:radial-gradient(60% 100% at 50% 100%,rgba(110,231,212,.55),transparent 70%);
+  opacity:0;animation:glowUp .9s .5s var(--easeOut) forwards}
+/* 수평선: 가운데에서 좌우로 스윽 */
+.sp-line{position:absolute;left:50%;bottom:30px;z-index:2;transform:translateX(-50%);width:0;height:6px;border-radius:6px;
+  background:linear-gradient(90deg,#6ee7d4,#8b7cf6);
+  animation:lineSweep .75s .05s var(--easeOut) forwards}
+@keyframes sunRise{
+  0%{transform:translateY(52px) scale(.7);opacity:0}
+  55%{opacity:1}
+  70%{transform:translateY(-6px) scale(1.06)}
+  100%{transform:translateY(0) scale(1);opacity:1}}
+@keyframes glowUp{to{opacity:1}}
+@keyframes lineSweep{0%{width:0}100%{width:172px}}
+.sp-name{font-size:19px;letter-spacing:.42em;color:var(--tx2);text-indent:.42em;
+  opacity:0;animation:slideUp .7s .85s var(--easeOut) forwards}
+
+/* 앱 본체: 스플래시가 걷힌 뒤 스윽 올라오며 등장 */
+#stage.entering{animation:stageIn .6s var(--easeOut) both}
+@keyframes stageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+body.phone #stage.entering{animation:stageIn .55s var(--easeOut) both}
+
+/* ═══════════ 화면 전환 애니메이션 ═══════════ */
+/* 상단바가 스윽 내려오는 느낌 */
+header{animation:barSlide .55s var(--easeOut) both}
+@keyframes barSlide{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+/* 아침↔밤 전환 시 전체가 부드럽게 */
+#stage,.card,.pill,.btn{transition:background .55s var(--ease), border-color .45s var(--ease), color .45s var(--ease)}
+/* 카드 다시 그릴 때 깜빡임 방지 — 등장 애니메이션은 최초 1회만 */
+.card.settled{animation:none}
+
+/* 달력 날짜 전환 시 날씨 카드만 살짝 */
+#wxCard.swap,.card[data-id="weather"].swap{animation:slideUp .3s var(--easeOut)}
+.wx-temp .slash{color:var(--tx3);margin:0 5px;font-weight:200}
+.wx-temp .lo2{color:var(--acc)}
+
+/* ═══════════ 수면 유도음 ═══════════ */
+.nz-kinds{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.nz{padding:10px 11px;border-radius:12px;border:1px solid var(--bd);background:var(--chip);text-align:left;
+  transition:border-color .18s var(--ease), background .18s var(--ease), transform .1s var(--ease)}
+.nz:active{transform:scale(.97)}
+.nz b{display:block;font-size:13.5px;font-weight:500}
+.nz i{font-size:10.5px;color:var(--tx3);font-style:normal}
+.nz.on{border-color:var(--accBd);background:var(--accSoft)}
+.nz.on b{color:var(--acc)}
+.nz-timer{display:flex;gap:5px;margin-top:10px}
+.nz-timer button{flex:1;padding:7px 0;border-radius:9px;border:1px solid var(--bd);background:transparent;
+  font-size:11.5px;color:var(--tx3)}
+.nz-timer button.on{border-color:var(--accBd);background:var(--accSoft);color:var(--acc)}
+.nz-vol{display:flex;align-items:center;gap:9px;margin-top:10px}
+.nz-vol input{flex:1;accent-color:var(--acc)}
+#refreshBtn{font-size:14px;line-height:1;padding:7px 12px}
+#refreshBtn.spin{animation:spin .6s var(--ease)}
+@keyframes spin{to{transform:rotate(360deg)}}
