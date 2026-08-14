@@ -1,11 +1,7 @@
-/* Briefing — 전체 스크립트 번들
-   원본은 js/ 폴더의 개별 파일이며, 업로드 편의를 위해 하나로 합친 것입니다.
-   순서: i18n → saju → core → sync → cards → boot */
+/* Briefing — 전체 스크립트 번들 */
 
 
-/* ══════════════════════════════════════════
-   js/i18n.js
-   ══════════════════════════════════════════ */
+/* ══════ js/i18n.js ══════ */
 
 /* ═══════════ 다국어 ═══════════ */
 const LANGS = [
@@ -113,9 +109,175 @@ function detectLang(){
 }
 
 
-/* ══════════════════════════════════════════
-   js/saju.js
-   ══════════════════════════════════════════ */
+/* ══════ js/qr.js ══════ */
+
+/* ═══════════ QR 코드 생성 ═══════════
+   외부 라이브러리 없이 QR Model 2를 직접 생성합니다.
+   바이트 모드 + 오류정정 레벨 M, 버전 자동 선택(1~10). */
+const QR = (function(){
+  /* 갈루아 필드 */
+  const EXP = new Array(512), LOG = new Array(256);
+  (function(){ let x = 1;
+    for(let i = 0; i < 255; i++){ EXP[i] = x; LOG[x] = i; x <<= 1; if(x & 0x100) x ^= 0x11d; }
+    for(let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  })();
+  const gmul = (a,b) => (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+
+  function rsPoly(n){
+    let p = [1];
+    for(let i = 0; i < n; i++){
+      const q = [1, EXP[i]], r = new Array(p.length + 1).fill(0);
+      for(let j = 0; j < p.length; j++)
+        for(let k = 0; k < 2; k++) r[j+k] ^= gmul(p[j], q[k]);
+      p = r;
+    }
+    return p;
+  }
+  function rsEncode(data, ecLen){
+    const gen = rsPoly(ecLen), res = new Array(ecLen).fill(0);
+    for(const d of data){
+      const f = d ^ res[0];
+      res.shift(); res.push(0);
+      if(f !== 0) for(let i = 0; i < ecLen; i++) res[i] ^= gmul(gen[i+1], f);
+    }
+    return res;
+  }
+
+  /* 버전별 (총 코드워드, EC 코드워드/블록, 블록수) — 레벨 M */
+  const VER = {
+    1:[26,10,1], 2:[44,16,1], 3:[70,26,1], 4:[100,18,2], 5:[134,24,2],
+    6:[172,16,4], 7:[196,18,4], 8:[242,22,4], 9:[292,22,5], 10:[346,26,5]
+  };
+  const ALIGN = { 1:[], 2:[6,18], 3:[6,22], 4:[6,26], 5:[6,30],
+                  6:[6,34], 7:[6,22,38], 8:[6,24,42], 9:[6,26,46], 10:[6,28,50] };
+
+  function capacity(v){ const [t,ec,b] = VER[v]; return t - ec*b; }
+
+  function make(text){
+    const bytes = new TextEncoder().encode(text);
+    let ver = 0;
+    for(let v = 1; v <= 10; v++){
+      const need = 4 + (v < 10 ? 8 : 16) + bytes.length*8;
+      if(need <= capacity(v)*8){ ver = v; break; }
+    }
+    if(!ver) return null;
+    const [total, ecLen, blocks] = VER[ver];
+    const dataLen = capacity(ver);
+
+    /* 비트 스트림 */
+    const bits = [];
+    const push = (val, len) => { for(let i = len-1; i >= 0; i--) bits.push((val >> i) & 1); };
+    push(4, 4);                                   // 바이트 모드
+    push(bytes.length, ver < 10 ? 8 : 16);
+    bytes.forEach(b => push(b, 8));
+    for(let i = 0; i < 4 && bits.length < dataLen*8; i++) bits.push(0);
+    while(bits.length % 8) bits.push(0);
+    const dw = [];
+    for(let i = 0; i < bits.length; i += 8){
+      let v = 0; for(let j = 0; j < 8; j++) v = (v << 1) | bits[i+j];
+      dw.push(v);
+    }
+    const PADS = [0xEC, 0x11]; let pi = 0;
+    while(dw.length < dataLen) dw.push(PADS[pi++ % 2]);
+
+    /* 블록 분할 + 오류정정 */
+    const per = Math.floor(dataLen / blocks), extra = dataLen % blocks;
+    const dBlocks = [], eBlocks = [];
+    let p = 0;
+    for(let i = 0; i < blocks; i++){
+      const n = per + (i >= blocks - extra ? 1 : 0);
+      const blk = dw.slice(p, p+n); p += n;
+      dBlocks.push(blk); eBlocks.push(rsEncode(blk, ecLen));
+    }
+    const finalDW = [];
+    const maxD = Math.max(...dBlocks.map(b => b.length));
+    for(let i = 0; i < maxD; i++) dBlocks.forEach(b => { if(i < b.length) finalDW.push(b[i]); });
+    for(let i = 0; i < ecLen; i++) eBlocks.forEach(b => finalDW.push(b[i]));
+
+    /* 모듈 배치 */
+    const size = ver*4 + 17;
+    const m = Array.from({length:size}, () => new Array(size).fill(null));
+    const setF = (r,c,v) => { if(r >= 0 && r < size && c >= 0 && c < size) m[r][c] = v; };
+
+    const finder = (r,c) => {
+      for(let i = -1; i <= 7; i++) for(let j = -1; j <= 7; j++){
+        const on = (i >= 0 && i <= 6 && (j === 0 || j === 6)) ||
+                   (j >= 0 && j <= 6 && (i === 0 || i === 6)) ||
+                   (i >= 2 && i <= 4 && j >= 2 && j <= 4);
+        setF(r+i, c+j, on ? 1 : 0);
+      }
+    };
+    finder(0,0); finder(0,size-7); finder(size-7,0);
+    for(let i = 8; i < size-8; i++){ m[6][i] = i % 2 === 0 ? 1 : 0; m[i][6] = i % 2 === 0 ? 1 : 0; }
+    const al = ALIGN[ver];
+    for(const r of al) for(const c of al){
+      if((r <= 8 && c <= 8) || (r <= 8 && c >= size-9) || (r >= size-9 && c <= 8)) continue;
+      for(let i = -2; i <= 2; i++) for(let j = -2; j <= 2; j++)
+        m[r+i][c+j] = (Math.abs(i) === 2 || Math.abs(j) === 2 || (i === 0 && j === 0)) ? 1 : 0;
+    }
+    m[size-8][8] = 1;                              // 다크 모듈
+    for(let i = 0; i < 9; i++){                    // 포맷 자리 예약
+      if(m[8][i] === null) m[8][i] = 0;
+      if(m[i][8] === null) m[i][8] = 0;
+    }
+    for(let i = 0; i < 8; i++){
+      if(m[8][size-1-i] === null) m[8][size-1-i] = 0;
+      if(m[size-1-i][8] === null) m[size-1-i][8] = 0;
+    }
+
+    /* 데이터 채우기 (마스크 0) */
+    const reserved = m.map(row => row.map(v => v !== null));
+    let bi = 0, up = true;
+    const allBits = [];
+    finalDW.forEach(d => { for(let i = 7; i >= 0; i--) allBits.push((d >> i) & 1); });
+    for(let col = size-1; col > 0; col -= 2){
+      if(col === 6) col--;
+      for(let k = 0; k < size; k++){
+        const row = up ? size-1-k : k;
+        for(let c = 0; c < 2; c++){
+          const cc = col - c;
+          if(reserved[row][cc]) continue;
+          let b = bi < allBits.length ? allBits[bi++] : 0;
+          if((row + cc) % 2 === 0) b ^= 1;         // 마스크 0
+          m[row][cc] = b;
+        }
+      }
+      up = !up;
+    }
+
+    /* 포맷 정보 (레벨 M = 00, 마스크 0) */
+    let fmt = 0b00 << 3 | 0;
+    let d = fmt << 10, g = 0b10100110111;
+    for(let i = 4; i >= 0; i--) if(d & (1 << (i+10))) d ^= g << i;
+    let bitsF = ((fmt << 10) | d) ^ 0b101010000010010;
+    const put = (r,c,v) => { m[r][c] = v; };
+    for(let i = 0; i <= 5; i++) put(8, i, (bitsF >> i) & 1);
+    put(8, 7, (bitsF >> 6) & 1); put(8, 8, (bitsF >> 7) & 1); put(7, 8, (bitsF >> 8) & 1);
+    for(let i = 9; i <= 14; i++) put(14 - i, 8, (bitsF >> i) & 1);
+    for(let i = 0; i <= 7; i++) put(size-1-i, 8, (bitsF >> i) & 1);
+    for(let i = 8; i <= 14; i++) put(8, size-15+i, (bitsF >> i) & 1);
+    m[size-8][8] = 1;
+
+    return { size, modules: m };
+  }
+
+  /* SVG 문자열로 반환 */
+  function svg(text, px){
+    const q = make(text);
+    if(!q) return '';
+    const n = q.size, pad = 2, total = n + pad*2, s = (px || 200) / total;
+    let path = '';
+    for(let r = 0; r < n; r++) for(let c = 0; c < n; c++)
+      if(q.modules[r][c]) path += `M${(c+pad)*s},${(r+pad)*s}h${s}v${s}h${-s}z`;
+    return `<svg viewBox="0 0 ${px||200} ${px||200}" width="${px||200}" height="${px||200}" xmlns="http://www.w3.org/2000/svg">`
+      + `<rect width="100%" height="100%" fill="#fff" rx="${s*2}"/>`
+      + `<path d="${path}" fill="#0b0e18"/></svg>`;
+  }
+  return { make, svg };
+})();
+
+
+/* ══════ js/saju.js ══════ */
 
 /* 명리(사주) 엔진 — 절기표는 태양 황경 계산으로 산출(2000~2050, KST) */
 const TERMS={2000:'042136051537042027051346051757070413071401071655080832071142072243060956',2001:'040326052127050217051936052346071002071949072244081422071732070433051547',2002:'040916060317050805060124060533071549080137080432082010072321071023052136',2003:'041504060905051353060711061121072136080724081019090157080509071612060325',2004:'042053051453041941051258051707070322071310071606080744071056072200060914',2005:'040241052041050128051845052253070909071857072152081331071643070348051502',2006:'040828060228050715060031060439071454080042080338081918072230070935052049',2007:'041415060815051301060617061025072040080628080924090104080417071523060237',2008:'042003051402041848051203051611070225071214071510080651071004072110060824',2009:'040150051949050035051750052157070812071800072057081238071552070257051412',2010:'040739060137050623052337060344071359072348080245081826072141070846052000',2011:'041328060726051211060525060932071946080535080833090015080330071435060150',2012:'041918051316041800051114051521070135071124071422080605070920072024060739',2013:'040108051906042350051704052110070724071714072012081155071511070215051330',2014:'040659060057050541052254060300071314072304080202081746072102070806051921',2015:'041251060649051132060445060850071905080454080753082337080253071357060113',2016:'041843051240041723051036051441070055071045071344080528070845071949060705',2017:'040034051832042314051626052031070645071635071934081119071436070141051256',2018:'040626060023050505052217060221071235072224080124081709072027070732051848',2019:'041217060613051055060406060810071824080413080713082259080217071323060039',2020:'041807051203041644050955051359070012071002071302080447070806071913060629',2021:'032356051752042233051543051946070559071549071849081035071354070102051219',2022:'040545052340050420052130060133071146072136080036081623071942070651051807',2023:'041133060528051008060317060719071732080322080623082210080129071239052355',2024:'041720051115041554050903051305062318070908071209080356070716071827060543',2025:'032307051702042141051449051851070503071453071755080942071303070014051130',2026:'040455052249050327052035060036071049072039072341081529071850070601051718',2027:'041042060436050914060222060622071635080225080527082116080037071148052305',2028:'041630051024041501050808051209062221070812071114080304070625071736060453',2029:'032219051612042049051356051756070408071359071702080852071214062325051042',2030:'040408052201050238051945052345070957071947072251081441071804070514051631',2031:'040958060351050828060134060534071545080136080440082031072354071104052222',2032:'041549050942041418050724051123062135070726071030080221070545071655060412',2033:'032140051533042009051314051713070325071316071621080812071136062246051004',2034:'040332052124050200051905052304070915071907072211081403071728070437051556',2035:'040924060316050751060056060454071506080057080402081954072319071029052147',2036:'041516050907041342050646051044062056070647070952080145070510071621060339',2037:'032107051458041933051236051634070245071237071542080735071100062212050930',2038:'040257052048050122051825052223070834071825072131081324071650070403051521',2039:'040847060238050711060014060411071422080013080319081913072239070952052111',2040:'041436050827041300050602050958062009070600070906080100070427071542060300',2041:'032024051415041847051149051545070155071147071453080647071015062130050849',2042:'040212052002050034051735052131070741071733072039081234071602070318051437',2043:'040800060149050621052321060317071327072318080225081820072148070905052024',2044:'041347050736041207050507050902061912070504070811080007070335071452060211',2045:'031934051323041754051053051448070058071050071357080553070922062040050759',2046:'040122051910042341051640052034070644071636071944081141071510070227051346',2047:'040710060058050528052227060221071231072223080131081729072058070815051935',2048:'041259050647041117050415050809061818070411070719072317070248071404060124',2049:'031849051236041706051004051357070007070959071308080507070837061953050713',2050:'040039051827042256051553051947070556071549071858081057071428070144051304'};
@@ -252,9 +414,7 @@ function fortune(birth,btime,dateObj){
 }
 
 
-/* ══════════════════════════════════════════
-   js/core.js
-   ══════════════════════════════════════════ */
+/* ══════ js/core.js ══════ */
 
 /* ═══════════ 코어 ═══════════ */
 const BUILD = 'v1.0.0 · 2026-08-14';
@@ -289,7 +449,7 @@ const DEFAULTS = {
   news:null, newsAt:0, newsTopics:['NATION','WORLD','SCIENCE'],
   habits:[], habitLog:{}, waterGoal:8, waterLog:{}, timetable:{},
   sync:{ on:false, uid:'', code:'', at:0 },
-  wx:null, phoneAll:false, day:''
+  wx:null, phoneAll:true, day:''
 };
 let C = JSON.parse(JSON.stringify(DEFAULTS));
 let save = function(){ Store.save(C); };
@@ -509,9 +669,7 @@ function rollover(){
 }
 
 
-/* ══════════════════════════════════════════
-   js/sync.js
-   ══════════════════════════════════════════ */
+/* ══════ js/sync.js ══════ */
 
 /* ═══════════ 기기 연결 ═══════════
    같은 계정 공간을 두 기기가 공유합니다.
@@ -654,9 +812,7 @@ const _save = save;
 save = function(){ _save(); syncSoon(); };
 
 
-/* ══════════════════════════════════════════
-   js/cards/clock.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/clock.js ══════ */
 
 /* 시계 · 날짜 · D-day */
 Cards.register({
@@ -682,9 +838,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/weather.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/weather.js ══════ */
 
 /* 날씨 — Open-Meteo (키 불필요, 상업적 이용 허용 / 출처 표기) */
 const WICON = c => c===0?'☀':c<=2?'⛅':c===3?'☁':c<=48?'≡':c<=67?'☂':c<=77?'❄':c<=82?'☂':'⚡';
@@ -819,9 +973,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/calendar.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/calendar.js ══════ */
 
 /* 달력 — 월 격자 + 일정 추가/편집/반복 */
 let calYM = null;        // {y,m} 보고 있는 달
@@ -986,9 +1138,7 @@ function saveEvent(){
 }
 
 
-/* ══════════════════════════════════════════
-   js/cards/todo.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/todo.js ══════ */
 
 /* 할 일 — 오늘 / 내일 탭 */
 let todoTab = 'todos';
@@ -1039,9 +1189,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/exam.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/exam.js ══════ */
 
 /* 수행평가 — 달력의 '수행평가' 종류 일정을 모아 보여줌 */
 Cards.register({
@@ -1070,9 +1218,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/baseball.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/baseball.js ══════ */
 
 /* 야구 — TheSportsDB 공개 API (KBO 리그 id 4830)
    크라우드소싱 개방형 스포츠 DB. 무료 키로 정식 이용.
@@ -1217,9 +1363,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/news.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/news.js ══════ */
 
 /* 뉴스 — 구글 뉴스 토픽 RSS (제목·출처·링크만, 본문 저장 안 함) */
 const NEWS_TOPICS = [
@@ -1280,9 +1424,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/fortune.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/fortune.js ══════ */
 
 /* 오늘의 운세 — 사주 명리 계산 (외부 통신 없음) */
 Cards.register({
@@ -1332,9 +1474,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/sleep.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/sleep.js ══════ */
 
 /* 수면 점수 (수동 기록) */
 Cards.register({
@@ -1396,9 +1536,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/quote.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/quote.js ══════ */
 
 /* 오늘의 한마디 */
 const Q_DAY = [
@@ -1428,9 +1566,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/habit.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/habit.js ══════ */
 
 /* 루틴 — 매일 반복하는 습관 체크 */
 const DEFAULT_HABITS = ['물 한 잔','스트레칭','가방 확인'];
@@ -1482,9 +1618,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/water.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/water.js ══════ */
 
 /* 물 마시기 */
 Cards.register({
@@ -1521,9 +1655,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/timetable.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/timetable.js ══════ */
 
 /* 시간표 — 요일별 과목 */
 Cards.register({
@@ -1554,9 +1686,7 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/cards/countdown.js
-   ══════════════════════════════════════════ */
+/* ══════ js/cards/countdown.js ══════ */
 
 /* 큰 D-day — 가장 가까운 하나를 크게 */
 Cards.register({
@@ -1576,11 +1706,16 @@ Cards.register({
 });
 
 
-/* ══════════════════════════════════════════
-   js/boot.js
-   ══════════════════════════════════════════ */
+/* ══════ js/boot.js ══════ */
 
 const FEEDBACK_EMAIL = 'feelrun.ahn@gmail.com';   // 배포 전 확인
+const APP_PKG   = 'io.github.feelrun.briefing';   // 배포 시 확정
+const APP_STORE = 'https://play.google.com/store/apps/details?id=' + APP_PKG;
+const APP_WEB   = location.origin + location.pathname;   // 웹으로 여는 주소
+/* 앱이 깔려 있으면 앱으로, 없으면 스토어로 보내는 링크 */
+function joinLink(code){
+  return APP_WEB + '?join=' + encodeURIComponent(code);
+}
 
 /* ═══════════ 설정 ═══════════ */
 let setTab = 'general';
@@ -1631,7 +1766,7 @@ function renderSettings(){
       <div class="fld"><input id="geoQ" placeholder="도시 이름으로 검색 (예: 목동, 대구, Seoul)">
         <div class="searchres" id="geoRes"></div></div>
       <button class="btn" id="geoBtn">현재 위치로 맞추기</button>`;
-    bindGeo();
+    bindGeo(B);
     const ls = B.querySelector('#langSel');
     if(ls) ls.onchange = () => { C.lang = ls.value; save(); build(); paint(); renderSettings(); };
   }
@@ -1729,8 +1864,8 @@ function renderSettings(){
       <h3 class="sectitle">기기 연결</h3>
       <p class="sechelp">태블릿과 휴대폰이 같은 일정·할 일을 보게 합니다.<br>
         연결되는 정보: 달력 일정, 할 일, 루틴, 시간표, 카드 구성. 날씨와 운세는 기기마다 따로 계산됩니다.</p>
-      <div id="linkBoxSet"></div>`;
-    renderLinkBox(B.querySelector('#linkBoxSet'));
+      <div class="linkbox"></div>`;
+    renderLinkBox(B.querySelector('.linkbox'));
   }
   else if(setTab === 'help'){
     B.innerHTML = `
@@ -1836,38 +1971,97 @@ function renderSettings(){
 }
 
 /* 지역 검색 (Open-Meteo 지오코딩, 키 불필요) */
-function bindGeo(){
-  const q = $('geoQ'), res = $('geoRes');
-  let t = null;
+function bindGeo(root){
+  const R = root || document;
+  const q = R.querySelector('#geoQ'), res = R.querySelector('#geoRes');
+  if(!q || !res) return;
+  let t = null, myPos = null;
+
+  /* 두 좌표 사이 거리(km) */
+  const dist = (a,b,c,d) => {
+    const R = 6371, rad = x => x*Math.PI/180;
+    const dLat = rad(c-a), dLon = rad(d-b);
+    const h = Math.sin(dLat/2)**2 + Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dLon/2)**2;
+    return 2*R*Math.asin(Math.sqrt(h));
+  };
+  const fmtKm = k => k < 1 ? '바로 여기' : k < 100 ? Math.round(k)+'km' : Math.round(k/10)*10+'km';
+
+  /* 기준 좌표: 기기 위치 > 저장된 지역 */
+  const baseLL = () => myPos || [C.lat, C.lon];
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      p => { myPos = [p.coords.latitude, p.coords.longitude]; },
+      () => {}, { enableHighAccuracy:false, timeout:8000, maximumAge:600000 });
+  }
+
+  async function search(v){
+    const url = n => `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(n)}&count=20&language=ko&format=json`;
+    let list = [];
+    try{ list = ((await (await fetch(url(v))).json()).results) || []; }catch(e){}
+    /* 결과가 적으면 '동/구/시'를 붙여 한 번 더 (예: 목동 → 목1동) */
+    if(list.length < 3 && !/[동구시군읍면]$/.test(v)){
+      for(const suf of ['동','시','구']){
+        try{
+          const more = ((await (await fetch(url(v+suf))).json()).results) || [];
+          list = list.concat(more);
+          if(list.length >= 6) break;
+        }catch(e){}
+      }
+    }
+    /* 중복 제거 */
+    const seen = {};
+    list = list.filter(r => { const k = r.latitude.toFixed(3)+','+r.longitude.toFixed(3);
+      return seen[k] ? false : (seen[k] = 1); });
+    /* 한국 먼저, 그 안에서 가까운 순 */
+    const [bx, by] = baseLL();
+    list.forEach(r => { r._d = dist(bx, by, r.latitude, r.longitude);
+      r._kr = (r.country_code === 'KR' || r.country === '대한민국') ? 0 : 1; });
+    list.sort((a,b) => a._kr - b._kr || a._d - b._d);
+    return list.slice(0, 8);
+  }
+
   q.addEventListener('input', () => {
     clearTimeout(t);
     const v = q.value.trim();
     if(v.length < 2){ res.innerHTML = ''; return; }
+    res.innerHTML = '<span class="hint">찾는 중…</span>';
     t = setTimeout(async () => {
-      try{
-        const j = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=ko&format=json`)).json();
-        res.innerHTML = (j.results||[]).map(r =>
-          `<button data-lat="${r.latitude}" data-lon="${r.longitude}" data-nm="${esc(r.name)}">
-            ${esc(r.name)} <span class="tiny">${esc([r.admin1, r.country].filter(Boolean).join(' · '))}</span></button>`).join('')
-          || '<span class="hint">결과가 없습니다.</span>';
-      }catch(e){ res.innerHTML = '<span class="hint">검색에 실패했습니다.</span>'; }
+      const list = await search(v);
+      res.innerHTML = list.length ? list.map(r => {
+        const where = [r.admin2, r.admin1].filter(Boolean).join(' ') || r.country || '';
+        return `<button data-lat="${r.latitude}" data-lon="${r.longitude}" data-nm="${esc(r.name)}">
+          <b>${esc(r.name)}</b>
+          <span class="tiny">${esc(where)}</span>
+          <i class="km">${fmtKm(r._d)}</i></button>`;
+      }).join('') : '<span class="hint">결과가 없습니다. 가까운 동네나 구 이름으로 검색해 보세요.</span>';
     }, 350);
   });
+
   res.onclick = e => {
-    const b = e.target.closest('[data-lat]'); if(!b) return;
-    C.place = b.dataset.nm; C.lat = +b.dataset.lat; C.lon = +b.dataset.lon;
-    save(); C.wx = null; renderSettings(); loadWeather(true);
+    const btn = e.target.closest('[data-lat]'); if(!btn) return;
+    C.place = btn.dataset.nm; C.lat = +btn.dataset.lat; C.lon = +btn.dataset.lon;
+    C.wx = null; save();
+    const p = R.querySelector('#obPlace'); if(p) p.textContent = C.place;
+    if($('setBody') && $('setBody').contains(res)) renderSettings();
+    else { res.innerHTML = `<span class="hint">선택: <b>${esc(C.place)}</b></span>`; }
+    loadWeather(true);
   };
-  $('geoBtn').onclick = () => {
+
+  const gb = R.querySelector('#geoBtn');
+  if(gb) gb.onclick = () => {
     if(!navigator.geolocation) return alert('이 기기에서는 위치를 쓸 수 없어요.');
-    $('geoBtn').textContent = '찾는 중…';
+    gb.textContent = '찾는 중…';
     const ok = p => {
+      myPos = [p.coords.latitude, p.coords.longitude];
       C.lat = +p.coords.latitude.toFixed(4); C.lon = +p.coords.longitude.toFixed(4);
-      C.wx = null; save(); renderSettings(); loadWeather(true);
+      C.wx = null; save();
+      gb.textContent = '현재 위치로 맞췄어요';
+      const pl = R.querySelector('#obPlace'); if(pl) pl.textContent = C.place || '현재 위치';
+      loadWeather(true);
     };
     navigator.geolocation.getCurrentPosition(ok,
       () => navigator.geolocation.getCurrentPosition(ok,
-        () => { $('geoBtn').textContent = '위치를 찾지 못했어요 · 다시 시도'; },
+        () => { gb.textContent = '위치를 찾지 못했어요 · 다시 시도'; },
         { enableHighAccuracy:true, timeout:30000, maximumAge:3600000 }),
       { enableHighAccuracy:false, timeout:15000, maximumAge:3600000 });
   };
@@ -1919,7 +2113,7 @@ function renderOnboard(){
         <div class="searchres" id="geoRes"></div></div>
       <div class="fld"><span class="hint">지금 선택: <b id="obPlace">${esc(C.place)}</b></span></div>
       <button class="btn" id="geoBtn">현재 위치로 맞추기</button>`;
-    bindGeo();
+    bindGeo(B);
   }
   else if(obStep === 4){
     B.innerHTML = `<h2>어떤 카드를 볼까요?</h2>
@@ -1938,8 +2132,8 @@ function renderOnboard(){
   else {
     B.innerHTML = `<h2>다른 기기와 연결</h2>
       <p class="lead">태블릿에서 적은 일정과 할 일을 휴대폰에서도 볼 수 있어요.<br>지금 안 해도 되고, 나중에 설정에서 할 수 있어요.</p>
-      <div id="linkBox"></div>`;
-    renderLinkBox($('linkBox'));
+      <div class="linkbox"></div>`;
+    renderLinkBox(B.querySelector('.linkbox'));
   }
 }
 function obCollect(){
@@ -1949,73 +2143,135 @@ function obCollect(){
   save();
 }
 
-/* ── 기기 연결 UI (온보딩·설정 공용) ── */
+/* ── 기기 연결 UI (온보딩·설정 공용) ──
+   같은 화면이 두 곳에 들어가므로 id 대신 클래스를 쓰고 box 안에서만 찾는다 */
 function renderLinkBox(box){
   if(!box) return;
+  const q = s => box.querySelector(s);
   const linked = C.sync && C.sync.on && C.sync.uid;
+
   if(linked){
+    const url = joinLink(C.sync.code || '');
     box.innerHTML = `
       <div class="lk-done">
-        <div class="lk-code">${esc(C.sync.code||'연결됨')}</div>
-        <p class="hint">이 기기는 연결되어 있어요. 다른 기기에서 위 코드를 넣으면 같은 내용을 보게 됩니다.</p>
-        <div class="lk-btns">
-          <button class="btn" id="lkSync">지금 맞추기</button>
-          <button class="btn danger" id="lkOff">연결 해제</button>
+        <div class="lk-share">
+          ${C.sync.code ? `<div class="lk-qr">${QR.svg(url, 150)}</div>` : ''}
+          <div class="lk-qrtxt">
+            <span class="lb">연결됨</span>
+            <div class="lk-code sm">${esc(C.sync.code || '연결됨')}</div>
+            <p class="hint">다른 기기에서 이 QR을 찍거나 코드를 넣으면 같은 내용을 봅니다.</p>
+          </div>
         </div>
+        <div class="lk-btns">
+          <button class="btn lk-sync">지금 맞추기</button>
+          <button class="btn danger lk-off">연결 해제</button>
+        </div>
+        <div class="lk-msg"></div>
       </div>`;
-    box.querySelector('#lkSync').onclick = async () => { await syncPull(true); await syncPush(true); renderLinkBox(box); };
-    box.querySelector('#lkOff').onclick = () => { if(confirm('연결을 해제할까요? 이 기기의 내용은 그대로 남습니다.')){ syncOff(); renderLinkBox(box); } };
+    q('.lk-sync').onclick = async () => {
+      q('.lk-msg').textContent = '맞추는 중…';
+      await syncPull(true); await syncPush(true);
+      q('.lk-msg').textContent = '최신 상태로 맞췄어요.';
+      paint();
+    };
+    q('.lk-off').onclick = () => {
+      if(confirm('연결을 해제할까요? 이 기기의 내용은 그대로 남습니다.')){ syncOff(); renderLinkBox(box); }
+    };
     return;
   }
+
   box.innerHTML = `
     <div class="lk-two">
-      <button class="lk-card" id="lkNew">
+      <button class="lk-card lk-new">
         <b>이 기기가 주 화면이에요</b>
-        <i>연결 코드를 만들어 다른 기기에 알려줍니다</i>
+        <i>QR과 연결 코드를 만들어 다른 기기에 보여줍니다</i>
       </button>
-      <button class="lk-card" id="lkJoin">
+      <button class="lk-card lk-join">
         <b>다른 기기에서 코드를 받았어요</b>
         <i>코드를 넣어 같은 내용을 봅니다</i>
       </button>
     </div>
-    <div id="lkPanel"></div>`;
-  box.querySelector('#lkNew').onclick = async () => {
-    const P = box.querySelector('#lkPanel');
+    <div class="lk-panel"></div>`;
+
+  q('.lk-new').onclick = async () => {
+    const P = q('.lk-panel');
     P.innerHTML = `<div class="lk-load">코드를 만드는 중…</div>`;
     try{
       const code = await syncCreate();
+      const url = joinLink(code);
       P.innerHTML = `
         <div class="lk-done">
-          <div class="lk-code">${code}</div>
-          <p class="hint">휴대폰에서 이 앱을 열고 <b>설정 → 기기 연결</b>에서 이 코드를 넣으세요.<br>
-            코드는 설정에서 다시 볼 수 있어요.</p>
+          <div class="lk-share">
+            <div class="lk-qr">${QR.svg(url, 160)}</div>
+            <div class="lk-qrtxt">
+              <span class="lb">휴대폰 카메라로 찍으세요</span>
+              <div class="lk-code sm">${code}</div>
+              <p class="hint">찍으면 바로 연결됩니다.<br>
+                카메라가 안 되면 휴대폰에서 <b>설정 → 기기 연결</b>에 이 코드를 넣어도 돼요.</p>
+              <button class="btn lk-copy">링크 복사</button>
+            </div>
+          </div>
         </div>`;
+      P.querySelector('.lk-copy').onclick = async ev => {
+        try{ await navigator.clipboard.writeText(url); ev.target.textContent = '복사했어요'; }
+        catch(e){ ev.target.textContent = url; }
+      };
     }catch(e){
-      P.innerHTML = `<div class="lk-err">${esc(e.message||'연결을 준비하지 못했습니다')}<br>
+      P.innerHTML = `<div class="lk-err">${esc(e.message || '연결을 준비하지 못했습니다')}<br>
         <span class="hint">인터넷 연결을 확인하고 다시 시도해 주세요.</span></div>`;
     }
   };
-  box.querySelector('#lkJoin').onclick = () => {
-    const P = box.querySelector('#lkPanel');
+
+  q('.lk-join').onclick = () => {
+    const P = q('.lk-panel');
     P.innerHTML = `
       <div class="fld"><label>연결 코드 6자리</label>
-        <input id="lkIn" class="lk-input" maxlength="6" placeholder="ABC123" autocapitalize="characters"></div>
-      <button class="btn primary" id="lkGo">연결하기</button>
-      <div class="lk-msg" id="lkMsg"></div>`;
+        <input class="lk-input lk-in" maxlength="6" placeholder="ABC123" autocapitalize="characters"></div>
+      <button class="btn primary lk-go">연결하기</button>
+      <div class="lk-msg"></div>`;
     const go = async () => {
-      const v = P.querySelector('#lkIn').value.trim();
-      if(v.length < 6){ P.querySelector('#lkMsg').textContent = '6자리를 모두 넣어 주세요.'; return; }
-      P.querySelector('#lkMsg').textContent = '연결하는 중…';
-      try{ await syncJoin(v); renderLinkBox(box); paint(); }
-      catch(e){ P.querySelector('#lkMsg').textContent = e.message || '연결에 실패했습니다'; }
+      const v = P.querySelector('.lk-in').value.trim();
+      if(v.length < 6){ P.querySelector('.lk-msg').textContent = '6자리를 모두 넣어 주세요.'; return; }
+      P.querySelector('.lk-msg').textContent = '연결하는 중…';
+      try{ await syncJoin(v); renderLinkBox(box); build(); paint(); }
+      catch(e){ P.querySelector('.lk-msg').textContent = e.message || '연결에 실패했습니다'; }
     };
-    P.querySelector('#lkGo').onclick = go;
-    P.querySelector('#lkIn').addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
-    P.querySelector('#lkIn').focus();
+    P.querySelector('.lk-go').onclick = go;
+    P.querySelector('.lk-in').addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
+    P.querySelector('.lk-in').focus();
   };
 }
 
 /* ═══════════ 부팅 ═══════════ */
+/* 링크·QR로 들어온 경우: ?join=코드 */
+async function handleJoinLink(){
+  const m = location.search.match(/[?&]join=([A-Za-z0-9]{6})/);
+  if(!m) return false;
+  const code = m[1].toUpperCase();
+  history.replaceState(null, '', location.pathname);
+  $('onboard').classList.remove('show');
+  const box = $('joinAuto');
+  box.innerHTML = `<div class="mbox ob"><div class="ob-hero">
+      <div class="ob-mark"><i></i></div>
+      <h2>기기 연결 중</h2>
+      <p class="lead">코드 <b>${code}</b> 로 연결하고 있어요…</p>
+      <div class="lk-msg" id="jaMsg"></div>
+    </div></div>`;
+  box.classList.add('show');
+  try{
+    await syncJoin(code);
+    C.onboarded = true; save();
+    box.querySelector('h2').textContent = '연결됐어요';
+    box.querySelector('.lead').innerHTML = '이제 두 기기가 같은 일정과 할 일을 봅니다.';
+    setTimeout(() => { box.classList.remove('show'); build(); paint(); }, 1400);
+  }catch(e){
+    box.querySelector('h2').textContent = '연결하지 못했어요';
+    box.querySelector('.lead').textContent = e.message || '코드를 다시 확인해 주세요.';
+    box.querySelector('#jaMsg').innerHTML = `<button class="btn primary" onclick="document.getElementById('joinAuto').classList.remove('show')">닫기</button>`;
+  }
+  return true;
+}
+
 async function boot(){
   const saved = await Store.load();
   if(saved) C = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), saved);
@@ -2030,7 +2286,8 @@ async function boot(){
   loadGames(false);
   loadNews(false);
 
-  if(!C.onboarded){ obStep = 0; renderOnboard(); $('onboard').classList.add('show'); }
+  const joined = await handleJoinLink();
+  if(!C.onboarded && !joined){ obStep = 0; renderOnboard(); $('onboard').classList.add('show'); }
 
   setInterval(() => {
     now = new Date();
