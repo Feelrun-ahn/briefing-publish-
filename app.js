@@ -448,6 +448,7 @@ const DEFAULTS = {
   teamId:'', sdbKey:'', games:[], gamesAt:0, gamesErr:null,
   news:null, newsAt:0, newsTopics:['NATION','WORLD','SCIENCE'],
   habits:[], habitLog:{}, waterGoal:8, waterLog:{}, timetable:{},
+  nzMin:30, nzVol:45, seenSplash:false,
   sync:{ on:false, uid:'', code:'', at:0 },
   wx:null, phoneAll:true, day:''
 };
@@ -574,6 +575,7 @@ function build(){
     cols[t].w += WEIGHT[c.size] || 2;
     c._el = art;
     if(c.init) c.init(art);
+    setTimeout(() => art.classList.add('settled'), 700 + idx*40);
   });
   cols.forEach(c => grid.appendChild(c.node));
 }
@@ -869,8 +871,8 @@ async function loadWeather(force){
     const u1 = `https://api.open-meteo.com/v1/forecast?latitude=${C.lat}&longitude=${C.lon}`
       + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code`
       + `&hourly=temperature_2m,weather_code,precipitation_probability`
-      + `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,uv_index_max,sunrise,sunset`
-      + `&timezone=Asia%2FSeoul&forecast_days=2`;
+      + `&daily=time,temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,uv_index_max,sunrise,sunset`
+      + `&timezone=Asia%2FSeoul&forecast_days=7`;
     const u2 = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${C.lat}&longitude=${C.lon}`
       + `&current=pm10,pm2_5&timezone=Asia%2FSeoul`;
     const j = await (await fetch(u1)).json();
@@ -896,7 +898,18 @@ async function loadWeather(force){
         rain: j.daily.precipitation_probability_max[di], uv: Math.round(j.daily.uv_index_max[di]),
         sunrise: (j.daily.sunrise[di]||'').slice(11), sunset: (j.daily.sunset[di]||'').slice(11) };
     };
-    C.wx = { date: today(), at: Date.now(), live:true, today: build(0), tomorrow: build(1) };
+    C.wx = { date: today(), at: Date.now(), live:true, today: build(0), tomorrow: build(1), days:{} };
+    /* 날짜별 예보를 담아 달력에서 고른 날의 날씨를 보여준다 */
+    for(let i = 0; i < 7; i++){
+      const d = j.daily.time && j.daily.time[i];
+      if(d) C.wx.days[d] = {
+        hi: Math.round(j.daily.temperature_2m_max[i]), lo: Math.round(j.daily.temperature_2m_min[i]),
+        code: j.daily.weather_code[i], rain: j.daily.precipitation_probability_max[i],
+        sunrise: (j.daily.sunrise[i]||'').slice(11), sunset: (j.daily.sunset[i]||'').slice(11),
+        uv: Math.round(j.daily.uv_index_max[i]),
+        wetH: build(i).wetH, hourly: build(i).hourly
+      };
+    }
     try{
       const a = await (await fetch(u2)).json();
       C.wx.air = { pm10: Math.round(a.current.pm10), pm25: Math.round(a.current.pm2_5) };
@@ -928,8 +941,25 @@ Cards.register({
     el.querySelector('#wxSrc').onclick = () => loadWeather(true);
   },
   render(el){
-    const w = C.wx && C.wx.today;
-    el.querySelector('#wxLab').textContent = (C.place || '내 지역') + ' · 오늘';
+    /* 달력에서 고른 날짜가 오늘이 아니면 그날 예보를 보여준다 */
+    const sel = (typeof calSel === 'string') ? calSel : today();
+    const isToday = sel === today();
+    const dayData = (C.wx && C.wx.days && C.wx.days[sel]) || null;
+    const w = isToday ? (C.wx && C.wx.today) : dayData;
+
+    const md = sel.slice(5).replace('-','월 ') + '일';
+    el.querySelector('#wxLab').textContent = (C.place || '내 지역') + ' · ' + (isToday ? '오늘' : md);
+
+    if(!isToday && !dayData){
+      el.querySelector('.wx-main').hidden = true;
+      el.querySelector('#wxStats').hidden = true;
+      el.querySelector('#wxTmrw').hidden = true;
+      el.querySelector('#wxHourly').hidden = true;
+      el.querySelector('#wxSrc').textContent = '';
+      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${md} 날씨 정보 없음<br>
+        <span class="tiny">예보는 오늘부터 7일까지만 제공돼요.</span></span>`;
+      return;
+    }
     el.querySelector('.wx-main').hidden = !w;
     el.querySelector('#wxStats').hidden = !w;
     el.querySelector('#wxTmrw').hidden = !w;
@@ -942,11 +972,18 @@ Cards.register({
     el.querySelector('#wxSrc').textContent = (C.wx.stale ? '이전 기록' : 'Open-Meteo') + ' · 눌러서 새로고침';
     el.querySelector('#wxIcon').textContent = WICON(w.code);
     el.querySelector('#wxDesc').textContent = WDESC(w.code);
-    el.querySelector('#wxTemp').innerHTML = `${w.temp}°`;
-    el.querySelector('#wxS1').textContent = `체감 ${w.feels}°`;
-    el.querySelector('#wxS2').textContent = `최고 ${w.hi}° / 최저 ${w.lo}°`;
+    if(isToday){
+      el.querySelector('#wxTemp').innerHTML = `${w.temp}°`;
+      el.querySelector('#wxS1').textContent = `체감 ${w.feels}°`;
+      el.querySelector('#wxS2').textContent = `최고 ${w.hi}° / 최저 ${w.lo}°`;
+    } else {
+      el.querySelector('#wxTemp').innerHTML = `<span class="lo2">${w.lo}°</span><span class="slash">/</span>${w.hi}°`;
+      el.querySelector('#wxS1').textContent = '최저 / 최고';
+      el.querySelector('#wxS2').textContent = `강수확률 ${w.rain != null ? w.rain : '—'}%`;
+    }
 
-    const air = (C.wx && C.wx.air) || {};
+    el.querySelector('#wxTmrw').hidden = !isToday;
+    const air = isToday ? ((C.wx && C.wx.air) || {}) : {};
     const st = [];
     if(air.pm10 != null){ const g = pmGrade(air.pm10,false); st.push(['미세먼지', air.pm10+' '+g[0], g[1]]); }
     if(air.pm25 != null){ const g = pmGrade(air.pm25,true); st.push(['초미세먼지', air.pm25+' '+g[0], g[1]]); }
@@ -1019,7 +1056,10 @@ Cards.register({
     };
     el.querySelector('#calGrid').onclick = e => {
       const c = e.target.closest('[data-d]'); if(!c) return;
-      calSel = c.dataset.d; paint();
+      calSel = c.dataset.d;
+      /* 화면 전체를 다시 그리지 않고 달력과 날씨만 갱신 */
+      const cal = Cards.get('calendar'); if(cal && cal._el) cal.render(cal._el);
+      const wx = Cards.get('weather'); if(wx && wx._el && Cards.isOn('weather')) wx.render(wx._el);
     };
     el.querySelector('#calAdd').onclick = () => openEvent(null, calSel);
     el.querySelector('#calList').onclick = e => {
@@ -1538,6 +1578,116 @@ Cards.register({
       : diff >= 3 ? `평균보다 ${diff}점 높아요. 컨디션 좋은 날입니다.`
       : diff <= -3 ? `평균보다 ${Math.abs(diff)}점 낮아요. 오늘은 일찍 자 보세요.`
       : '최근 흐름과 비슷합니다.';
+  }
+});
+
+
+/* ══════ js/cards/whitenoise.js ══════ */
+
+/* 수면 유도음 — 백색소음·빗소리·파도를 브라우저에서 직접 생성 (파일 없음) */
+let NZ = { ctx:null, src:null, gain:null, filt:null, lfo:null, playing:'', timer:null, endAt:0 };
+const NZ_KINDS = [
+  { id:'white', name:'백색소음', desc:'고른 쉬익 소리' },
+  { id:'pink',  name:'핑크노이즈', desc:'낮고 부드러운 소리' },
+  { id:'rain',  name:'빗소리',   desc:'잔잔한 비' },
+  { id:'wave',  name:'파도',     desc:'밀려왔다 빠지는 소리' }
+];
+function nzBuffer(ctx, kind){
+  const len = ctx.sampleRate * 4;
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  if(kind === 'pink' || kind === 'rain' || kind === 'wave'){
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<len;i++){
+      const w = Math.random()*2-1;
+      b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759; b2=0.96900*b2+w*0.1538520;
+      b3=0.86650*b3+w*0.3104856; b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980;
+      d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11; b6=w*0.115926;
+    }
+  } else {
+    for(let i=0;i<len;i++) d[i] = Math.random()*2-1;
+  }
+  return buf;
+}
+function nzStop(){
+  if(NZ.src){ try{ NZ.src.stop(); }catch(e){} NZ.src.disconnect(); NZ.src = null; }
+  if(NZ.lfo){ try{ NZ.lfo.stop(); }catch(e){} NZ.lfo = null; }
+  NZ.playing = ''; NZ.endAt = 0;
+  clearInterval(NZ.timer); NZ.timer = null;
+  const c = Cards.get('whitenoise'); if(c && c._el) c.render(c._el);
+}
+function nzPlay(kind, minutes){
+  nzStop();
+  NZ.ctx = NZ.ctx || new (window.AudioContext || window.webkitAudioContext)();
+  const ctx = NZ.ctx;
+  if(ctx.state === 'suspended') ctx.resume();
+  const src = ctx.createBufferSource();
+  src.buffer = nzBuffer(ctx, kind); src.loop = true;
+  const filt = ctx.createBiquadFilter();
+  filt.type = 'lowpass';
+  filt.frequency.value = kind === 'rain' ? 1800 : kind === 'wave' ? 900 : kind === 'pink' ? 3200 : 12000;
+  const gain = ctx.createGain();
+  const vol = (C.nzVol != null ? C.nzVol : 45) / 100;
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.001, vol * 0.5), ctx.currentTime + 1.2);
+  if(kind === 'wave'){                       // 파도: 천천히 부풀었다 가라앉게
+    const lfo = ctx.createOscillator(), lg = ctx.createGain();
+    lfo.frequency.value = 0.09; lg.gain.value = vol * 0.28;
+    lfo.connect(lg); lg.connect(gain.gain); lfo.start(); NZ.lfo = lfo;
+  }
+  src.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+  src.start();
+  NZ.src = src; NZ.gain = gain; NZ.filt = filt; NZ.playing = kind;
+  if(minutes){
+    NZ.endAt = Date.now() + minutes*60000;
+    NZ.timer = setInterval(() => {
+      const left = NZ.endAt - Date.now();
+      if(left <= 0) return nzStop();
+      if(left < 20000 && NZ.gain)              // 끝나기 전 서서히 줄이기
+        NZ.gain.gain.setTargetAtTime(0.0001, ctx.currentTime, 6);
+      const c = Cards.get('whitenoise'); if(c && c._el) c.render(c._el);
+    }, 1000);
+  }
+  const c = Cards.get('whitenoise'); if(c && c._el) c.render(c._el);
+}
+Cards.register({
+  id:'whitenoise', name:'수면 유도음', size:'S', def:false,
+  desc:'백색소음·빗소리·파도. 타이머를 걸면 알아서 꺼집니다',
+  init(el){
+    el.innerHTML = `
+      <div class="chead"><span class="clab">수면 유도음</span><span class="cmeta" id="nzMeta"></span></div>
+      <div class="nz-kinds" id="nzKinds"></div>
+      <div class="nz-timer" id="nzTimer"></div>
+      <div class="nz-vol"><span class="tiny">음량</span>
+        <input type="range" min="5" max="100" id="nzVol"></div>`;
+    el.querySelector('#nzKinds').onclick = e => {
+      const b = e.target.closest('[data-k]'); if(!b) return;
+      if(NZ.playing === b.dataset.k) nzStop();
+      else nzPlay(b.dataset.k, C.nzMin || 30);
+    };
+    el.querySelector('#nzTimer').onclick = e => {
+      const b = e.target.closest('[data-m]'); if(!b) return;
+      C.nzMin = +b.dataset.m; save();
+      if(NZ.playing) nzPlay(NZ.playing, C.nzMin);
+      else { const c = Cards.get('whitenoise'); c.render(c._el); }
+    };
+    el.querySelector('#nzVol').addEventListener('input', e => {
+      C.nzVol = +e.target.value; save();
+      if(NZ.gain) NZ.gain.gain.setTargetAtTime(Math.max(0.001, C.nzVol/100*0.5), NZ.ctx.currentTime, 0.2);
+    });
+  },
+  render(el){
+    const mins = C.nzMin || 30;
+    el.querySelector('#nzKinds').innerHTML = NZ_KINDS.map(k =>
+      `<button class="nz ${NZ.playing===k.id?'on':''}" data-k="${k.id}">
+        <b>${k.name}</b><i>${k.desc}</i></button>`).join('');
+    el.querySelector('#nzTimer').innerHTML = [15,30,60,120].map(m =>
+      `<button class="${mins===m?'on':''}" data-m="${m}">${m>=60?(m/60)+'시간':m+'분'}</button>`).join('');
+    el.querySelector('#nzVol').value = C.nzVol != null ? C.nzVol : 45;
+    const left = NZ.endAt ? Math.max(0, NZ.endAt - Date.now()) : 0;
+    el.querySelector('#nzMeta').textContent = NZ.playing
+      ? (left ? `${Math.ceil(left/60000)}분 남음` : '재생 중')
+      : '';
   }
 });
 
@@ -2289,7 +2439,13 @@ async function boot(){
   }
   if(!C.lang) C.lang = detectLang();
   rollover();
-  addEventListener('resize', fit);
+  /* 화면 회전·창 크기 변경에 안정적으로 대응 */
+  let fitT = null;
+  const refit = () => { clearTimeout(fitT); fitT = setTimeout(() => { fit(); paint(); }, 120); };
+  addEventListener('resize', refit);
+  addEventListener('orientationchange', () => { refit(); setTimeout(refit, 400); });
+  if(screen.orientation && screen.orientation.addEventListener)
+    screen.orientation.addEventListener('change', refit);
   fit(); build(); paint();
   loadWeather(false);
   loadGames(false);
@@ -2313,12 +2469,32 @@ async function boot(){
   setInterval(() => loadNews(false), 60*60*1000);
   setInterval(() => { if(syncReady()) syncPull(); }, 45000);
 
+  /* 시작 화면을 걷어내고 본체를 스윽 등장시킨다 */
+  const sp = $('splash');
+  if(sp){
+    const done = () => {
+      sp.classList.add('gone');
+      $('stage').classList.add('entering');
+      setTimeout(() => { sp.remove(); $('stage').classList.remove('entering'); }, 700);
+    };
+    setTimeout(done, C.seenSplash ? 900 : 1750);
+    C.seenSplash = true; save();
+  }
   try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).catch(()=>{});
 }
 
 /* 이벤트 바인딩 */
 $('setBtn').onclick = () => openSettings();
+$('refreshBtn').onclick = async () => {
+  const btn = $('refreshBtn');
+  btn.classList.add('spin');
+  C.wx = null; C.news = null; C.newsAt = 0; C.gamesAt = 0;
+  await Promise.all([loadWeather(true), loadGames(true), loadNews(true)]);
+  if(syncReady()) await syncPull(true);
+  paint();
+  setTimeout(() => btn.classList.remove('spin'), 400);
+};
 $('setClose').onclick = closeSettings;
 document.querySelector('.setnav').onclick = e => {
   const b = e.target.closest('[data-tab]'); if(!b) return;
@@ -2356,4 +2532,3 @@ document.addEventListener('keydown', e => {
 
 try{ new Function('let a=1?.x; let b=1??2;'); }catch(e){ $('oldBrowser').style.display = 'block'; }
 boot();
-
