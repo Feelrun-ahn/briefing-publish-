@@ -20,8 +20,10 @@ html,body{margin:0;padding:0;background:var(--rootBg);color:var(--tx);
 html,body{overflow-x:hidden}
 /* 한 화면 고정 여부는 JS가 html에 클래스로 지정 (:has() 미지원 대비) */
 html.fixed,html.fixed body{overflow:hidden;height:100%}
-html.scrollable{overflow-y:auto;height:auto}
-html.scrollable body{overflow-y:visible;height:auto;min-height:100%}
+html.scrollable{overflow-y:auto;height:auto;-webkit-overflow-scrolling:touch}
+html.scrollable body{overflow-y:visible;height:auto;min-height:100%;position:static}
+html.scrollable #root{position:static!important;height:auto!important;overflow:visible!important}
+html.scrollable #stage{height:auto!important;min-height:100dvh}
 *{box-sizing:border-box}
 input,button,select,textarea,a{font-family:inherit;color:inherit}
 button{cursor:pointer}
@@ -96,8 +98,9 @@ main{position:relative;display:grid;gap:14px;min-height:0}
 .mbox.ev{width:min(520px,100%);flex-direction:column;padding:24px 26px}
 .mbox.ob{width:min(560px,100%);flex-direction:column;padding:30px 30px 24px}
 .mbox.set{width:min(920px,100%);height:min(640px,88dvh)}
-.mclose{position:absolute;top:16px;right:18px;width:32px;height:32px;border-radius:50%;
-  border:1px solid var(--bd);background:var(--chip);font-size:17px;color:var(--tx3);line-height:1}
+.mclose{position:absolute;top:16px;right:18px;z-index:5;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--bd);background:var(--modal);font-size:17px;color:var(--tx3);line-height:1;
+  box-shadow:0 0 0 6px var(--modal)}
 .mclose.sm{position:static;width:28px;height:28px;font-size:15px}
 .mtitle{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;font-size:19px}
 .mfoot{display:flex;align-items:center;gap:9px;margin-top:6px}
@@ -170,8 +173,15 @@ body.phone .mbox{max-height:100dvh;height:100dvh;width:100%;border-radius:0;bord
 body.phone .mbox.ob,body.phone .mbox.ev{padding-bottom:28px}
 body.phone .obnav,body.phone .mfoot{position:sticky;bottom:0;background:var(--modal);padding:12px 0 4px;margin-top:8px}
 body.phone .mbox.set{flex-direction:column;height:100dvh}
-body.phone .setnav{width:100%;flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid var(--bd);padding:14px 12px}
-body.phone .sethead,body.phone .setfoot{display:none}
+body.phone .setnav{width:100%;flex-direction:row;overflow-x:auto;border-right:none;
+  border-bottom:1px solid var(--bd);padding:14px 56px 14px 12px;scrollbar-width:none}
+body.phone .setnav::-webkit-scrollbar{display:none}
+body.phone .setfoot{display:none}
+/* 폰에서는 닫기 버튼을 위한 제목 줄을 따로 둔다 */
+body.phone .sethead{display:block;font-size:17px;padding:4px 48px 12px 4px}
+body.phone .setnav{flex-wrap:wrap;padding:12px 12px 12px 12px}
+body.phone .setnav .sethead{width:100%}
+body.phone .mclose{top:10px;right:12px}
 body.phone .setnav button{white-space:nowrap;padding:9px 14px}
 body.phone .setbody{padding:20px 16px}
 body.phone .row2,body.phone .row3{grid-template-columns:1fr}
