@@ -2,6 +2,13 @@
 
 아침·밤 두 얼굴을 가진 개인 대시보드. 플레이스토어 출시용 소스.
 
+## 주소
+
+- 앱 `https://feelrun-ahn.github.io/briefing-publish-/`
+- 관리자 `https://feelrun-ahn.github.io/briefing-publish-/admin.html`
+- 개인정보처리방침 `https://feelrun-ahn.github.io/briefing-publish-/privacy.html`
+- 문의 이메일 `feelrun@kakao.com` (`app.js`의 `FEEDBACK_EMAIL`, `privacy.html` 두 곳)
+
 ## 업로드할 파일 (11개)
 
 ```
@@ -12,31 +19,30 @@ icon-192.png   icon-512.png   icon-maskable-512.png
 
 ## 화면 채우기
 
-`fitStage()` 4단계: 밀도 조정 → 열 재분배(실제 높이 측정) → zoom 미세 축소(0.76까지) → 열 스크롤.
-**주기적 갱신(`paint(true)`)에서는 재배치를 건너뜁니다.** 화면이 들썩이지 않게 하려는 것이니
+`fitStage()` 4단계: 밀도 조정 → 열 재분배(실제 높이 측정) → zoom 축소(0.76까지) → 열 스크롤.
+주기적 갱신(`paint(true)`)에서는 재배치를 건너뜁니다. 화면이 들썩이지 않게 하려는 것이니
 새 코드에서 `paint()`를 1초 주기로 부르지 마세요.
 
 ## 색 규칙
 
-- **야구** — 응원 팀 브랜드색이 카드 배경에 옅게(28%→6% 그라디언트). `KBO_TEAMS[].c`
-- **운세** — 배경은 기본, 점수만 단계별 (75+ 민트 / 60+ 초록 / 45+ 노랑 / 30+ 주황 / 그 이하 빨강)
+- **야구** — 응원 팀 브랜드색이 카드 배경에 옅게. `KBO_TEAMS[].c`
+- **운세** — 점수만 단계별 (75+ 민트 / 60+ 초록 / 45+ 노랑 / 30+ 주황 / 이하 빨강)
 - **기온** — 최저 `.lo2` 파랑, 최고 `.hi2` 빨강
-- **강수확률** — 60% 이상이면 강조색
+- **강수확률** — 60% 이상 강조색
 
 ## 뉴스
 
 CORS 때문에 직접 호출이 막힙니다. `NEWS_SOURCES` 순서:
-**rss2json(JSON, 가장 안정)** → 직접 → allorigins → codetabs → corsproxy → jina.
-모두 실패하면 어느 단계에서 막혔는지 카드에 표시됩니다.
+rss2json(JSON, 가장 안정) → 직접 → allorigins → codetabs → corsproxy → jina.
+전부 실패하면 어느 단계에서 막혔는지 카드에 표시됩니다.
 
 ## 야구
 
 `eventsseason`으로 시즌 전체를 받아 `eventsnext`/`eventslast`와 합칩니다.
-(개별 API가 1~2건만 주는 경우가 있어 경기 누락·최근 전적 부족이 생겼습니다)
 
 ## 시간표 (나이스)
 
-방학·주말이면 **최근 8주를 거슬러** 찾고 두 학기를 모두 시도합니다.
+방학·주말이면 최근 8주를 거슬러 찾고 두 학기를 모두 시도합니다.
 
 ## 하루의 기준
 
@@ -44,12 +50,12 @@ CORS 때문에 직접 호출이 막힙니다. `NEWS_SOURCES` 순서:
 
 ## 다국어
 
-4개 언어 124개 문구. 새 문구는 **네 언어 모두**에 넣어야 합니다.
+4개 언어 124개 문구. 새 문구는 네 언어 모두에 넣어야 합니다.
 
 ## 남은 작업
 
 - [ ] 나이스 인증키 발급 → 설정 입력
 - [ ] Firebase 익명·이메일 로그인 켜기, 규칙 게시 (관리자 feelrun@kakao.com)
-- [ ] 앱 이름 확정 → 패키지 ID 결정
+- [ ] 앱 이름 확정 → 패키지 ID 결정 (`app.js`의 `APP_PKG`)
 - [ ] Capacitor 패키징
 - [ ] 폐쇄 테스트 12명 × 14일

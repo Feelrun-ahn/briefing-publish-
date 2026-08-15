@@ -3045,7 +3045,7 @@ const OB = {
 
 /* ══════ js/boot.js ══════ */
 
-const FEEDBACK_EMAIL = 'feelrun.ahn@gmail.com';   // 배포 전 확인
+const FEEDBACK_EMAIL = 'feelrun@kakao.com';   // 배포 전 확인
 const APP_PKG   = 'io.github.feelrun.briefing';   // 배포 시 확정
 const APP_STORE = 'https://play.google.com/store/apps/details?id=' + APP_PKG;
 const APP_WEB   = location.origin + location.pathname;   // 웹으로 여는 주소
