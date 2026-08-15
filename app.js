@@ -764,11 +764,13 @@ function build(){
   if(!phone) requestAnimationFrame(fitStage);
 }
 
-function paint(){
+let lastFit = 0;
+function paint(quiet){
   applyTheme();
   Cards.enabled().forEach(c => { if(c._el && c.render) { try{ c.render(c._el); }catch(e){ console.warn(c.id, e); } } });
   paintHeader();
-  if(!document.body.classList.contains('phone')) requestAnimationFrame(fitStage);
+  /* 주기적 갱신에서는 배치를 다시 계산하지 않는다 (화면이 들썩이지 않도록) */
+  if(!document.body.classList.contains('phone') && !quiet) requestAnimationFrame(fitStage);
 }
 
 function paintHeader(){
@@ -809,6 +811,8 @@ function fit(){
     $('allBtn').textContent = C.phoneAll ? '간단히 보기' : '전체 보기';
     $('stage').style.transform = 'none';
     $('stage').style.height = '';
+    $('stage').style.width = '';
+    document.body.dataset.density = '';
   } else {
     document.body.classList.remove('showall');
     fitStage();
@@ -820,34 +824,81 @@ function fitStage(){
   const st = $('stage');
   if(!st || document.body.classList.contains('phone')) return;
 
-  /* ① 카드 수에 따라 밀도를 먼저 낮춘다 (내용을 줄여 잘림을 막음) */
+  /* ① 카드 수에 따라 밀도를 먼저 낮춘다 */
   const n = Cards.enabled().length;
-  const dens = n >= 12 ? 'tight' : n >= 9 ? 'compact' : '';
-  document.body.dataset.density = dens;
+  /* 화면 높이도 함께 본다 — 낮은 화면일수록 일찍 촘촘하게 */
+  const per = n / 3;                       // 열당 카드 수
+  const roomy = innerHeight >= 980;
+  document.body.dataset.density =
+    (per >= 4 && !roomy) || per >= 5 ? 'tight' : (per >= 3 && !roomy) || per >= 4 ? 'compact' : '';
 
   st.style.transform = 'none';
-  st.style.height = '900px';
+  st.style.zoom = '';
+  st.style.width = '100%';
+  st.style.height = '100%';
 
-  /* ② 그래도 넘치면 무대를 늘리고 그만큼 축소 (글씨가 너무 작아지지 않게 한계를 둔다) */
-  const cols = [...document.querySelectorAll('main > .col')];
-  const need = cols.reduce((m, c) => Math.max(m, c.scrollHeight), 0);
-  const view = cols.length ? cols[0].clientHeight : 0;
-  const MAXH = 1500;
-  let H = 900;
-  if(need > view + 4) H = Math.min(MAXH, 900 + (need - view) + 4);
-  st.style.height = H + 'px';
-  st.style.transform = `scale(${Math.min(innerWidth/1440, innerHeight/H)})`;
-
-  /* ③ 최대 높이로도 모자라면 각 열을 스크롤 가능하게 하고 안내를 띄운다 */
   requestAnimationFrame(() => {
-    let over = false;
-    cols.forEach(col => {
-      const o = col.scrollHeight > col.clientHeight + 6;
-      col.classList.toggle('over', o);
-      if(o) over = true;
+    rebalance();
+    requestAnimationFrame(() => {
+      /* ③ 그래도 넘치면 전체를 조금씩 줄여 한 화면에 담는다 */
+      const over = () => {
+        let max = 0;
+        document.querySelectorAll('main > .col').forEach(col => {
+          max = Math.max(max, col.scrollHeight - col.clientHeight);
+        });
+        return max;
+      };
+      let z = 1;
+      for(let i = 0; i < 10 && over() > 4 && z > 0.76; i++){
+        z = Math.round((z - 0.04) * 100) / 100;
+        st.style.zoom = z;
+      }
+      const rest = over() > 4;
+      document.querySelectorAll('main > .col').forEach(col => {
+        col.classList.toggle('over', col.scrollHeight > col.clientHeight + 6);
+      });
+      document.body.classList.toggle('cards-overflow', rest);
     });
-    document.body.classList.toggle('cards-overflow', over);
   });
+}
+
+/* 실제 높이를 재서 열을 고르게 다시 나눈다 (사용자가 열을 지정한 카드는 그대로 둔다) */
+function rebalance(){
+  const cols = [...document.querySelectorAll('main > .col')];
+  if(cols.length < 2) return;
+  const manual = C.layoutMode === 'manual';
+  const cards = Cards.enabled().map(c => c._el).filter(Boolean);
+  const gap = parseFloat(getComputedStyle(cols[0]).gap) || 14;
+
+  const fixed = {}, flow = [];
+  cards.forEach(el => {
+    const id = el.dataset.id;
+    if(manual && C.cardCol && C.cardCol[id] != null){
+      const t = Math.max(0, Math.min(cols.length-1, +C.cardCol[id]));
+      (fixed[t] = fixed[t] || []).push(el);
+    } else flow.push(el);
+  });
+
+  const h = el => el.getBoundingClientRect().height + gap;
+  const load = cols.map((_, i) => (fixed[i] || []).reduce((s, el) => s + h(el), 0));
+  const plan = cols.map((_, i) => (fixed[i] || []).slice());
+
+  flow.forEach(el => {
+    let t = 0;
+    for(let i = 1; i < cols.length; i++) if(load[i] < load[t]) t = i;
+    plan[t].push(el); load[t] += h(el);
+  });
+
+  /* 순서가 이미 같으면 건드리지 않는다 (깜빡임 방지) */
+  let same = true;
+  cols.forEach((col, i) => {
+    const cur = [...col.children];
+    if(cur.length !== plan[i].length || cur.some((x, k) => x !== plan[i][k])) same = false;
+  });
+  if(same) return;
+  document.body.classList.add('no-anim');
+  cols.forEach((col, i) => plan[i].forEach(el => col.appendChild(el)));
+  setTimeout(() => document.body.classList.remove('no-anim'), 60);
 }
 
 /* ── 일정 헬퍼 (캘린더·수행평가·D-day 공용) ── */
@@ -1218,45 +1269,65 @@ function neisSvcOf(kind){
 async function neisTimetable(force){
   const s = C.school;
   if(!s || !s.code || !s.grade || !s.cls) return { err:'학교·학년·반을 먼저 설정해 주세요' };
+  const monday = d => { const x = new Date(d); const w = x.getDay();
+    x.setDate(x.getDate() - ((w + 6) % 7)); return ymd(x); };
+  const thisWeek = monday(now);
   const cache = C.ttCache;
-  const monday = (() => { const d = new Date(now); const w = d.getDay();
-    d.setDate(d.getDate() - ((w + 6) % 7)); return ymd(d); })();
-  if(!force && cache && cache.week === monday && cache.key === s.code + s.grade + s.cls)
-    return { table: cache.table, cached: true };
+  if(!force && cache && cache.week === thisWeek && cache.key === s.code + s.grade + s.cls)
+    return { table: cache.table, cached: true, weekOf: cache.weekOf };
 
-  const sunday = (() => { const d = new Date(monday + 'T00:00:00'); d.setDate(d.getDate() + 6); return ymd(d); })();
   const svc = neisSvcOf(s.kind);
-  const yy = now.getMonth() + 1 >= 3 ? now.getFullYear() : now.getFullYear() - 1;
-  const sem = (now.getMonth() + 1 >= 3 && now.getMonth() + 1 <= 8) ? 1 : 2;
-  const q = `${svc}?Type=json&pIndex=1&pSize=300`
-    + (neisKey() ? '&KEY=' + encodeURIComponent(neisKey()) : '')
-    + `&ATPT_OFCDC_SC_CODE=${encodeURIComponent(s.office)}`
-    + `&SD_SCHUL_CODE=${encodeURIComponent(s.code)}`
-    + `&AY=${yy}&SEM=${sem}`
-    + `&TI_FROM_YMD=${monday.replace(/-/g,'')}&TI_TO_YMD=${sunday.replace(/-/g,'')}`
-    + `&GRADE=${encodeURIComponent(s.grade)}&CLASS_NM=${encodeURIComponent(s.cls)}`;
-  const r = await neisFetch(q);
-  if(r.err) return { err: r.err };
+  /* 방학·주말이면 이번 주 자료가 없다. 최근 8주를 거슬러 찾는다. */
+  for(let back = 0; back < 8; back++){
+    const start = new Date(thisWeek + 'T00:00:00');
+    start.setDate(start.getDate() - back*7);
+    const from = ymd(start);
+    const endD = new Date(start); endD.setDate(endD.getDate() + 6);
+    const to = ymd(endD);
+    /* 학기가 걸쳐 있을 수 있으니 두 학기를 모두 시도 */
+    for(const sem of [semOf(start), semOf(start) === 1 ? 2 : 1]){
+      const yy = ayOf(start);
+      const q = `${svc}?Type=json&pIndex=1&pSize=300`
+        + (neisKey() ? '&KEY=' + encodeURIComponent(neisKey()) : '')
+        + `&ATPT_OFCDC_SC_CODE=${encodeURIComponent(s.office)}`
+        + `&SD_SCHUL_CODE=${encodeURIComponent(s.code)}`
+        + `&AY=${yy}&SEM=${sem}`
+        + `&TI_FROM_YMD=${from.replace(/-/g,'')}&TI_TO_YMD=${to.replace(/-/g,'')}`
+        + `&GRADE=${encodeURIComponent(s.grade)}&CLASS_NM=${encodeURIComponent(s.cls)}`;
+      const r = await neisFetch(q);
+      if(r.err){
+        /* 인증키 문제는 더 시도해도 소용없다 */
+        if(/인증키|한도/.test(r.err)) return { err: r.err };
+        continue;
+      }
+      const rows = neisRows(r.data, svc);
+      if(!rows.length) continue;
 
-  const rows = neisRows(r.data, svc);
-  if(!rows.length) return { err:'이번 주 시간표가 등록되어 있지 않습니다' };
-  const table = {};                       // { 요일(0~6): ['국어','수학',...] }
-  rows.forEach(x => {
-    const d = String(x.ALL_TI_YMD || '');
-    if(d.length < 8) return;
-    const dow = new Date(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}T00:00:00`).getDay();
-    const no = parseInt(x.PERIO, 10);
-    const subj = (x.ITRT_CNTNT || '').trim();
-    if(!no || !subj) return;
-    table[dow] = table[dow] || [];
-    table[dow][no - 1] = subj;
-  });
-  for(const k in table) table[k] = table[k].map(v => v || '');
-  C.ttCache = { week: monday, key: s.code + s.grade + s.cls, table, at: Date.now() };
-  C.timetable = table;                    // 카드가 바로 쓰도록
-  save();
-  return { table };
+      const table = {};
+      rows.forEach(x => {
+        const d = String(x.ALL_TI_YMD || '');
+        if(d.length < 8) return;
+        const dow = new Date(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}T00:00:00`).getDay();
+        const no = parseInt(x.PERIO, 10);
+        const subj = (x.ITRT_CNTNT || '').trim();
+        if(!no || !subj) return;
+        table[dow] = table[dow] || [];
+        table[dow][no - 1] = subj;
+      });
+      for(const k in table) table[k] = table[k].map(v => v || '');
+      if(!Object.keys(table).length) continue;
+
+      C.ttCache = { week: thisWeek, weekOf: from, key: s.code + s.grade + s.cls, table, at: Date.now() };
+      C.timetable = table;
+      save();
+      return { table, weekOf: from, old: back > 0 };
+    }
+  }
+  return { err:'최근 8주 안에 등록된 시간표가 없습니다 (방학 기간일 수 있어요)' };
 }
+/* 학년도·학기 계산 — 3~8월 1학기, 9~2월 2학기 */
+function ayOf(d){ return (d.getMonth() + 1) >= 3 ? d.getFullYear() : d.getFullYear() - 1; }
+function semOf(d){ const m = d.getMonth() + 1; return (m >= 3 && m <= 8) ? 1 : 2; }
 
 
 /* ══════ js/cards/clock.js ══════ */
@@ -1444,11 +1515,14 @@ Cards.register({
     if(isToday){
       el.querySelector('#wxTemp').innerHTML = `${w.temp}°`;
       el.querySelector('#wxS1').textContent = `${T('wxFeels')} ${w.feels}°`;
-      el.querySelector('#wxS2').textContent = `${T('wxHi')} ${w.hi}° / ${T('wxLo')} ${w.lo}°`;
+      el.querySelector('#wxS2').innerHTML =
+        `${T('wxHi')} <b class="hi2">${w.hi}°</b> / ${T('wxLo')} <b class="lo2">${w.lo}°</b>`;
     } else {
-      el.querySelector('#wxTemp').innerHTML = `<span class="lo2">${w.lo}°</span><span class="slash">/</span>${w.hi}°`;
+      el.querySelector('#wxTemp').innerHTML =
+        `<span class="lo2">${w.lo}°</span><span class="slash">/</span><span class="hi2">${w.hi}°</span>`;
       el.querySelector('#wxS1').textContent = T('wxLoHi');
-      el.querySelector('#wxS2').textContent = `${T('wxRain')} ${w.rain != null ? w.rain : '—'}%`;
+      el.querySelector('#wxS2').innerHTML =
+        `${T('wxRain')} <b style="color:${w.rain>=60?'var(--acc)':'inherit'}">${w.rain != null ? w.rain : '—'}%</b>`;
     }
 
     el.querySelector('#wxTmrw').hidden = !isToday;
@@ -1486,7 +1560,7 @@ Cards.register({
     const tw = C.wx.tomorrow;
     el.querySelector('#wxTmrw').innerHTML = tw
       ? `<span class="lb">${T('wxTomorrow')}</span><span class="ic">${WICON(tw.code)}</span>`
-        + `<span class="tp"><b>${tw.lo}°</b> / ${tw.hi}°</span>`
+        + `<span class="tp"><b class="lo2">${tw.lo}°</b> / <b class="hi2">${tw.hi}°</b></span>`
         + `<span class="rn">${WDESC(tw.code)}${tw.rain!=null?' · '+T('wxRain')+' <b>'+tw.rain+'%</b>':''}`
         + `${wetRanges(tw.wetH)?' · '+wetRanges(tw.wetH):''}</span>`
       : '';
@@ -1830,17 +1904,22 @@ Cards.register({
    데이터 출처 표기: TheSportsDB.com */
 const KBO_LEAGUE = '4830';
 const KBO_TEAMS = [
-  { id:'139825', kr:'삼성 라이온즈', s:'삼성',  en:'Samsung Lions' },
-  { id:'139820', kr:'LG 트윈스',    s:'LG',    en:'LG Twins' },
-  { id:'139822', kr:'두산 베어스',   s:'두산',  en:'Doosan Bears' },
-  { id:'139824', kr:'KIA 타이거즈',  s:'KIA',   en:'Kia Tigers' },
-  { id:'139821', kr:'롯데 자이언츠', s:'롯데',  en:'Lotte Giants' },
-  { id:'139826', kr:'한화 이글스',   s:'한화',  en:'Hanwha Eagles' },
-  { id:'139828', kr:'SSG 랜더스',    s:'SSG',   en:'SSG Landers' },
-  { id:'139819', kr:'NC 다이노스',   s:'NC',    en:'NC Dinos' },
-  { id:'139827', kr:'KT 위즈',       s:'KT',    en:'KT Wiz' },
-  { id:'139823', kr:'키움 히어로즈', s:'키움',  en:'Kiwoom Heroes' }
+  { id:'139825', kr:'삼성 라이온즈', s:'삼성',  en:'Samsung Lions',  c:'#074CA1' },
+  { id:'139820', kr:'LG 트윈스',    s:'LG',    en:'LG Twins',       c:'#C30452' },
+  { id:'139822', kr:'두산 베어스',   s:'두산',  en:'Doosan Bears',   c:'#131230' },
+  { id:'139824', kr:'KIA 타이거즈',  s:'KIA',   en:'Kia Tigers',     c:'#EA0029' },
+  { id:'139821', kr:'롯데 자이언츠', s:'롯데',  en:'Lotte Giants',   c:'#041E42' },
+  { id:'139826', kr:'한화 이글스',   s:'한화',  en:'Hanwha Eagles',  c:'#FC4E00' },
+  { id:'139828', kr:'SSG 랜더스',    s:'SSG',   en:'SSG Landers',    c:'#CE0E2D' },
+  { id:'139819', kr:'NC 다이노스',   s:'NC',    en:'NC Dinos',       c:'#315288' },
+  { id:'139827', kr:'KT 위즈',       s:'KT',    en:'KT Wiz',         c:'#000000' },
+  { id:'139823', kr:'키움 히어로즈', s:'키움',  en:'Kiwoom Heroes',  c:'#570514' }
 ];
+/* 팀 색을 카드 배경에 은은하게 깔기 위한 값 */
+function hexRgb(h){
+  const m = h.replace('#','');
+  return [parseInt(m.slice(0,2),16), parseInt(m.slice(2,4),16), parseInt(m.slice(4,6),16)];
+}
 const VENUE_KR = {
   'Daegu Samsung Lions Park':'대구 라이온즈파크', 'Jamsil':'잠실', 'Gocheok':'고척',
   'Incheon SSG Landers Field':'인천 랜더스필드', 'Suwon':'수원', 'Hanwha Life Eagles Park':'대전',
@@ -1873,34 +1952,23 @@ async function sdbFetch(path){
 
 async function loadGames(force){
   if(!Cards.isOn('baseball') || !C.teamId) return;
-  if(!force && C.games && Date.now() - (C.gamesAt||0) < 3*3600000) return;
+  if(!force && C.games && C.games.length && Date.now() - (C.gamesAt||0) < 3*3600000) return;
+
   const list = [];
   let err = null;
   const push = arr => (arr||[]).forEach(e => list.push(e));
   try{
-    const [nx, lt] = await Promise.all([
-      sdbFetch('eventsnext.php?id='+C.teamId).catch(() => null),
-      sdbFetch('eventslast.php?id='+C.teamId).catch(() => null)
+    /* 시즌 전체를 받아 두면 경기 누락과 최근 전적 부족이 함께 해결된다 */
+    const [se, nx, lt] = await Promise.all([
+      sdbFetch(`eventsseason.php?id=${KBO_LEAGUE}&s=${now.getFullYear()}`).catch(() => null),
+      sdbFetch('eventsnext.php?id=' + C.teamId).catch(() => null),
+      sdbFetch('eventslast.php?id=' + C.teamId).catch(() => null)
     ]);
+    if(se) (se.events || []).forEach(e => {
+      if(e.idHomeTeam === C.teamId || e.idAwayTeam === C.teamId) list.push(e);
+    });
     if(nx) push(nx.events);
     if(lt) push(lt.results || lt.events);
-
-    /* 끝난 경기가 3개에 못 미치면 시즌 전체에서 보충한다
-       (eventslast 는 요청 시점에 따라 1~2건만 주는 경우가 있음) */
-    const t = ymd(now);
-    const done = list.filter(e => {
-      const d = String(e.gameDate || e.dateEvent || '').replace(/\D/g,'').slice(0,8);
-      const ds = d.length === 8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : '';
-      const a = e.intHomeScore, b2 = e.intAwayScore;
-      return ds && ds < t && a != null && a !== '' && b2 != null && b2 !== '';
-    }).length;
-
-    if(!list.length || done < 3){
-      const s = await sdbFetch(`eventsseason.php?id=${KBO_LEAGUE}&s=${now.getFullYear()}`).catch(() => null);
-      if(s) (s.events||[]).forEach(e => {
-        if(e.idHomeTeam === C.teamId || e.idAwayTeam === C.teamId) list.push(e);
-      });
-    }
   }catch(e){ err = e.message || '연결 실패'; }
 
   if(list.length){
@@ -1944,6 +2012,14 @@ Cards.register({
       el.querySelector('#bbBody').innerHTML = `<div class="empty">설정 → 카드 구성에서 응원 팀을 골라 주세요.</div>`;
       el.querySelector('#bbRecent').innerHTML = ''; return;
     }
+    /* 응원 팀 색을 카드 배경에 은은하게 */
+    if(team && team.c){
+      const [r,g,bl] = hexRgb(team.c);
+      el.style.background =
+        `linear-gradient(155deg, rgba(${r},${g},${bl},.28), rgba(${r},${g},${bl},.06))`;
+      el.style.borderColor = `rgba(${r},${g},${bl},.42)`;
+    } else { el.style.background = ''; el.style.borderColor = ''; }
+
     const games = C.games || [];
     if(!games.length){
       el.querySelector('#bbSrc').textContent = '눌러서 다시';
@@ -1953,9 +2029,10 @@ Cards.register({
     el.querySelector('#bbSrc').textContent = 'TheSportsDB';
     const t = ymd(baseDate());
     const g = games.find(x => x.date === t), next = games.find(x => x.date > t);
+    const full = o => { const t = KBO_TEAMS.find(x => x.s === o); return t ? t.kr : o; };
     if(g){
       el.querySelector('#bbBody').innerHTML =
-        `<div class="bb-head">${g.home ? esc(g.opp)+' vs '+team.s : team.s+' vs '+esc(g.opp)}</div>
+        `<div class="bb-vs"><i>vs</i><b>${esc(full(g.opp))}</b></div>
          <div class="bb-chips">
            <span class="lc acc">${g.home ? '홈' : '원정'}${g.venue ? ' · '+esc(g.venue) : ''}</span>
            ${g.time ? `<span class="lc">${g.time}</span>` : ''}
@@ -1964,7 +2041,7 @@ Cards.register({
     } else {
       el.querySelector('#bbBody').innerHTML =
         `<div class="bb-head sm">${dayOff() ? '내일은' : '오늘은'} 경기가 없습니다</div>` +
-        (next ? `<div class="bb-chips"><span class="lc">다음 ${next.date.slice(5).replace('-','/')} · ${next.home ? esc(next.opp)+' vs '+team.s : team.s+' vs '+esc(next.opp)} ${next.time}</span></div>` : '');
+        (next ? `<div class="bb-chips"><span class="lc">다음 ${next.date.slice(5).replace('-','/')} · vs ${esc(full(next.opp))} ${next.time}</span></div>` : '');
     }
     const past = games.filter(x => x.date < today() && x.my != null && x.op != null && (x.my + x.op) > 0).slice(-3);
     if(past.length){
@@ -1994,40 +2071,58 @@ const NEWS_TOPICS = [
 ];
 /* 구글 뉴스 RSS는 CORS 헤더가 없어 직접 호출이 막힌다.
    프록시를 순서대로 시도한다. (Capacitor로 감싸면 첫 번째가 바로 통과) */
-const NEWS_PROXIES = [
+/* 구글 뉴스 RSS는 CORS 헤더가 없어 직접 호출이 막힌다.
+   JSON으로 변환해 주는 곳을 먼저 쓰고, 안 되면 일반 프록시를 차례로 시도한다. */
+const NEWS_SOURCES = [
+  { n:'rss2json', json:true,
+    f: u => 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(u) },
   { n:'직접',       f: u => u },
   { n:'allorigins', f: u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
   { n:'codetabs',   f: u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) },
   { n:'corsproxy',  f: u => 'https://corsproxy.io/?url=' + encodeURIComponent(u) },
-  { n:'jina',       f: u => 'https://r.jina.ai/' + u },
-  { n:'thingproxy', f: u => 'https://thingproxy.freeboard.io/fetch/' + u }
+  { n:'jina',       f: u => 'https://r.jina.ai/' + u }
 ];
 let NEWS_ERR = '';
+
+function splitTitle(raw){
+  const m = String(raw||'').match(/^(.*?)\s+-\s+([^-]+)$/);
+  return { text: (m ? m[1] : raw).trim(), src: m ? m[2].trim() : '' };
+}
+
 async function rssFirst(url){
   const errs = [];
-  for(const p of NEWS_PROXIES){
+  for(const p of NEWS_SOURCES){
     const ac = new AbortController();
     const to = setTimeout(() => ac.abort(), 9000);
     try{
       const r = await fetch(p.f(url), { signal: ac.signal });
       clearTimeout(to);
-      if(!r.ok){ errs.push(p.n+':'+r.status); continue; }
+      if(!r.ok){ errs.push(p.n + ':' + r.status); continue; }
+
+      if(p.json){
+        const j = await r.json();
+        const it = j && j.items && j.items[0];
+        if(!it || !it.title){ errs.push(p.n + ':빈값'); continue; }
+        const t = splitTitle(it.title);
+        return { text: t.text, src: t.src, url: it.link || '' };
+      }
+
       const text = await r.text();
       let xml = new DOMParser().parseFromString(text, 'text/xml');
       let it = xml.querySelector('item');
-      if(!it){                                   // 텍스트로 감싸 오는 프록시 대비
+      if(!it){
         const s = text.indexOf('<item');
-        if(s < 0){ errs.push(p.n+':형식'); continue; }
+        if(s < 0){ errs.push(p.n + ':형식'); continue; }
         xml = new DOMParser().parseFromString(text.slice(text.indexOf('<')), 'text/xml');
         it = xml.querySelector('item');
-        if(!it){ errs.push(p.n+':형식'); continue; }
+        if(!it){ errs.push(p.n + ':형식'); continue; }
       }
       const raw = (it.querySelector('title') || {}).textContent || '';
-      if(!raw.trim()){ errs.push(p.n+':빈값'); continue; }
-      const m = raw.match(/^(.*?)\s+-\s+([^-]+)$/);
-      return { text: (m ? m[1] : raw).trim(), src: m ? m[2].trim() : '',
+      if(!raw.trim()){ errs.push(p.n + ':빈값'); continue; }
+      const t = splitTitle(raw);
+      return { text: t.text, src: t.src,
                url: ((it.querySelector('link') || {}).textContent || '').trim() };
-    }catch(e){ clearTimeout(to); errs.push(p.n+':차단'); }
+    }catch(e){ clearTimeout(to); errs.push(p.n + ':차단'); }
   }
   NEWS_ERR = errs.slice(0,3).join(' · ');
   return null;
@@ -2073,7 +2168,7 @@ Cards.register({
 
 /* 오늘의 운세 — 사주 명리 계산 (외부 통신 없음) */
 Cards.register({
-  id:'fortune', name:'오늘의 운세', size:'L', grow:true, tone:'accent',
+  id:'fortune', name:'오늘의 운세', size:'L', grow:true,
   desc:'생년월일로 절기·일진·십신을 계산한 사주 운세 (재미로 보는 참고용)',
   init(el){
     el.innerHTML = `
@@ -2099,7 +2194,13 @@ Cards.register({
     const g = f.score>=90?'대길(大吉)':f.score>=75?'길(吉)':f.score>=62?'소길(小吉)':f.score>=52?'평(平)':'신중(愼)';
     const col = v => v>=78?'var(--acc)':v>=60?'var(--amber)':'var(--rose)';
     const b = now.getFullYear() - new Date(C.birth+'T00:00:00').getFullYear();
-    el.querySelector('#foScore').textContent = f.score;
+    const sc = el.querySelector('#foScore');
+    sc.textContent = f.score;
+    /* 점수 구간별 색 — 낮으면 빨강, 보통은 주황, 좋으면 초록 */
+    sc.style.color = f.score >= 75 ? 'var(--acc)'
+                   : f.score >= 60 ? '#7fd48b'
+                   : f.score >= 45 ? 'var(--amber)'
+                   : f.score >= 30 ? '#f28f5a' : 'var(--rose)';
     el.querySelector('#foGrade').textContent = g;
     el.querySelector('#foWho').textContent = `일진 ${GANH[f.tp.dg]}${JIH[f.tp.db]}`;
     el.querySelector('#foBadges').innerHTML = [
@@ -2510,8 +2611,10 @@ Cards.register({
     const dow = now.getDay();
     const list = (C.timetable || {})[dow] || [];
     const auto = !!(C.school && C.school.code);
+    const wk = C.ttCache && C.ttCache.weekOf;
+    const oldWeek = wk && wk !== (function(){ const x=new Date(now); x.setDate(x.getDate()-((x.getDay()+6)%7)); return ymd(x); })();
     el.querySelector('#ttMeta').textContent = auto
-      ? (C.school.name + ' ' + C.school.grade + '-' + C.school.cls)
+      ? (C.school.name + ' ' + C.school.grade + '-' + C.school.cls + (oldWeek ? ' · ' + wk.slice(5).replace('-','/') + ' 주' : ''))
       : (list.length ? '' : '설정에서 넣기');
     el.querySelector('#ttList').innerHTML = list.length
       ? list.map((s,i) => s
@@ -2519,7 +2622,7 @@ Cards.register({
           : `<div class="tt empty-p"><span class="no">${i+1}</span><span class="sj">—</span></div>`).join('')
       : `<div class="empty">${
           dow === 0 || dow === 6 ? (lang()==='ko' ? '주말이에요. 시간표가 없습니다.' : '—')
-          : auto ? '오늘 시간표가 없습니다. 눌러서 다시 불러오세요.'
+          : auto ? '오늘 시간표가 없습니다. 방학이면 마지막 학기 것이 표시됩니다.'
           : '설정 → 카드 구성에서 학교를 연결하거나 직접 넣어 보세요.'}</div>`;
   }
 });
@@ -3162,7 +3265,8 @@ function renderSettings(){
       if(r.err){ msg.textContent = r.err; msg.className = 'lk-msg err'; }
       else {
         const days = Object.keys(r.table).length;
-        msg.textContent = `${days}일치를 가져왔어요.`;
+        msg.textContent = `${days}일치를 가져왔어요.`
+          + (r.old ? ` (${r.weekOf.slice(5).replace('-','/')} 주 · 방학이라 최근 자료를 가져왔습니다)` : '');
         msg.className = 'lk-msg ok';
         paint();
       }
@@ -3632,7 +3736,7 @@ async function boot(){
       if(overrideBase && natural !== overrideBase){ modeOverride = null; overrideBase = null; }
     }
     paintHeader();
-    if(now.getSeconds() === 0){ paint(); Notify.tick(); }
+    if(now.getSeconds() === 0){ paint(true); Notify.tick(); }
     if(now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 2){ rollover(); paint(); }
   }, 1000);
   setInterval(() => loadWeather(false), 15*60*1000);
