@@ -1,61 +1,56 @@
 # Briefing (가칭)
 
-아침·밤 두 얼굴을 가진 개인 대시보드. 플레이스토어 출시용 소스.
-
 ## 주소
+앱 `https://feelrun-ahn.github.io/briefing-publish-/` ·
+관리자 `.../admin.html` · 방침 `.../privacy.html` · 문의 `feelrun@kakao.com`
 
-- 앱 `https://feelrun-ahn.github.io/briefing-publish-/`
-- 관리자 `https://feelrun-ahn.github.io/briefing-publish-/admin.html`
-- 개인정보처리방침 `https://feelrun-ahn.github.io/briefing-publish-/privacy.html`
-- 문의 이메일 `feelrun@kakao.com` (`app.js`의 `FEEDBACK_EMAIL`, `privacy.html` 두 곳)
+## 업로드 파일 (11개)
+index.html · app.css · onboard.css · app.js · manifest.json · sw.js ·
+admin.html · privacy.html · icon-192/512/maskable-512.png
 
-## 업로드할 파일 (11개)
+## 입력 안정성 (v23에서 고침 — 가장 중요)
 
-```
-index.html   app.css   onboard.css   app.js   manifest.json   sw.js
-admin.html   privacy.html
-icon-192.png   icon-512.png   icon-maskable-512.png
-```
+태블릿에서 키보드가 열리면 `resize`가 계속 발생합니다.
+예전에는 그때마다 전체를 다시 그려서 **입력값과 포커스가 날아갔습니다.**
+
+지금은 이렇게 막습니다.
+
+- `typing()` — 입력 중이면 `paint`·`fitStage`·`rebalance`·주기 갱신·동기화를 모두 건너뜀
+- `refit()` — **폭이 24px 이상 바뀐 경우에만** 다시 그림 (키보드로 인한 높이 변화는 무시)
+- `paint()` — 포커스가 들어 있는 카드는 다시 그리지 않음
+- 저장 직후에는 그 카드만 직접 `render()`하고 포커스를 되돌림
+
+**새 코드를 넣을 때 지켜야 할 것**
+- 1초 주기 작업에서 `paint()`를 부르지 말 것 (`paint(true)`를 쓰고 `typing()` 확인)
+- 카드 안에서 저장한 뒤에는 `paint()`만 부르지 말고 그 카드를 직접 다시 그릴 것
+
+## 엔터 키
+
+온보딩과 앱 모두 엔터가 페이지를 벗어나지 않도록 막았습니다
+(안드로이드 크롬에서 검은 화면으로 넘어가던 문제).
+온보딩에서 엔터는 다음 단계로 넘어갑니다.
+
+## 카드 배치 — 끌어서 옮기기
+
+`js/drag.js`. 카드 제목을 **길게 눌러(320ms)** 끌면 옮겨집니다.
+놓일 자리를 점선으로 표시하고, 놓으면 순서와 열이 저장됩니다(`layoutMode='manual'`).
+마우스·터치 모두 `pointer` 이벤트로 처리합니다.
 
 ## 화면 채우기
-
-`fitStage()` 4단계: 밀도 조정 → 열 재분배(실제 높이 측정) → zoom 축소(0.76까지) → 열 스크롤.
-주기적 갱신(`paint(true)`)에서는 재배치를 건너뜁니다. 화면이 들썩이지 않게 하려는 것이니
-새 코드에서 `paint()`를 1초 주기로 부르지 마세요.
-
-## 색 규칙
-
-- **야구** — 응원 팀 브랜드색이 카드 배경에 옅게. `KBO_TEAMS[].c`
-- **운세** — 점수만 단계별 (75+ 민트 / 60+ 초록 / 45+ 노랑 / 30+ 주황 / 이하 빨강)
-- **기온** — 최저 `.lo2` 파랑, 최고 `.hi2` 빨강
-- **강수확률** — 60% 이상 강조색
-
-## 뉴스
-
-CORS 때문에 직접 호출이 막힙니다. `NEWS_SOURCES` 순서:
-rss2json(JSON, 가장 안정) → 직접 → allorigins → codetabs → corsproxy → jina.
-전부 실패하면 어느 단계에서 막혔는지 카드에 표시됩니다.
-
-## 야구
-
-`eventsseason`으로 시즌 전체를 받아 `eventsnext`/`eventslast`와 합칩니다.
-
-## 시간표 (나이스)
-
-방학·주말이면 최근 8주를 거슬러 찾고 두 학기를 모두 시도합니다.
-
-## 하루의 기준
-
-`dayOff()` — 취침 2시간 전(기본 21:00)부터 자정까지 '내일'. 자정~새벽 5시와 낮은 '오늘'.
+`fitStage()`: 밀도 → 열 재분배 → zoom(0.76까지) → 열 스크롤.
+스크롤 끝의 그라디언트는 제거했습니다(검은 박스 방지).
 
 ## 다국어
+`i18n.js` + `i18n-more.js` + `i18n-set.js` — 4개 언어 330여 문구.
+카드·설정 7탭·소개 6단계·운세까지 전부. 새 문구는 네 언어 모두에 추가.
 
-4개 언어 124개 문구. 새 문구는 네 언어 모두에 넣어야 합니다.
+## 명언
+한국어 낮 45 · 밤 25, 영어 낮 28 · 밤 13.
+아인슈타인·처칠·잡스·만델라·에디슨·공자·노자·안중근·김구 등 출처를 함께 표시.
 
 ## 남은 작업
-
-- [ ] 나이스 인증키 발급 → 설정 입력
-- [ ] Firebase 익명·이메일 로그인 켜기, 규칙 게시 (관리자 feelrun@kakao.com)
-- [ ] 앱 이름 확정 → 패키지 ID 결정 (`app.js`의 `APP_PKG`)
-- [ ] Capacitor 패키징
+- [ ] 나이스 인증키 발급
+- [ ] Firebase 로그인 2종 켜고 규칙 게시
+- [ ] 앱 이름 → 패키지 ID
+- [ ] Capacitor 패키징 (뉴스 CORS도 이때 해결됨)
 - [ ] 폐쇄 테스트 12명 × 14일

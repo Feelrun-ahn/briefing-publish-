@@ -537,10 +537,9 @@ html.theme-night, .brief-app.theme-night{
 .brief-app .slide{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
   padding-bottom:8px;scroll-padding-bottom:12px}
 .brief-app .ob-foot{flex:0 0 auto;position:relative;z-index:6;
-  margin:0 calc(-1 * clamp(20px,5vw,64px));
-  padding:12px clamp(20px,5vw,64px) max(12px, env(safe-area-inset-bottom));
+  padding:12px 0 max(10px, env(safe-area-inset-bottom));
   border-top:1px solid var(--ob-border);
-  background:var(--ob-bg)}
+  background:transparent}
 .brief-app .stage{flex:1 1 0;min-height:0}
 .brief-app .ob-foot{flex:0 0 auto}
 @media (max-height:720px){

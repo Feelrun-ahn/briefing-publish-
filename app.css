@@ -160,7 +160,7 @@ main{position:relative;display:grid;gap:14px;min-height:0}
 body.phone{overflow-x:hidden;overflow-y:visible;height:auto}
 body.phone #root{position:static;display:block;height:auto;overflow:visible;background:transparent}
 body.phone #stage{overflow:hidden}
-body.phone #stage{width:100%;height:auto;min-height:100dvh;transform:none!important;
+body.phone #stage{width:100%;max-width:100%;height:auto;min-height:100dvh;transform:none!important;
   display:flex;flex-direction:column;gap:11px;padding:14px 12px 30px}
 body.phone #b1{width:340px;height:270px;left:-100px;top:-60px}
 body.phone #b2{width:320px;height:260px;right:-100px;bottom:-40px}
@@ -726,8 +726,7 @@ body[data-density="tight"] .qt{font-size:14.5px}
 
 /* 그래도 넘치면 열 스크롤 + 아래쪽 흐림으로 더 있음을 알림 */
 main > .col.over{position:relative;-webkit-overflow-scrolling:touch}
-main > .col.over::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38px;
-  pointer-events:none;background:linear-gradient(180deg,transparent,var(--bg));border-radius:0 0 22px 22px}
+main > .col.over::after{content:none}
 .tt.empty-p .sj{color:var(--tx3)}
 #ttWeek .fld{margin-bottom:10px}
 #ttWeek label{color:var(--tx3)}
@@ -836,3 +835,27 @@ body.no-anim *,body.no-anim *::before,body.no-anim *::after{
   animation:none!important;transition:none!important}
 /* 자리 잡은 카드는 다시 등장 애니메이션을 하지 않는다 */
 .card.settled{animation:none!important}
+
+
+/* 폰: 좌우 여백을 줄여 화면을 꽉 채운다 */
+body.phone #root{padding:0}
+body.phone #stage{padding:10px 10px 30px}
+body.phone main{gap:10px}
+body.phone .col{gap:10px}
+body.phone header{padding:4px 4px 0}
+
+
+/* 스크롤 끝에 색을 덧씌우지 않는다 (검은 박스 방지) */
+main > .col.over::after,main > .col::after{content:none!important;background:none!important}
+.brief-app .ob-foot{background:transparent!important}
+
+/* ═══════════ 카드 끌어 옮기기 ═══════════ */
+body.dragging{cursor:grabbing;user-select:none}
+body.dragging .card{transition:transform .16s var(--ease)}
+.card.drag-src{opacity:.35;transform:scale(.98)}
+.drop-mark{height:64px;border-radius:20px;border:2px dashed var(--accBd);
+  background:var(--accSoft);flex:0 0 auto;animation:markIn .18s var(--easeOut)}
+@keyframes markIn{from{opacity:0;transform:scaleY(.6)}to{opacity:1;transform:none}}
+/* 옮길 수 있다는 표시 */
+body:not(.phone) .card > .chead{cursor:grab}
+body:not(.phone) .card > .chead:active{cursor:grabbing}

@@ -9,8 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20">
-<link rel="stylesheet" href="onboard.css?v=20">
+<link rel="stylesheet" href="app.css?v=23">
+<link rel="stylesheet" href="onboard.css?v=23">
 <title>Briefing</title>
 </head>
 <body>
@@ -86,8 +86,8 @@
               <div>
                 <div class="slide-head">
                   <div class="slide-kicker stagger" style="--i:0">Welcome</div>
-                  <h1 class="slide-title stagger" style="--i:1">하루를 한 화면에.</h1>
-                  <p class="slide-sub stagger" style="--i:2">아침엔 오늘을, 밤엔 내일을. 시간에 따라 화면 색과 인사말이 통째로 바뀝니다. 필요한 카드만 골라 나만의 화면을 만드세요.</p>
+                  <h1 class="slide-title stagger" style="--i:1" data-i18n="obTitle1">하루를 한 화면에.</h1>
+                  <p class="slide-sub stagger" style="--i:2" data-i18n="obSub1">아침엔 오늘을, 밤엔 내일을. 시간에 따라 화면 색과 인사말이 통째로 바뀝니다. 필요한 카드만 골라 나만의 화면을 만드세요.</p>
                 </div>
                 <div class="feat-list">
                   <div class="feat stagger" style="--i:3">
@@ -135,12 +135,12 @@
           <section class="slide" data-slide="2" aria-label="이름">
             <div class="slide-head">
               <div class="slide-kicker stagger" style="--i:0">01 · 이름</div>
-              <h1 class="slide-title stagger" style="--i:1">어떻게 불러 드릴까요?</h1>
-              <p class="slide-sub stagger" style="--i:2">인사말에 쓰입니다. 지금 건너뛰어도 나중에 설정에서 바꿀 수 있어요.</p>
+              <h1 class="slide-title stagger" style="--i:1" data-i18n="obTitle2">어떻게 불러 드릴까요?</h1>
+              <p class="slide-sub stagger" style="--i:2" data-i18n="obSub2">인사말에 쓰입니다. 지금 건너뛰어도 나중에 설정에서 바꿀 수 있어요.</p>
             </div>
             <div class="form-col">
               <div class="field stagger" style="--i:3">
-                <label for="ob-name">이름 <span class="optional">(선택)</span></label>
+                <label for="ob-name"data-i18n="obNameLabel">이름 <span class="optional">(선택)</span></label>
                 <input class="input" id="ob-name" type="text" placeholder="예: 지호" autocomplete="off">
               </div>
             </div>
@@ -150,8 +150,8 @@
           <section class="slide" data-slide="3" aria-label="생년월일">
             <div class="slide-head">
               <div class="slide-kicker stagger" style="--i:0">02 · 생일</div>
-              <h1 class="slide-title stagger" style="--i:1">언제 태어났나요?</h1>
-              <p class="slide-sub stagger" style="--i:2">오늘의 운세를 계산하는 데 쓰여요.</p>
+              <h1 class="slide-title stagger" style="--i:1" data-i18n="obTitle3">언제 태어났나요?</h1>
+              <p class="slide-sub stagger" data-i18n="obSub3" style="--i:2">오늘의 운세를 계산하는 데 쓰여요.</p>
             </div>
             <div class="form-col">
               <div class="field stagger" style="--i:3">
@@ -173,7 +173,7 @@
           <section class="slide" data-slide="4" aria-label="지역">
             <div class="slide-head">
               <div class="slide-kicker stagger" style="--i:0">03 · 지역</div>
-              <h1 class="slide-title stagger" style="--i:1">어디의 날씨를 볼까요?</h1>
+              <h1 class="slide-title stagger" style="--i:1" data-i18n="obTitle4">어디의 날씨를 볼까요?</h1>
               <p class="slide-sub stagger" style="--i:2">도시를 검색하거나 현재 위치로 자동 설정할 수 있어요.</p>
             </div>
             <div class="form-col">
@@ -195,7 +195,7 @@
           <section class="slide" data-slide="5" aria-label="카드 고르기">
             <div class="slide-head">
               <div class="slide-kicker stagger" style="--i:0">04 · 카드</div>
-              <h1 class="slide-title stagger" style="--i:1">어떤 카드를 볼까요?</h1>
+              <h1 class="slide-title stagger" style="--i:1" data-i18n="obTitle5">어떤 카드를 볼까요?</h1>
               <p class="slide-sub stagger" style="--i:2">언제든 설정에서 켜고 끌 수 있어요. <span class="pick-count">현재 <b class="cnt" id="obCnt">0</b>개 선택</span></p>
             </div>
             <div class="card-grid" id="obCards"></div>
@@ -336,6 +336,6 @@
   </div>
 </div>
 
-<script src="app.js?v=20"></script>
+<script src="app.js?v=23"></script>
 </body>
 </html>
