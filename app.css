@@ -725,3 +725,59 @@ main > .col.over::after{content:"";position:absolute;left:0;right:0;bottom:0;hei
 .tt.empty-p .sj{color:var(--tx3)}
 #ttWeek .fld{margin-bottom:10px}
 #ttWeek label{color:var(--tx3)}
+
+/* 날씨 통계 칸 — 라벨은 짧게, 부가 정보는 아래 줄에 */
+.wx-stat u{display:block;margin-top:3px;font-size:10.5px;line-height:1.4;color:var(--tx3);text-decoration:none}
+.wx-stat i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body[data-density="tight"] .wx-stat u{display:none}
+
+/* 할 일 입력 — 체크 버튼과 안내 */
+.td-add{gap:6px;flex-wrap:wrap}
+.td-add input{min-width:0}
+.td-when{width:30px;height:30px;flex:none;border-radius:9px;border:1px solid var(--bd);
+  background:transparent;display:grid;place-items:center;position:relative}
+.td-when::before{content:"";width:15px;height:14px;border:1.6px solid var(--tx3);border-radius:3px}
+.td-when::after{content:"";position:absolute;top:8px;width:15px;height:1.6px;background:var(--tx3)}
+.td-ok{width:30px;height:30px;flex:none;border-radius:9px;border:1px solid var(--accBd);
+  background:var(--accSoft);color:var(--acc);font-size:15px;line-height:1;
+  display:grid;place-items:center;animation:popIn .2s var(--spring)}
+.td-hint{margin-top:6px;font-size:11.5px;color:var(--tx3);line-height:1.5}
+.td-opt{align-items:center}
+.td-lb{font-size:11px;color:var(--acc);letter-spacing:.1em}
+body[data-density="tight"] .td-hint{display:none}
+
+/* ═══════════ ② 가로 스와이프 차단 · ⑪ 좁고 긴 화면 대응 ═══════════ */
+html,body{overscroll-behavior-x:none;touch-action:pan-y}
+#root,#stage,main,.col,.card{overscroll-behavior-x:none;max-width:100%}
+.card,.col,main{touch-action:pan-y}
+/* 가로로 넘칠 수 있는 요소는 안에서만 스크롤 */
+.wx-hourly,.cal-grid,.setnav,.nz-timer,.dowpick{overscroll-behavior-x:contain}
+
+/* 폴드·플립 등 아주 좁거나 긴 화면 */
+@media (max-width:420px){
+  body.phone #stage{padding:12px 10px 26px}
+  body.phone .card{padding:14px 13px;border-radius:18px}
+  body.phone .ck-hm{font-size:52px}
+  body.phone .wx-temp{font-size:44px}
+  body.phone .wx-stats{grid-template-columns:1fr 1fr}
+  body.phone .fo-score b{font-size:44px}
+  body.phone .fo-lucky,body.phone .fo-act{grid-template-columns:1fr 1fr}
+  body.phone .cal-c{aspect-ratio:1/1}
+  body.phone .cal-c .n{font-size:12px}
+  body.phone .nz-kinds{grid-template-columns:1fr}
+}
+@media (max-width:380px){          /* 플립 커버·소형 폰 */
+  body.phone .wx-stats{grid-template-columns:1fr}
+  body.phone .ck-hm{font-size:44px}
+  body.phone .td-opt{flex-direction:column;align-items:stretch}
+  body.phone .td-opt input{width:100%}
+  body.phone .td-opt .btn{width:100%}
+  body.phone .tabs button{padding:5px 11px;font-size:11.5px}
+  body.phone .fo-lucky,body.phone .fo-act{grid-template-columns:1fr 1fr}
+  body.phone .nz-timer{flex-wrap:wrap}
+  body.phone .nz-timer button{flex:1 1 45%}
+}
+/* 폴드 펼친 상태(정사각형에 가까운 큰 화면) */
+@media (min-width:760px) and (max-aspect-ratio:1/1){
+  main{grid-template-columns:1fr 1fr!important}
+}

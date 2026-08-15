@@ -1,8 +1,8 @@
 /* Briefing 서비스워커
    코드(HTML·CSS·JS·JSON)는 네트워크 우선 — 새로 올린 파일이 바로 반영됩니다.
    이미지만 캐시 우선. */
-const CACHE = 'briefing-v14';
-const SHELL = ['./', './index.html', './app.css?v=14','./onboard.css?v=14', './app.js?v=14', './manifest.json','./privacy.html',
+const CACHE = 'briefing-v17';
+const SHELL = ['./', './index.html', './app.css?v=17','./onboard.css?v=17', './app.js?v=17', './manifest.json','./privacy.html',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {

@@ -22,7 +22,40 @@ const I18N = {
     hour:'시간', minute:'분',
     tabGeneral:'일반', tabCards:'카드 구성', tabTime:'시간', tabLink:'기기 연결', tabData:'데이터', tabHelp:'도움말',
     save:'저장', cancel:'취소', delete:'삭제', add:'추가', edit:'편집', close:'닫기',
-    today:'오늘', tomorrow:'내일', noItems:'항목이 없습니다'
+    today:'오늘', tomorrow:'내일', noItems:'항목이 없습니다',
+    wxPm10:'미세먼지', wxPm25:'초미세먼지', wxRain:'강수확률', wxHum:'습도', wxUv:'자외선',
+    wxSunrise:'일출', wxSunset:'일몰', uvVeryHigh:'매우높음', uvHigh:'높음', uvMid:'보통',
+    wxLo:'최저', wxHi:'최고', wxLoHi:'최저 / 최고', wxTomorrow:'내일', wxNoData:'날씨 정보 없음',
+    wxFail:'날씨를 불러오지 못했습니다. 인터넷 연결을 확인하고 오른쪽 위를 눌러 주세요.',
+    wxRetry:'다시 시도', wxRefresh:'눌러서 새로고침', wxFeels:'체감',
+    tdToday:'오늘', tdAll:'전체', tdDone:'완료', tdPlaceholder:'할 일을 적어 보세요',
+    tdHintDate:'달력 아이콘을 누르면 날짜와 시각을 정할 수 있어요',
+    tdSetOn:'{d}에 할 일', tdWillNotify:'알림 옴',
+    tdEmptyToday:'오늘 할 일이 없습니다. 위에 적어 보세요.',
+    tdEmptyAll:'할 일이 없습니다.', tdEmptyDone:'완료한 일이 없습니다.',
+    tdLeft:'남은 일 {n}', tdLate:'{n}일 지남', tdTomorrow:'내일',
+    calTitle:'달력', calToday:'오늘', calAdd:'+ 일정', calEmpty:'일정이 없습니다. + 버튼으로 추가하세요.',
+    calAllDay:'종일', calRepeat:'반복',
+    ddayHint:'달력에서 D-day를 추가해 보세요',
+    quoteLab:'오늘의 한마디', foLabToday:'오늘의 운세', foLabTomorrow:'내일의 운세',
+    newsLab:'뉴스 브리핑', newsFail:'헤드라인을 불러오지 못했습니다', newsTap:'눌러서 불러오기',
+    sleepLab:'수면 점수', habitLab:'매일 루틴', waterLab:'물 마시기', ttLab:'오늘 시간표',
+    examLab:'수행평가 알리미', bbLab:'야구',
+    setTitle:'설정', close:'닫기',
+    advHot:'반팔에 얇은 셔츠 한 장이면 충분합니다.', advWarm:'반팔, 저녁에는 가디건 한 장.',
+    advMild:'긴팔 셔츠가 적당합니다.', advCool:'재킷은 꼭 챙기세요.', advCold:'코트와 목도리가 필요합니다.',
+    advRainAt:'{r}에 비, 우산을 챙기세요.', advRain:'우산을 챙기세요.',
+    dowSun:'일', dowMon:'월', dowTue:'화', dowWed:'수', dowThu:'목', dowFri:'금', dowSat:'토',
+    dateFull:'{m}월 {d}일 {w}요일', ymLabel:'{y}년 {m}월', dayOfWeek:'{w}요일',
+    ampmAM:'AM', ampmPM:'PM', wxPlace:'내 지역',
+    tdDate:'날짜', tdTime:'시각', tdClear:'지우기',
+    ddayLabel:'D-day', quoteTapHint:'',
+    wClear:'맑음', wPartly:'구름 조금', wCloud:'흐림', wFog:'안개', wDrizzle:'이슬비',
+    wRain:'비', wSnow:'눈', wShower:'소나기', wThunder:'천둥번개',
+    aqGood:'좋음', aqMid:'보통', aqBad:'나쁨', aqWorst:'매우나쁨',
+    wClear:'맑음', wPartly:'구름 조금', wCloud:'흐림', wFog:'안개', wDrizzle:'이슬비',
+    wRain:'비', wSnow:'눈', wShower:'소나기', wThunder:'천둥번개',
+    aqGood:'좋음', aqMid:'보통', aqBad:'나쁨', aqWorst:'매우나쁨'
   },
   en:{
     morning:'MORNING', night:'NIGHT',
@@ -35,7 +68,37 @@ const I18N = {
     hour:'h', minute:'m',
     tabGeneral:'General', tabCards:'Cards', tabTime:'Times', tabLink:'Devices', tabData:'Data', tabHelp:'Help',
     save:'Save', cancel:'Cancel', delete:'Delete', add:'Add', edit:'Edit', close:'Close',
-    today:'Today', tomorrow:'Tomorrow', noItems:'Nothing here yet'
+    today:'Today', tomorrow:'Tomorrow', noItems:'Nothing here yet',
+    wxPm10:'PM10', wxPm25:'PM2.5', wxRain:'Rain', wxHum:'Humidity', wxUv:'UV',
+    wxSunrise:'Sunrise', wxSunset:'Sunset', uvVeryHigh:'very high', uvHigh:'high', uvMid:'moderate',
+    wxLo:'Low', wxHi:'High', wxLoHi:'Low / High', wxTomorrow:'Tomorrow', wxNoData:'No forecast',
+    wxFail:'Could not load the weather. Check your connection and tap the top right.',
+    wxRetry:'Try again', wxRefresh:'tap to refresh', wxFeels:'Feels like',
+    tdToday:'Today', tdAll:'All', tdDone:'Done', tdPlaceholder:'What needs doing?',
+    tdHintDate:'Tap the calendar icon to set a date and time',
+    tdSetOn:'Due {d}', tdWillNotify:'you\u2019ll be reminded',
+    tdEmptyToday:'Nothing for today. Add something above.',
+    tdEmptyAll:'No to-dos yet.', tdEmptyDone:'Nothing completed yet.',
+    tdLeft:'{n} left', tdLate:'{n} days late', tdTomorrow:'Tomorrow',
+    calTitle:'Calendar', calToday:'Today', calAdd:'+ Event', calEmpty:'Nothing planned. Tap + to add.',
+    calAllDay:'All day', calRepeat:'repeats',
+    ddayHint:'Add a D-day from the calendar',
+    quoteLab:'Quote of the day', foLabToday:'Today\u2019s fortune', foLabTomorrow:'Tomorrow\u2019s fortune',
+    newsLab:'News briefing', newsFail:'Could not load headlines', newsTap:'tap to load',
+    sleepLab:'Sleep score', habitLab:'Daily habits', waterLab:'Water', ttLab:'Today\u2019s classes',
+    examLab:'Assignments', bbLab:'Baseball',
+    setTitle:'Settings', close:'Close',
+    advHot:'A T-shirt is plenty today.', advWarm:'T-shirt, with a cardigan for the evening.',
+    advMild:'A long-sleeve shirt works well.', advCool:'Bring a jacket.', advCold:'You will want a coat and scarf.',
+    advRainAt:'Rain around {r} — take an umbrella.', advRain:'Take an umbrella.',
+    dowSun:'Sun', dowMon:'Mon', dowTue:'Tue', dowWed:'Wed', dowThu:'Thu', dowFri:'Fri', dowSat:'Sat',
+    dateFull:'{w}, {m}/{d}', ymLabel:'{m} {y}', dayOfWeek:'{w}',
+    ampmAM:'AM', ampmPM:'PM', wxPlace:'My area',
+    tdDate:'Date', tdTime:'Time', tdClear:'Clear',
+    ddayLabel:'D-day', quoteTapHint:'',
+    wClear:'Clear', wPartly:'Partly cloudy', wCloud:'Cloudy', wFog:'Fog', wDrizzle:'Drizzle',
+    wRain:'Rain', wSnow:'Snow', wShower:'Showers', wThunder:'Thunderstorm',
+    aqGood:'good', aqMid:'moderate', aqBad:'bad', aqWorst:'very bad'
   },
   ja:{
     morning:'MORNING', night:'NIGHT',
@@ -48,7 +111,37 @@ const I18N = {
     hour:'時間', minute:'分',
     tabGeneral:'一般', tabCards:'カード', tabTime:'時刻', tabLink:'端末連携', tabData:'データ', tabHelp:'ヘルプ',
     save:'保存', cancel:'キャンセル', delete:'削除', add:'追加', edit:'編集', close:'閉じる',
-    today:'今日', tomorrow:'明日', noItems:'項目がありません'
+    today:'今日', tomorrow:'明日', noItems:'項目がありません',
+    wxPm10:'PM10', wxPm25:'PM2.5', wxRain:'降水確率', wxHum:'湿度', wxUv:'紫外線',
+    wxSunrise:'日の出', wxSunset:'日の入り', uvVeryHigh:'非常に強い', uvHigh:'強い', uvMid:'普通',
+    wxLo:'最低', wxHi:'最高', wxLoHi:'最低 / 最高', wxTomorrow:'明日', wxNoData:'予報がありません',
+    wxFail:'天気を取得できませんでした。通信環境を確認して右上を押してください。',
+    wxRetry:'再試行', wxRefresh:'押して更新', wxFeels:'体感',
+    tdToday:'今日', tdAll:'すべて', tdDone:'完了', tdPlaceholder:'やることを書いてください',
+    tdHintDate:'カレンダーのアイコンで日付と時刻を設定できます',
+    tdSetOn:'{d} の予定', tdWillNotify:'通知します',
+    tdEmptyToday:'今日のやることはありません。上に書いてみましょう。',
+    tdEmptyAll:'やることがありません。', tdEmptyDone:'完了した項目はありません。',
+    tdLeft:'残り {n}', tdLate:'{n}日 過ぎました', tdTomorrow:'明日',
+    calTitle:'カレンダー', calToday:'今日', calAdd:'+ 予定', calEmpty:'予定がありません。+ で追加します。',
+    calAllDay:'終日', calRepeat:'繰り返し',
+    ddayHint:'カレンダーから Dデーを追加できます',
+    quoteLab:'今日の一言', foLabToday:'今日の運勢', foLabTomorrow:'明日の運勢',
+    newsLab:'ニュース', newsFail:'見出しを取得できませんでした', newsTap:'押して読み込み',
+    sleepLab:'睡眠スコア', habitLab:'毎日の習慣', waterLab:'水を飲む', ttLab:'今日の時間割',
+    examLab:'課題', bbLab:'野球',
+    setTitle:'設定', close:'閉じる',
+    advHot:'半袖一枚で十分です。', advWarm:'半袖に、夜はカーディガンを。',
+    advMild:'長袖シャツがちょうどいいです。', advCool:'上着を持って出ましょう。', advCold:'コートとマフラーが必要です。',
+    advRainAt:'{r} に雨。傘を持って行きましょう。', advRain:'傘を持って行きましょう。',
+    dowSun:'日', dowMon:'月', dowTue:'火', dowWed:'水', dowThu:'木', dowFri:'金', dowSat:'土',
+    dateFull:'{m}月{d}日（{w}）', ymLabel:'{y}年{m}月', dayOfWeek:'{w}曜日',
+    ampmAM:'AM', ampmPM:'PM', wxPlace:'現在地',
+    tdDate:'日付', tdTime:'時刻', tdClear:'消す',
+    ddayLabel:'Dデー', quoteTapHint:'',
+    wClear:'晴れ', wPartly:'晴れ時々曇り', wCloud:'曇り', wFog:'霧', wDrizzle:'霧雨',
+    wRain:'雨', wSnow:'雪', wShower:'にわか雨', wThunder:'雷雨',
+    aqGood:'良い', aqMid:'普通', aqBad:'悪い', aqWorst:'非常に悪い'
   },
   zh:{
     morning:'MORNING', night:'NIGHT',
@@ -61,7 +154,37 @@ const I18N = {
     hour:'小时', minute:'分',
     tabGeneral:'常规', tabCards:'卡片', tabTime:'时间', tabLink:'设备连接', tabData:'数据', tabHelp:'帮助',
     save:'保存', cancel:'取消', delete:'删除', add:'添加', edit:'编辑', close:'关闭',
-    today:'今天', tomorrow:'明天', noItems:'暂无内容'
+    today:'今天', tomorrow:'明天', noItems:'暂无内容',
+    wxPm10:'PM10', wxPm25:'PM2.5', wxRain:'降水概率', wxHum:'湿度', wxUv:'紫外线',
+    wxSunrise:'日出', wxSunset:'日落', uvVeryHigh:'很强', uvHigh:'强', uvMid:'中等',
+    wxLo:'最低', wxHi:'最高', wxLoHi:'最低 / 最高', wxTomorrow:'明天', wxNoData:'暂无预报',
+    wxFail:'无法获取天气。请检查网络后点击右上角。',
+    wxRetry:'重试', wxRefresh:'点击刷新', wxFeels:'体感',
+    tdToday:'今天', tdAll:'全部', tdDone:'已完成', tdPlaceholder:'写下要做的事',
+    tdHintDate:'点击日历图标可设置日期和时间',
+    tdSetOn:'{d} 到期', tdWillNotify:'会提醒你',
+    tdEmptyToday:'今天没有待办。在上面添加吧。',
+    tdEmptyAll:'还没有待办。', tdEmptyDone:'还没有完成的事项。',
+    tdLeft:'剩余 {n}', tdLate:'已过 {n} 天', tdTomorrow:'明天',
+    calTitle:'日历', calToday:'今天', calAdd:'+ 日程', calEmpty:'暂无日程。点击 + 添加。',
+    calAllDay:'全天', calRepeat:'重复',
+    ddayHint:'可在日历中添加倒数日',
+    quoteLab:'每日一句', foLabToday:'今日运势', foLabTomorrow:'明日运势',
+    newsLab:'新闻简报', newsFail:'无法获取标题', newsTap:'点击加载',
+    sleepLab:'睡眠评分', habitLab:'每日习惯', waterLab:'喝水', ttLab:'今日课表',
+    examLab:'作业提醒', bbLab:'棒球',
+    setTitle:'设置', close:'关闭',
+    advHot:'短袖就够了。', advWarm:'短袖，晚上带件开衫。',
+    advMild:'长袖衬衫刚刚好。', advCool:'记得带外套。', advCold:'需要大衣和围巾。',
+    advRainAt:'{r} 有雨，记得带伞。', advRain:'记得带伞。',
+    dowSun:'日', dowMon:'一', dowTue:'二', dowWed:'三', dowThu:'四', dowFri:'五', dowSat:'六',
+    dateFull:'{m}月{d}日 周{w}', ymLabel:'{y}年{m}月', dayOfWeek:'周{w}',
+    ampmAM:'上午', ampmPM:'下午', wxPlace:'我的位置',
+    tdDate:'日期', tdTime:'时间', tdClear:'清除',
+    ddayLabel:'倒数日', quoteTapHint:'',
+    wClear:'晴', wPartly:'多云转晴', wCloud:'阴', wFog:'雾', wDrizzle:'小雨',
+    wRain:'雨', wSnow:'雪', wShower:'阵雨', wThunder:'雷雨',
+    aqGood:'优', aqMid:'良', aqBad:'差', aqWorst:'很差'
   }
 };
 /* 카드 이름·설명 번역 (없으면 한국어) */
@@ -104,11 +227,47 @@ function T(k, vars){
   if(vars) for(const v in vars) s = s.replace('{'+v+'}', vars[v]);
   return s;
 }
-function cardName(c){ const m = CARD_I18N[lang()] && CARD_I18N[lang()][c.id]; return m ? m[0] : c.name; }
-function cardDesc(c){ const m = CARD_I18N[lang()] && CARD_I18N[lang()][c.id]; return m ? m[1] : (c.desc||''); }
+/* 소개 화면은 한국어로 고정되어 있어, 그 화면에서는 카드 이름도 한국어로 맞춘다 */
+function inOnboard(){ return !!document.getElementById('briefApp'); }
+function cardName(c){
+  if(inOnboard()) return c.name;
+  const m = CARD_I18N[lang()] && CARD_I18N[lang()][c.id];
+  return m ? m[0] : c.name;
+}
+function cardDesc(c){
+  if(inOnboard()) return c.desc || '';
+  const m = CARD_I18N[lang()] && CARD_I18N[lang()][c.id];
+  return m ? m[1] : (c.desc || '');
+}
+/* 첫 실행 언어
+   앱의 소개 화면·운세·명언이 한국어로 되어 있어 한국어로 시작한다.
+   기기가 일본어·중국어면 그쪽으로 맞추고, 언제든 설정에서 바꿀 수 있다. */
 function detectLang(){
-  const l = (navigator.language || 'ko').slice(0,2).toLowerCase();
-  return LANGS.some(x => x.id === l) ? l : 'en';
+  const list = (navigator.languages && navigator.languages.length)
+    ? navigator.languages : [navigator.language || 'ko'];
+  let other = '';
+  for(const raw of list){
+    const l = String(raw).slice(0,2).toLowerCase();
+    if(l === 'ko') return 'ko';
+    if(!other && (l === 'ja' || l === 'zh')) other = l;
+  }
+  return other || 'ko';
+}
+
+
+/* 언어에 맞는 요일 이름 */
+function dows(){ return [T('dowSun'),T('dowMon'),T('dowTue'),T('dowWed'),T('dowThu'),T('dowFri'),T('dowSat')]; }
+/* 언어에 맞는 날짜 표기 */
+function dateLabel(d){
+  const w = dows()[d.getDay()];
+  const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if(lang() === 'en') return `${w}, ${M[d.getMonth()].slice(0,3)} ${d.getDate()}`;
+  return T('dateFull', { m: d.getMonth()+1, d: d.getDate(), w });
+}
+function ymLabel(y, m){
+  const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if(lang() === 'en') return `${M[m]} ${y}`;
+  return T('ymLabel', { y, m: m+1 });
 }
 
 
@@ -444,6 +603,7 @@ const DEFAULTS = {
   name:'', birth:'', birthTime:'',
   place:'서울', lat:37.5665, lon:126.9780,
   wake:'07:00', out:'08:00', bed:'23:00',
+  useWake:true, useOut:true, useBed:true,
   cardOrder:[], cardOff:[], cardCol:{}, layoutMode:'auto',
   events:[],   // {id,title,date,time,memo,type:'event'|'todo'|'exam'|'dday',repeat,done,anyday}
   todoMigrated:false,
@@ -517,6 +677,7 @@ function dayOff(){
   if(!isNight()) return 0;
   const h = now.getHours();
   if(h < 5) return 0;
+  if(C.useBed === false) return h >= 21 ? 1 : 0;      // 취침 시각을 안 쓰면 21시 기준
   const bedM = mins(C.bed || '23:00');
   const start = Math.max(18*60, (bedM >= 300 ? bedM : bedM + 1440) - 120);
   return (h*60 + now.getMinutes()) >= start ? 1 : 0;
@@ -573,8 +734,10 @@ function build(){
   grid.innerHTML = '';
   const cards = Cards.enabled();
   const phone = document.body.classList.contains('phone');
-  const nCol = phone ? 1 : 3;
-  grid.style.gridTemplateColumns = phone ? '1fr' : 'repeat(3,1fr)';
+  /* 폴드처럼 정사각형에 가까운 화면은 2열이 더 자연스럽다 */
+  const ratio = innerWidth / Math.max(1, innerHeight);
+  const nCol = phone ? 1 : (ratio < 1.15 ? 2 : 3);
+  grid.style.gridTemplateColumns = `repeat(${nCol},1fr)`;
 
   const cols = Array.from({length:nCol}, () => ({ w:0, node: el('div','col') }));
   const manual = C.layoutMode === 'manual';
@@ -622,9 +785,14 @@ function paintHeader(){
   let toBed = mins(C.bed) - nowM; if(toBed < 0) toBed += 1440;
   const toOut = mins(C.out) - nowM;
   const fmt = m => (Math.floor(m/60) ? Math.floor(m/60)+T('hour')+' ' : '') + (m%60) + T('minute');
-  $('countdown').textContent = night
-    ? (h < 5 ? T('bedPast',{t:C.bed}) : toBed <= 240 ? T('bedIn',{t:C.bed,d:fmt(toBed)}) : T('bedGoal',{t:C.bed}))
-    : (toOut > 0 ? T('outIn',{t:C.out,d:fmt(toOut)}) : T('outPast',{t:C.out}));
+  const useBed = C.useBed !== false, useOut = C.useOut !== false;
+  let txt = '';
+  if(night && useBed)
+    txt = (h < 5 ? T('bedPast',{t:C.bed}) : toBed <= 240 ? T('bedIn',{t:C.bed,d:fmt(toBed)}) : T('bedGoal',{t:C.bed}));
+  else if(!night && useOut)
+    txt = (toOut > 0 ? T('outIn',{t:C.out,d:fmt(toOut)}) : T('outPast',{t:C.out}));
+  $('countdown').textContent = txt;
+  $('countdown').hidden = !txt;
 }
 
 /* ── 화면 맞춤 ── */
@@ -1105,14 +1273,14 @@ Cards.register({
   render(){
     const h = now.getHours();
     $('ckHM').textContent = pad(h)+':'+pad(now.getMinutes());
-    $('ckAP').textContent = h < 12 ? 'AM' : 'PM';
-    $('ckDate').textContent = `${now.getMonth()+1}월 ${now.getDate()}일 ${DAYS_KR[now.getDay()]}요일`;
+    $('ckAP').textContent = h < 12 ? T('ampmAM') : T('ampmPM');
+    $('ckDate').textContent = dateLabel(now);
     const dd = EV.all().filter(e => e.type === 'dday' && !e.repeat)
       .map(e => ({ n:e.title, l:dleft(e.date) }))
       .filter(x => x.l >= 0).sort((a,b) => a.l - b.l).slice(0,3);
     $('ckChips').innerHTML = dd.map((d,i) =>
       `<span class="ck-chip${i===0?' hot':''}">${dtxt(d.l)} ${esc(d.n)}</span>`).join('')
-      || `<span class="tiny">달력에서 D-day를 추가해 보세요</span>`;
+      || `<span class="tiny">${T('ddayHint')}</span>`;
   }
 });
 
@@ -1122,9 +1290,11 @@ Cards.register({
 /* 날씨 — Open-Meteo (키 불필요, 상업적 이용 허용 / 출처 표기) */
 let WX_ERR = '';
 const WICON = c => c===0?'☀':c<=2?'⛅':c===3?'☁':c<=48?'≡':c<=67?'☂':c<=77?'❄':c<=82?'☂':'⚡';
-const WDESC = c => c===0?'맑음':c<=2?'구름 조금':c===3?'흐림':c<=48?'안개':c<=55?'이슬비':c<=67?'비':c<=77?'눈':c<=82?'소나기':'천둥번개';
+const WDESC = c => c===0?T('wClear'):c<=2?T('wPartly'):c===3?T('wCloud'):c<=48?T('wFog')
+  :c<=55?T('wDrizzle'):c<=67?T('wRain'):c<=77?T('wSnow'):c<=82?T('wShower'):T('wThunder');
 const pmGrade = (v, fine) => { const t = fine?[15,35,75]:[30,80,150];
-  return v<=t[0]?['좋음','var(--acc)']:v<=t[1]?['보통','var(--tx)']:v<=t[2]?['나쁨','var(--amber)']:['매우나쁨','var(--rose)']; };
+  return v<=t[0]?[T('aqGood'),'var(--acc)']:v<=t[1]?[T('aqMid'),'var(--tx)']
+       :v<=t[2]?[T('aqBad'),'var(--amber)']:[T('aqWorst'),'var(--rose)']; };
 
 /* 비 오는 시간대를 '오후 3~6시' 형태로 */
 function wetRanges(hs){
@@ -1135,7 +1305,10 @@ function wetRanges(hs){
     if(s[i] != null && s[i]-p <= 2){ p = s[i]; continue; }
     rs.push([a,p]); a = s[i]; p = s[i];
   }
-  const f = h => h===0 ? '자정' : h===12 ? '낮 12시' : (h<12?'오전 ':'오후 ') + (h%12) + '시';
+  const f = h => {
+    if(lang() !== 'ko') return (h<10?'0':'') + h + ':00';
+    return h===0 ? '자정' : h===12 ? '낮 12시' : (h<12?'오전 ':'오후 ') + (h%12) + '시';
+  };
   return rs.slice(0,2).map(([x,y]) => x===y ? f(x) : `${f(x)}~${f(y)}`).join(', ');
 }
 
@@ -1163,7 +1336,7 @@ async function loadWeather(force){
       for(let i=0;i<6;i++){
         const k = base + startH + i*step;
         if(j.hourly.temperature_2m[k] == null) break;
-        hourly.push({ t: pad((startH + i*step) % 24)+'시', temp: Math.round(j.hourly.temperature_2m[k]), icon: WICON(j.hourly.weather_code[k]) });
+        hourly.push({ t: pad((startH + i*step) % 24) + (lang()==='ko' ? '시' : ''), temp: Math.round(j.hourly.temperature_2m[k]), icon: WICON(j.hourly.weather_code[k]) });
       }
       const wetH = [];
       for(let h=0;h<24;h++){
@@ -1242,8 +1415,8 @@ Cards.register({
 
     const md = sel.slice(5).replace(/^0/,'').replace('-','월 ').replace(/-0?/,'') + '일';
     const tmr = ymd(new Date(now.getTime() + 86400000));
-    const when = isToday ? '오늘' : (sel === tmr ? '내일' : md);
-    el.querySelector('#wxLab').textContent = (C.place || '내 지역') + ' · ' + when;
+    const when = isToday ? T('today') : (sel === tmr ? T('tomorrow') : md);
+    el.querySelector('#wxLab').textContent = (C.place || T('wxPlace')) + ' · ' + when;
 
     if(!isToday && !dayData){
       el.querySelector('.wx-main').hidden = true;
@@ -1251,7 +1424,7 @@ Cards.register({
       el.querySelector('#wxTmrw').hidden = true;
       el.querySelector('#wxHourly').hidden = true;
       el.querySelector('#wxSrc').textContent = '';
-      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${when} 날씨 정보 없음<br>
+      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${when} ${T('wxNoData')}<br>
         <span class="tiny">예보는 오늘부터 7일까지만 제공돼요.</span></span>`;
       return;
     }
@@ -1260,22 +1433,22 @@ Cards.register({
     el.querySelector('#wxTmrw').hidden = !w;
     el.querySelector('#wxHourly').hidden = !w;
     if(!w){
-      el.querySelector('#wxSrc').textContent = '다시 시도';
-      el.querySelector('#wxAdv').innerHTML = `<span class="empty">날씨를 불러오지 못했습니다. 인터넷 연결을 확인하고 오른쪽 위를 눌러 주세요.</span>`;
+      el.querySelector('#wxSrc').textContent = T('wxRetry');
+      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${T('wxFail')}</span>`;
       return;
     }
     el.querySelector('#wxSrc').textContent =
-      (C.wx.stale ? '이전 기록' : (C.wx.model ? '기상청 · Open-Meteo' : 'Open-Meteo')) + ' · 눌러서 새로고침';
+      (C.wx.stale ? '—' : (C.wx.model && lang()==='ko' ? '기상청 · Open-Meteo' : 'Open-Meteo')) + ' · ' + T('wxRefresh');
     el.querySelector('#wxIcon').textContent = WICON(w.code);
     el.querySelector('#wxDesc').textContent = WDESC(w.code);
     if(isToday){
       el.querySelector('#wxTemp').innerHTML = `${w.temp}°`;
-      el.querySelector('#wxS1').textContent = `체감 ${w.feels}°`;
-      el.querySelector('#wxS2').textContent = `최고 ${w.hi}° / 최저 ${w.lo}°`;
+      el.querySelector('#wxS1').textContent = `${T('wxFeels')} ${w.feels}°`;
+      el.querySelector('#wxS2').textContent = `${T('wxHi')} ${w.hi}° / ${T('wxLo')} ${w.lo}°`;
     } else {
       el.querySelector('#wxTemp').innerHTML = `<span class="lo2">${w.lo}°</span><span class="slash">/</span>${w.hi}°`;
-      el.querySelector('#wxS1').textContent = '최저 / 최고';
-      el.querySelector('#wxS2').textContent = `강수확률 ${w.rain != null ? w.rain : '—'}%`;
+      el.querySelector('#wxS1').textContent = T('wxLoHi');
+      el.querySelector('#wxS2').textContent = `${T('wxRain')} ${w.rain != null ? w.rain : '—'}%`;
     }
 
     el.querySelector('#wxTmrw').hidden = !isToday;
@@ -1283,26 +1456,38 @@ Cards.register({
     const st = [];
     const num = v => (v != null && isFinite(v)) ? Math.round(v) : null;
     const p10 = num(air.pm10), p25 = num(air.pm25);
-    if(p10 != null){ const g = pmGrade(p10,false); st.push(['미세먼지', p10+' '+g[0], g[1]]); }
-    if(p25 != null){ const g = pmGrade(p25,true); st.push(['초미세먼지', p25+' '+g[0], g[1]]); }
-    st.push(['강수확률' + (wetRanges(w.wetH) ? ' · '+wetRanges(w.wetH) : ''), (w.rain ?? '—')+'%', w.rain>=60?'var(--acc)':'var(--tx)']);
-    st.push(['습도', w.hum+'%', 'var(--tx)']);
-    st.push(['자외선', w.uv>=8?w.uv+' 매우높음':w.uv>=6?w.uv+' 높음':w.uv+' 보통', 'var(--tx)']);
-    st.push([isNight()?'일출':'일몰', (isNight()?w.sunrise:w.sunset)||'—', 'var(--tx)']);
+    const rainRange = wetRanges(w.wetH);
+    if(isToday){
+      /* 오늘: 미세먼지·초미세먼지·강수·습도·자외선·일출 */
+      if(p10 != null){ const g = pmGrade(p10,false); st.push([T('wxPm10'), p10+' '+g[0], g[1]]); }
+      if(p25 != null){ const g = pmGrade(p25,true); st.push([T('wxPm25'), p25+' '+g[0], g[1]]); }
+      st.push([T('wxRain'), (w.rain != null ? w.rain : '—')+'%', w.rain>=60?'var(--acc)':'var(--tx)', rainRange]);
+      if(num(w.hum) != null) st.push([T('wxHum'), num(w.hum)+'%', 'var(--tx)']);
+      st.push([T('wxUv'), w.uv>=8?w.uv+' '+T('uvVeryHigh'):w.uv>=6?w.uv+' '+T('uvHigh'):w.uv+' '+T('uvMid'), 'var(--tx)']);
+      st.push([isNight()?T('wxSunrise'):T('wxSunset'), (isNight()?w.sunrise:w.sunset)||'—', 'var(--tx)']);
+    } else {
+      /* 다른 날: 습도·체감은 예보에 없으므로 세 칸만 */
+      st.push([T('wxRain'), (w.rain != null ? w.rain : '—')+'%', w.rain>=60?'var(--acc)':'var(--tx)', rainRange]);
+      st.push([T('wxUv'), w.uv>=8?w.uv+' '+T('uvVeryHigh'):w.uv>=6?w.uv+' '+T('uvHigh'):w.uv+' '+T('uvMid'), 'var(--tx)']);
+      st.push([T('wxSunrise'), w.sunrise||'—', 'var(--tx)']);
+    }
     el.querySelector('#wxStats').innerHTML = st.map(s =>
-      `<div class="wx-stat"><i>${s[0]}</i><b style="color:${s[2]}">${s[1]}</b></div>`).join('');
+      `<div class="wx-stat"><i>${s[0]}</i><b style="color:${s[2]}">${s[1]}</b>`
+      + (s[3] ? `<u>${esc(s[3])}</u>` : '') + `</div>`).join('');
 
-    const t = w.temp;
-    el.querySelector('#wxAdv').textContent =
-      (t>=28?'반팔에 얇은 셔츠 한 장이면 충분합니다.':t>=23?'반팔, 저녁에는 가디건 한 장.':
-       t>=17?'긴팔 셔츠가 적당합니다.':t>=10?'재킷은 꼭 챙기세요.':'코트와 목도리가 필요합니다.')
-      + (w.rain>=50 ? (wetRanges(w.wetH) ? ` ${wetRanges(w.wetH)}에 비, 우산을 챙기세요.` : ' 우산을 챙기세요.') : '');
+    /* 조언 기준: 오늘은 현재 기온, 다른 날은 그날 최고 기온 */
+    const t = (w.temp != null) ? w.temp : w.hi;
+    const adv = t>=28 ? T('advHot') : t>=23 ? T('advWarm')
+              : t>=17 ? T('advMild') : t>=10 ? T('advCool') : T('advCold');
+    const rr = wetRanges(w.wetH);
+    el.querySelector('#wxAdv').textContent = adv
+      + (w.rain>=50 ? ' ' + (rr ? T('advRainAt',{r:rr}) : T('advRain')) : '');
 
     const tw = C.wx.tomorrow;
     el.querySelector('#wxTmrw').innerHTML = tw
-      ? `<span class="lb">내일</span><span class="ic">${WICON(tw.code)}</span>`
+      ? `<span class="lb">${T('wxTomorrow')}</span><span class="ic">${WICON(tw.code)}</span>`
         + `<span class="tp"><b>${tw.lo}°</b> / ${tw.hi}°</span>`
-        + `<span class="rn">${WDESC(tw.code)}${tw.rain!=null?' · 강수 <b>'+tw.rain+'%</b>':''}`
+        + `<span class="rn">${WDESC(tw.code)}${tw.rain!=null?' · '+T('wxRain')+' <b>'+tw.rain+'%</b>':''}`
         + `${wetRanges(tw.wetH)?' · '+wetRanges(tw.wetH):''}</span>`
       : '';
     el.querySelector('#wxHourly').innerHTML = w.hourly.map(x =>
@@ -1329,18 +1514,18 @@ Cards.register({
     calInit();
     el.innerHTML = `
       <div class="chead">
-        <span class="clab">달력</span>
+        <span class="clab">${T('calTitle')}</span>
         <div class="cal-nav">
           <button class="cbtn" data-go="-1">‹</button>
           <span class="cal-ym" id="calYM"></span>
           <button class="cbtn" data-go="1">›</button>
-          <button class="cbtn" data-go="0">오늘</button>
+          <button class="cbtn" data-go="0">${T('calToday')}</button>
         </div>
       </div>
       <div class="cal-dow" id="calDow"></div>
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-day">
-        <div class="cal-dhead"><span id="calDayLab"></span><button class="cbtn acc" id="calAdd">+ 일정</button></div>
+        <div class="cal-dhead"><span id="calDayLab"></span><button class="cbtn acc" id="calAdd">${T('calAdd')}</button></div>
         <div class="cal-list" id="calList"></div>
       </div>`;
     el.querySelector('.cal-nav').onclick = e => {
@@ -1368,8 +1553,8 @@ Cards.register({
   render(el){
     calInit();
     const { y, m } = calYM;
-    el.querySelector('#calYM').textContent = `${y}년 ${m+1}월`;
-    el.querySelector('#calDow').innerHTML = DAYS_KR.map((d,i) =>
+    el.querySelector('#calYM').textContent = ymLabel(y, m);
+    el.querySelector('#calDow').innerHTML = dows().map((d,i) =>
       `<span class="${i===0?'sun':i===6?'sat':''}">${d}</span>`).join('');
 
     const first = new Date(y, m, 1), start = first.getDay();
@@ -1397,16 +1582,16 @@ Cards.register({
     const sd = new Date(calSel+'T00:00:00');
     const dl = dleft(calSel);
     el.querySelector('#calDayLab').innerHTML =
-      `${sd.getMonth()+1}월 ${sd.getDate()}일 ${DAYS_KR[sd.getDay()]}요일 <i class="tiny">${calSel===t?'오늘':dtxt(dl)}</i>`;
+      `${dateLabel(sd)} <i class="tiny">${calSel===t?T('calToday'):dtxt(dl)}</i>`;
     const list = EV.onDate(calSel);
     el.querySelector('#calList').innerHTML = list.length ? list.map(e => `
       <div class="cal-ev" data-ev="${e.id}">
         <i class="bar" style="background:${evColor(e.type)}"></i>
-        <span class="tm">${e.time || '종일'}</span>
+        <span class="tm">${e.time || T('calAllDay')}</span>
         <span class="tt">${esc(e.title)}${e.repeat && e.repeat.type ? ' <i class="rp">반복</i>' : ''}
           ${e.type === 'todo' ? '<i class="rp">할 일</i>' : ''}</span>
         ${e.time && e.notify !== false ? '<i class="rp">🔔</i>' : ''}
-      </div>`).join('') : `<div class="empty">일정이 없습니다. + 버튼으로 추가하세요.</div>`;
+      </div>`).join('') : `<div class="empty">${T('calEmpty')}</div>`;
   }
 });
 
@@ -1441,7 +1626,7 @@ function openEvent(id, dateStr){
     </div>
     <div class="fld" id="evWeekWrap" ${rep.type==='weekly'?'':'hidden'}>
       <label>요일</label>
-      <div class="dowpick" id="evDow">${DAYS_KR.map((x,i) =>
+      <div class="dowpick" id="evDow">${dows().map((x,i) =>
         `<button data-d="${i}" class="${(rep.days||[]).includes(i)?'on':''}">${x}</button>`).join('')}</div>
       <input id="evUntil" type="date" value="${rep.until||''}" placeholder="종료일">
       <span class="hint">종료일을 비우면 계속 반복됩니다.</span>
@@ -1500,32 +1685,49 @@ Cards.register({
     el.innerHTML = `
       <div class="chead">
         <div class="tabs" id="tdTabs">
-          <button class="on" data-k="today">오늘</button>
-          <button data-k="all">전체</button>
-          <button data-k="done">완료</button>
+          <button class="on" data-k="today">${T('tdToday')}</button>
+          <button data-k="all">${T('tdAll')}</button>
+          <button data-k="done">${T('tdDone')}</button>
         </div>
         <span class="cmeta" id="tdCount"></span>
       </div>
       <div class="td-add">
         <span>+</span>
-        <input id="tdIn" maxlength="90" placeholder="할 일을 적고 Enter">
-        <button class="td-when" id="tdWhen" title="날짜·시각">📅</button>
+        <input id="tdIn" maxlength="90" placeholder="${T('tdPlaceholder')}">
+        <button class="td-when" id="tdWhen" title="날짜·시각"></button>
+        <button class="td-ok" id="tdOk" title="추가" hidden>✓</button>
       </div>
+      <div class="td-hint" id="tdHint"></div>
       <div class="td-opt" id="tdOpt" hidden>
-        <input type="date" id="tdDate"><input type="time" id="tdTime">
-        <button class="btn" id="tdClear">지우기</button>
+        <label class="td-lb">${T('tdDate')}</label><input type="date" id="tdDate">
+        <label class="td-lb">${T('tdTime')}</label><input type="time" id="tdTime">
+        <button class="btn" id="tdClear">${T('tdClear')}</button>
       </div>
       <div class="td-list" id="tdList"></div>`;
 
     const inp = el.querySelector('#tdIn');
     const opt = el.querySelector('#tdOpt');
+    const ok  = el.querySelector('#tdOk');
+    const hint = el.querySelector('#tdHint');
+    const syncHint = () => {
+      const d = el.querySelector('#tdDate').value, tm = el.querySelector('#tdTime').value;
+      hint.textContent = d
+        ? (T('tdSetOn', { d: d.slice(5).replace('-','/') }) + (tm ? ' ' + tm : '') + (tm ? ' · ' + T('tdWillNotify') : ''))
+        : T('tdHintDate');
+      ok.hidden = !inp.value.trim();
+    };
+    el._syncHint = syncHint;
     el.querySelector('#tdWhen').onclick = () => {
       opt.hidden = !opt.hidden;
       if(!opt.hidden && !el.querySelector('#tdDate').value) el.querySelector('#tdDate').value = today();
+      syncHint();
     };
+    el.querySelector('#tdDate').addEventListener('change', syncHint);
+    el.querySelector('#tdTime').addEventListener('change', syncHint);
+    inp.addEventListener('input', syncHint);
     el.querySelector('#tdClear').onclick = () => {
       el.querySelector('#tdDate').value = ''; el.querySelector('#tdTime').value = '';
-      opt.hidden = true; inp.focus();
+      opt.hidden = true; inp.focus(); syncHint();
     };
     const add = () => {
       const v = inp.value.trim(); if(!v) return;
@@ -1536,8 +1738,10 @@ Cards.register({
       inp.value = ''; el.querySelector('#tdDate').value = ''; el.querySelector('#tdTime').value = '';
       opt.hidden = true; paint();
       if(tm) Notify.ask();
+      syncHint();
     };
     inp.addEventListener('keydown', e => { if(e.key === 'Enter') add(); });
+    ok.onclick = add;
 
     el.querySelector('#tdTabs').onclick = e => {
       const b = e.target.closest('button'); if(!b) return;
@@ -1557,6 +1761,7 @@ Cards.register({
     };
   },
   render(el){
+    if(el._syncHint) el._syncHint();
     const t = today();
     let list = EV.all().filter(e => e.type === 'todo');
     if(todoFilter === 'today') list = list.filter(e => !e.done && (e.anyday || e.date <= t));
@@ -1565,14 +1770,16 @@ Cards.register({
     list.sort((a,b) => (a.date+(a.time||'99:99')).localeCompare(b.date+(b.time||'99:99')));
 
     const left = EV.all().filter(e => e.type === 'todo' && !e.done && (e.anyday || e.date <= t)).length;
-    el.querySelector('#tdCount').textContent = left ? `남은 일 ${left}` : '';
+    el.querySelector('#tdCount').textContent = left ? T('tdLeft', { n: left }) : '';
 
     el.querySelector('#tdList').innerHTML = list.length ? list.map(e => {
       const dl = e.anyday ? null : dleft(e.date);
       const late = dl != null && dl < 0 && !e.done;
       const when = e.anyday ? '' :
-        (dl === 0 ? (e.time || '오늘') : dl === 1 ? '내일' + (e.time ? ' '+e.time : '') :
-         late ? `${-dl}일 지남` : `${e.date.slice(5).replace('-','/')}${e.time ? ' '+e.time : ''}`);
+        (dl === 0 ? (e.time || T('tdToday')) :
+         dl === 1 ? T('tdTomorrow') + (e.time ? ' '+e.time : '') :
+         late ? T('tdLate', { n: -dl }) :
+         `${e.date.slice(5).replace('-','/')}${e.time ? ' '+e.time : ''}`);
       return `<div class="td ${e.done?'done':''}" data-ev="${e.id}">
         <button class="ck" data-a="tog"></button>
         <span class="tx" data-a="tog">${esc(e.title)}</span>
@@ -1581,9 +1788,8 @@ Cards.register({
         <button class="rm" data-a="del">×</button>
       </div>`;
     }).join('') : `<div class="empty">${
-      todoFilter === 'done' ? '완료한 일이 없습니다.' :
-      todoFilter === 'all' ? '할 일이 없습니다.' :
-      '오늘 할 일이 없습니다. 위에 적어 보세요.'}</div>`;
+      todoFilter === 'done' ? T('tdEmptyDone') :
+      todoFilter === 'all' ? T('tdEmptyAll') : T('tdEmptyToday')}</div>`;
   }
 });
 
@@ -1596,7 +1802,7 @@ Cards.register({
   desc:'달력에 수행평가로 넣은 일정만 모아 D-day로 표시',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab">수행평가 알리미</span>
+      <div class="chead"><span class="clab">${T('examLab')}</span>
         <button class="cbtn" id="exAdd">+ 추가</button></div>
       <div class="ex-list" id="exList"></div>`;
     el.querySelector('#exAdd').onclick = () => openEvent(null, today());
@@ -1789,36 +1995,41 @@ const NEWS_TOPICS = [
 /* 구글 뉴스 RSS는 CORS 헤더가 없어 직접 호출이 막힌다.
    프록시를 순서대로 시도한다. (Capacitor로 감싸면 첫 번째가 바로 통과) */
 const NEWS_PROXIES = [
-  u => u,
-  u => 'https://r.jina.ai/' + u,
-  u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
-  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u)
+  { n:'직접',       f: u => u },
+  { n:'allorigins', f: u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
+  { n:'codetabs',   f: u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) },
+  { n:'corsproxy',  f: u => 'https://corsproxy.io/?url=' + encodeURIComponent(u) },
+  { n:'jina',       f: u => 'https://r.jina.ai/' + u },
+  { n:'thingproxy', f: u => 'https://thingproxy.freeboard.io/fetch/' + u }
 ];
+let NEWS_ERR = '';
 async function rssFirst(url){
+  const errs = [];
   for(const p of NEWS_PROXIES){
     const ac = new AbortController();
     const to = setTimeout(() => ac.abort(), 9000);
     try{
-      const r = await fetch(p(url), { signal: ac.signal });
+      const r = await fetch(p.f(url), { signal: ac.signal });
       clearTimeout(to);
-      if(!r.ok) continue;
+      if(!r.ok){ errs.push(p.n+':'+r.status); continue; }
       const text = await r.text();
       let xml = new DOMParser().parseFromString(text, 'text/xml');
       let it = xml.querySelector('item');
       if(!it){                                   // 텍스트로 감싸 오는 프록시 대비
         const s = text.indexOf('<item');
-        if(s < 0) continue;
+        if(s < 0){ errs.push(p.n+':형식'); continue; }
         xml = new DOMParser().parseFromString(text.slice(text.indexOf('<')), 'text/xml');
         it = xml.querySelector('item');
-        if(!it) continue;
+        if(!it){ errs.push(p.n+':형식'); continue; }
       }
       const raw = (it.querySelector('title') || {}).textContent || '';
-      if(!raw.trim()) continue;
+      if(!raw.trim()){ errs.push(p.n+':빈값'); continue; }
       const m = raw.match(/^(.*?)\s+-\s+([^-]+)$/);
       return { text: (m ? m[1] : raw).trim(), src: m ? m[2].trim() : '',
                url: ((it.querySelector('link') || {}).textContent || '').trim() };
-    }catch(e){ clearTimeout(to); }
+    }catch(e){ clearTimeout(to); errs.push(p.n+':차단'); }
   }
+  NEWS_ERR = errs.slice(0,3).join(' · ');
   return null;
 }
 async function loadNews(force){
@@ -1830,7 +2041,7 @@ async function loadNews(force){
   const out = await Promise.all(picks.map(async t => {
     let g = await rssFirst(`${base}/search?q=${encodeURIComponent(t.q)}&hl=ko&gl=KR&ceid=KR:ko`);
     if(!g) g = await rssFirst(`${base}/headlines/section/topic/${t.id}?hl=ko&gl=KR&ceid=KR:ko`);
-    return g ? Object.assign({ tag:t.name }, g) : { tag:t.name, text:'헤드라인을 불러오지 못했습니다', src:'', url:'' };
+    return g ? Object.assign({ tag:t.name }, g) : { tag:t.name, text:T('newsFail'), src:'', url:'' };
   }));
   C.news = out; C.newsAt = Date.now(); save(); paint();
 }
@@ -1839,14 +2050,15 @@ Cards.register({
   desc:'분야별 헤드라인 한 줄씩. 누르면 기사로 이동',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab">뉴스 브리핑</span>
+      <div class="chead"><span class="clab">${T('newsLab')}</span>
         <span class="cmeta" id="nwSrc">눌러서 새로고침</span></div>
       <div class="nw-list" id="nwList"></div>`;
     el.querySelector('#nwSrc').onclick = () => { el.querySelector('#nwSrc').textContent = '불러오는 중…'; loadNews(true); };
   },
   render(el){
     const list = C.news || [];
-    el.querySelector('#nwSrc').textContent = list.length ? 'Google News' : '눌러서 불러오기';
+    el.querySelector('#nwSrc').textContent = list.length && list.some(x => x.url)
+      ? 'Google News' : (NEWS_ERR ? NEWS_ERR + ' · ' + T('wxRetry') : T('newsTap'));
     el.querySelector('#nwList').innerHTML = list.length ? list.map(n => `
       <a class="nw" ${n.url?`href="${esc(n.url)}" target="_blank" rel="noopener"`:''}>
         <span class="tg">${n.tag}</span>
@@ -1865,7 +2077,7 @@ Cards.register({
   desc:'생년월일로 절기·일진·십신을 계산한 사주 운세 (재미로 보는 참고용)',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab" id="foLab">오늘의 운세</span><span class="cmeta" id="foWho"></span></div>
+      <div class="chead"><span class="clab" id="foLab">${T('foLabToday')}</span><span class="cmeta" id="foWho"></span></div>
       <div class="fo-score"><b class="big" id="foScore">--</b><i id="foGrade"></i></div>
       <div class="fo-badges" id="foBadges"></div>
       <p class="fo-head" id="foHead"></p>
@@ -1883,7 +2095,7 @@ Cards.register({
     const bd = baseDate();
     try{ f = fortune(C.birth, C.birthTime, new Date(bd.getFullYear(), bd.getMonth(), bd.getDate())); }catch(e){ return; }
     const lab = el.querySelector('#foLab');
-    if(lab) lab.textContent = dayOff() ? '내일의 운세' : '오늘의 운세';
+    if(lab) lab.textContent = dayOff() ? T('foLabTomorrow') : T('foLabToday');
     const g = f.score>=90?'대길(大吉)':f.score>=75?'길(吉)':f.score>=62?'소길(小吉)':f.score>=52?'평(平)':'신중(愼)';
     const col = v => v>=78?'var(--acc)':v>=60?'var(--amber)':'var(--rose)';
     const b = now.getFullYear() - new Date(C.birth+'T00:00:00').getFullYear();
@@ -1918,7 +2130,7 @@ Cards.register({
   desc:'스마트워치 수면 점수를 옮겨 적고 7일 흐름 보기',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab">수면 점수</span><span class="cmeta" id="slMeta"></span></div>
+      <div class="chead"><span class="clab">${T('sleepLab')}</span><span class="cmeta" id="slMeta"></span></div>
       <div id="slFull" hidden>
         <div class="sl-num"><b class="big" id="slScore">--</b><i id="slWord"></i></div>
         <div class="sl-bars" id="slBars"></div>
@@ -2090,22 +2302,99 @@ const Q_DAY = [
  ['천천히 가더라도 멈추지 않으면 된다.','공자'],['아침을 지배하면 하루를 지배한다.','속담'],
  ['할 수 있다고 믿는 사람은 그렇게 된다.','베르길리우스'],['오늘 걷지 않으면 내일은 뛰어야 한다.','속담'],
  ['준비되지 않은 기회는 그냥 지나가는 소음이다.',''],['꾸준함은 재능을 이긴다.',''],
- ['좋은 질문은 좋은 답보다 멀리 간다.',''],['오늘의 나는 어제 내가 한 선택의 결과다.','']
+ ['좋은 질문은 좋은 답보다 멀리 간다.',''],['오늘의 나는 어제 내가 한 선택의 결과다.',''],
+ ['가장 큰 위험은 위험을 감수하지 않는 것이다.','마크 저커버그'],
+ ['계획 없는 목표는 그저 소원일 뿐이다.','생텍쥐페리'],
+ ['배움에는 끝이 없고, 그래서 지루할 틈도 없다.',''],
+ ['어제보다 한 걸음이면 충분하다.',''],['잘하는 것보다 계속하는 것이 어렵다.',''],
+ ['실수는 배우는 중이라는 증거다.',''],['모르는 것을 모른다고 말하는 것이 앎의 시작이다.','공자'],
+ ['위대한 일은 작은 일들이 모여 이루어진다.','반 고흐'],
+ ['행동은 모든 성공의 기초다.','파블로 피카소'],['시간은 가장 공평한 자원이다.',''],
+ ['하기 싫은 일부터 해치우면 하루가 가벼워진다.',''],
+ ['완벽한 때는 오지 않는다. 지금이 그때다.',''],
+ ['집중은 무엇을 할지가 아니라 무엇을 안 할지 정하는 것이다.','스티브 잡스'],
+ ['오늘 할 수 있는 일에 전부를 쏟아라.','뉴턴'],
+ ['어려움 한가운데 기회가 있다.','아인슈타인'],
+ ['성공은 열정을 잃지 않고 실패를 거듭하는 능력이다.','처칠'],
+ ['운은 준비가 기회를 만났을 때 생긴다.','세네카'],
+ ['남과 비교하는 순간 행복은 사라진다.',''],
+ ['읽지 않은 책은 나무토막과 같다.',''],['생각은 크게, 시작은 작게.',''],
+ ['오늘의 노력은 내일의 여유다.',''],['질문하지 않으면 답도 없다.',''],
+ ['길을 잃는 것도 길을 아는 방법이다.',''],['쉬는 것도 하루의 일이다.',''],
+ ['가장 좋은 시작은 지금 시작하는 것이다.','']
 ];
 const Q_NIGHT = [
  ['잠은 최고의 명상이다.','달라이 라마'],['오늘 못 한 일은 내일의 나에게 맡기자.',''],
  ['하루를 잘 보낸 사람에게 밤은 짧다.','속담'],['내일의 나는 오늘 잔 만큼이다.',''],
  ['저녁이 되어서야 하루가 무슨 날이었는지 알 수 있다.','괴테'],['가장 어두운 시간은 해 뜨기 직전이다.','속담'],
- ['오늘의 나를 칭찬하고 자는 것도 실력이다.',''],['내일 걱정은 내일의 몫으로 남겨 두자.','']
+ ['오늘의 나를 칭찬하고 자는 것도 실력이다.',''],['내일 걱정은 내일의 몫으로 남겨 두자.',''],
+ ['하루를 접는 방식이 다음 하루를 만든다.',''],
+ ['잘 자는 것은 게으름이 아니라 준비다.',''],
+ ['오늘 한 일을 세어 보면 생각보다 많다.',''],
+ ['피곤한 몸에게도 고맙다고 말해 주자.',''],
+ ['어둠은 별을 보게 해 준다.',''],['후회는 짧게, 정리는 확실하게.',''],
+ ['조용한 밤은 생각을 정리하기 좋은 시간이다.',''],
+ ['내일 아침의 나를 위해 오늘 밤을 정리하자.',''],
+ ['모든 하루는 다시 오지 않는다. 그래서 소중하다.',''],
+ ['쉼표가 있어야 문장이 읽힌다.',''],['오늘 하루도 잘 버텼다.',''],
+ ['내일은 오늘보다 조금 더 나을 것이다.',''],
+ ['걱정으로 밤을 채우면 잠 잘 자리가 없다.',''],
+ ['하루의 끝에서 가장 좋았던 순간 하나만 떠올려 보자.',''],
+ ['깊이 잔 사람만이 멀리 갈 수 있다.',''],['불을 끄면 생각도 쉰다.',''],
+ ['내일의 계획은 오늘 밤에 세울 때 가장 선명하다.','']
 ];
+const Q_EN_DAY = [
+ ['Each day is a small lifetime.','Schopenhauer'],['Well begun is half done.','Aristotle'],
+ ['It does not matter how slowly you go, so long as you do not stop.','Confucius'],
+ ['Win the morning and you win the day.',''],['Consistency beats talent.',''],
+ ['A good question travels further than a good answer.',''],
+ ['The biggest risk is not taking any risk.','Mark Zuckerberg'],
+ ['A goal without a plan is just a wish.','Saint-Exupéry'],
+ ['Great things are done by a series of small things.','Van Gogh'],
+ ['Action is the foundational key to all success.','Picasso'],
+ ['In the middle of difficulty lies opportunity.','Einstein'],
+ ['Focus is deciding what not to do.','Steve Jobs'],
+ ['Mistakes are proof that you are trying.',''],['Think big, start small.',''],
+ ['The best time to start is now.','']
+];
+const Q_EN_NIGHT = [
+ ['Sleep is the best meditation.','Dalai Lama'],['Leave what is left to tomorrow\u2019s you.',''],
+ ['The night is short for those who spent the day well.',''],
+ ['Darkness lets you see the stars.',''],['You made it through today.',''],
+ ['Tidy the night for the morning you.',''],['Rest is part of the work.',''],
+ ['Tomorrow will be a little better than today.','']
+];
+const Q_JA_DAY = [['一日一日が小さな人生だ。','ショーペンハウアー'],['始めは半ば。','アリストテレス'],
+ ['ゆっくりでも止まらなければいい。','孔子'],['朝を制する者が一日を制する。',''],
+ ['続けることは才能に勝る。',''],['小さな積み重ねが大きなことをつくる。','ゴッホ']];
+const Q_JA_NIGHT = [['睡眠は最高の瞑想である。','ダライ・ラマ'],['今日できなかったことは明日の自分に。',''],
+ ['暗いからこそ星が見える。',''],['今日もよく頑張った。','']];
+const Q_ZH_DAY = [['每一天都是一段小小的人生。','叔本华'],['好的开始是成功的一半。','亚里士多德'],
+ ['走得慢没关系，只要不停下。','孔子'],['赢得清晨，就赢得一天。',''],
+ ['坚持胜过天赋。',''],['伟大源于点滴积累。','梵高']];
+const Q_ZH_NIGHT = [['睡眠是最好的冥想。','达赖喇嘛'],['今天没做完的，交给明天的自己。',''],
+ ['黑夜才让我们看见星星。',''],['今天也辛苦了。','']];
+function quoteList(night){
+  const l = lang();
+  if(l === 'en') return night ? Q_EN_NIGHT : Q_EN_DAY;
+  if(l === 'ja') return night ? Q_JA_NIGHT : Q_JA_DAY;
+  if(l === 'zh') return night ? Q_ZH_NIGHT : Q_ZH_DAY;
+  return night ? Q_NIGHT : Q_DAY;
+}
+let quoteSeed = 0;
 Cards.register({
   id:'quote', name:'오늘의 한마디', size:'S',
   desc:'아침·밤에 맞춘 문장 하나',
-  init(el){ el.innerHTML = `<p class="qt" id="qtText"></p><span class="qtsrc" id="qtSrc"></span>`; },
+  init(el){
+    el.innerHTML = `<p class="qt" id="qtText"></p><span class="qtsrc" id="qtSrc"></span>`;
+    el.style.cursor = 'pointer';
+    el.onclick = () => { quoteSeed++; const c = Cards.get('quote'); c.render(c._el); };
+  },
   render(){
-    const seed = jdn(now.getFullYear(), now.getMonth()+1, now.getDate());
-    const list = isNight() ? Q_NIGHT : Q_DAY;
-    const q = list[seed % list.length];
+    /* 날짜 + 새로고침 횟수로 고르므로, 새로고침할 때마다 새 문장이 나온다 */
+    const list = quoteList(isNight());
+    const seed = jdn(now.getFullYear(), now.getMonth()+1, now.getDate()) + quoteSeed;
+    const q = list[Math.abs(seed) % list.length];
     $('qtText').textContent = '“' + q[0] + '”';
     $('qtSrc').textContent = q[1] ? '— ' + q[1] : '';
   }
@@ -2121,7 +2410,7 @@ Cards.register({
   desc:'매일 반복하는 습관을 체크. 연속 달성 일수도 함께',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab">매일 루틴</span><span class="cmeta" id="hbMeta"></span></div>
+      <div class="chead"><span class="clab">${T('habitLab')}</span><span class="cmeta" id="hbMeta"></span></div>
       <div class="hb-list" id="hbList"></div>
       <div class="hb-add"><input id="hbIn" maxlength="20" placeholder="+ 루틴 추가"></div>`;
     el.querySelector('#hbIn').addEventListener('keydown', e => {
@@ -2172,7 +2461,7 @@ Cards.register({
   desc:'하루 목표 잔 수를 채워 가며 기록',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab">물 마시기</span><span class="cmeta" id="wtMeta"></span></div>
+      <div class="chead"><span class="clab">${T('waterLab')}</span><span class="cmeta" id="wtMeta"></span></div>
       <div class="wt-cups" id="wtCups"></div>
       <div class="wt-row">
         <button class="btn" id="wtMinus">−</button>
@@ -2209,7 +2498,7 @@ Cards.register({
   desc:'학교를 연결하면 자동으로, 직접 일주일치를 넣을 수도 있어요',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab">오늘 시간표</span>
+      <div class="chead"><span class="clab">${T('ttLab')}</span>
         <span class="cmeta" id="ttMeta"></span></div>
       <div class="tt-list" id="ttList"></div>`;
     el.querySelector('#ttMeta').onclick = () => {
@@ -2229,7 +2518,7 @@ Cards.register({
           ? `<div class="tt"><span class="no">${i+1}</span><span class="sj">${esc(s)}</span></div>`
           : `<div class="tt empty-p"><span class="no">${i+1}</span><span class="sj">—</span></div>`).join('')
       : `<div class="empty">${
-          dow === 0 || dow === 6 ? '주말이에요. 시간표가 없습니다.'
+          dow === 0 || dow === 6 ? (lang()==='ko' ? '주말이에요. 시간표가 없습니다.' : '—')
           : auto ? '오늘 시간표가 없습니다. 눌러서 다시 불러오세요.'
           : '설정 → 카드 구성에서 학교를 연결하거나 직접 넣어 보세요.'}</div>`;
   }
@@ -2694,7 +2983,7 @@ function renderSettings(){
       <h3 class="sectitle">언어</h3>
       <div class="fld"><select data-k="lang" id="langSel">
         ${LANGS.map(l => `<option value="${l.id}"${lang()===l.id?' selected':''}>${l.name}</option>`).join('')}
-      </select><span class="hint">화면 문구와 카드 이름에 적용됩니다. 운세·명언은 한국어로 표시됩니다.</span></div>
+      </select><span class="hint">화면 문구와 카드 이름에 적용됩니다. 운세·명언과 첫 소개 화면은 한국어로 표시됩니다.</span></div>
 
       <h3 class="sectitle" style="margin-top:26px">내 정보</h3>
       <div class="row2">
@@ -2910,12 +3199,29 @@ function renderSettings(){
       <h3 class="sectitle">하루 시각</h3>
       <p class="sechelp">헤더의 남은 시간 표시와 수면 안내에 쓰입니다.</p>
       <div class="row3">
-        <div class="fld"><label>기상</label><input data-k="wake" type="time" value="${C.wake}"></div>
-        <div class="fld"><label>외출 · 등교</label><input data-k="out" type="time" value="${C.out}"></div>
-        <div class="fld"><label>목표 취침</label><input data-k="bed" type="time" value="${C.bed}"></div>
+        <div class="fld"><label>기상</label>
+          <input data-k="wake" type="time" value="${C.wake}" ${C.useWake===false?'disabled':''}>
+          <label class="chk sm"><input type="checkbox" id="offWake" ${C.useWake===false?'checked':''}>
+            <span>사용 안 함</span></label></div>
+        <div class="fld"><label>외출 · 등교</label>
+          <input data-k="out" type="time" value="${C.out}" ${C.useOut===false?'disabled':''}>
+          <label class="chk sm"><input type="checkbox" id="offOut" ${C.useOut===false?'checked':''}>
+            <span>사용 안 함</span></label></div>
+        <div class="fld"><label>목표 취침</label>
+          <input data-k="bed" type="time" value="${C.bed}" ${C.useBed===false?'disabled':''}>
+          <label class="chk sm"><input type="checkbox" id="offBed" ${C.useBed===false?'checked':''}>
+            <span>사용 안 함</span></label></div>
       </div>
+      <p class="sechelp">사용 안 함으로 두면 헤더의 남은 시간 표시가 나타나지 않습니다.</p>
       <h3 class="sectitle" style="margin-top:26px">화면</h3>
       <p class="sechelp">아침 5시부터 밝은 화면, 저녁 6시부터 어두운 화면으로 자동 전환됩니다. 헤더 버튼으로 직접 바꿔도 다음 전환 시각에 자동으로 돌아옵니다.</p>`;
+    ['offWake','offOut','offBed'].forEach(id => {
+      const el = B.querySelector('#'+id); if(!el) return;
+      el.onchange = () => {
+        C[{offWake:'useWake', offOut:'useOut', offBed:'useBed'}[id]] = !el.checked;
+        save(); renderSettings(); paintHeader();
+      };
+    });
   }
   else if(setTab === 'notify'){
     const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
