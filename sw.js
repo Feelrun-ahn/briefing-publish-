@@ -1,8 +1,8 @@
 /* Briefing 서비스워커
    코드(HTML·CSS·JS·JSON)는 네트워크 우선 — 새로 올린 파일이 바로 반영됩니다.
    이미지만 캐시 우선. */
-const CACHE = 'briefing-v5';
-const SHELL = ['./', './index.html', './app.css?v=5', './app.js?v=5', './manifest.json',
+const CACHE = 'briefing-v7';
+const SHELL = ['./', './index.html', './app.css?v=7','./onboard.css?v=7', './app.js?v=7', './manifest.json',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
@@ -16,6 +16,14 @@ self.addEventListener('activate', e => {
   );
 });
 self.addEventListener('message', e => { if(e.data === 'skipWaiting') self.skipWaiting(); });
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(clients.matchAll({ type:'window', includeUncontrolled:true }).then(list => {
+    for(const c of list) if('focus' in c) return c.focus();
+    if(clients.openWindow) return clients.openWindow('./');
+  }));
+});
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
