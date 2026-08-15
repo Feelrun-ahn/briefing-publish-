@@ -22,7 +22,7 @@
 }
 
 /* ---------- 아침 테마 ---------- */
-html.theme-day, .brief-app.theme-day, html.theme-day .brief-app{
+html.theme-day, .brief-app.theme-day{
   --bg:#f6f4ee;
   --card:rgba(255,255,255,.72);
   --card-strong:rgba(255,255,255,.9);
@@ -41,7 +41,7 @@ html.theme-day, .brief-app.theme-day, html.theme-day .brief-app{
 }
 
 /* ---------- 밤 테마 ---------- */
-html.theme-night, .brief-app.theme-night, html.theme-night .brief-app{
+html.theme-night, .brief-app.theme-night{
   --bg:#080a14;
   --card:rgba(255,255,255,.055);
   --card-strong:rgba(255,255,255,.09);
@@ -68,6 +68,7 @@ html.theme-night, .brief-app.theme-night, html.theme-night .brief-app{
    ============================================================ */
 .brief-app{
   position:relative;
+  height:100vh;
   height:100dvh;
   width:100%;
   overflow:hidden;
@@ -169,7 +170,8 @@ html.theme-night, .brief-app.theme-night, html.theme-night .brief-app{
    ============================================================ */
 .onboard{
   position:relative;z-index:4;
-  width:100%;height:100dvh;
+  width:100%;height:100vh;
+  height:100dvh;
   display:flex;flex-direction:column;
   opacity:0;pointer-events:none;
   transition:opacity .5s ease .15s;
@@ -211,14 +213,6 @@ html.theme-night, .brief-app.theme-night, html.theme-night .brief-app{
 .onboard[data-step="6"] .seg:nth-child(-n+6)::after{transform:scaleX(1);}
 
 /* ---- 테마 토글 ---- */
-
-
-
-
-.theme-day 
-.theme-night 
-.theme-day  
-.theme-night 
 
 /* ---- 슬라이드 트랙 ---- */
 .stage{flex:1;min-height:0;position:relative;margin-top:22px;overflow:hidden;}
@@ -490,7 +484,6 @@ html.theme-night, .brief-app.theme-night, html.theme-night .brief-app{
   .ob-inner{padding:18px 18px 16px;}
   .ob-top{gap:12px;flex-wrap:wrap;}
   .ob-brand b{display:none;}
-  
   .stage{margin-top:16px;}
   .slide-head{margin-bottom:18px;}
   .hero-grid{grid-template-columns:1fr;gap:22px;align-items:start;overflow:visible;}
@@ -517,16 +510,16 @@ html.theme-night, .brief-app.theme-night, html.theme-night .brief-app{
 }
 
 /* ── 앱 연동 보정 ── */
-.brief-app{position:fixed;inset:0;z-index:300;height:100dvh;
-  background:var(--bg);color:var(--ink)}
+.brief-app{position:fixed;inset:0;z-index:300;background:var(--bg);color:var(--ink);
+  height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .brief-app.is-done{opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s}
 .brief-app .qr svg{width:120px;height:120px;border-radius:10px;background:#fff;padding:6px}
 .brief-app .qr-note{letter-spacing:.22em;font-weight:600}
 .brief-app .locate.busy{opacity:.6;pointer-events:none}
 .brief-app .code-in.busy input{opacity:.5}
 .brief-app .code-in.ok input{border-color:var(--accent)}
-.brief-app .code-in.err input{border-color:#e2708a;animation:shake .35s}
-@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.brief-app .code-in.err input{border-color:#e2708a;animation:obShake .35s}
+@keyframes obShake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
 /* 좁은 화면에서 카드 선택 칸이 넘치지 않게 */
 .brief-app .pick{min-width:0;max-width:100%;box-sizing:border-box}
@@ -534,6 +527,26 @@ html.theme-night, .brief-app.theme-night, html.theme-night .brief-app{
 .brief-app .pick .p-tx b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .brief-app .pick .p-ic{flex:0 0 auto}
 .brief-app .card-grid{max-width:100%}
+
+/* 세로가 짧은 화면에서도 아래 버튼이 항상 보이게 */
+.brief-app .onboard{height:auto;min-height:100vh;min-height:100dvh}
+.brief-app .ob-inner{height:auto;min-height:100vh;min-height:100dvh}
+/* 아래 버튼은 화면 맨 아래에 항상 붙어 있게 */
+.brief-app .ob-foot{position:sticky;bottom:0;z-index:6;margin-top:auto;
+  padding:14px 0 max(10px, env(safe-area-inset-bottom));
+  background:linear-gradient(180deg, transparent, var(--bg) 34%)}
+.brief-app .stage{flex:1 1 auto;min-height:280px}
+.brief-app .stage{flex:1 1 0;min-height:0}
+.brief-app .ob-foot{flex:0 0 auto}
+@media (max-height:720px){
+  .brief-app .ob-inner{padding-top:16px;padding-bottom:14px}
+  .brief-app .stage{margin-top:12px}
+  .brief-app .slide-title{font-size:28px}
+  .brief-app .slide-sub{font-size:14px;margin-top:8px}
+  .brief-app .ob-foot{padding-top:12px}
+  .brief-app .btn{height:44px}
+  .brief-app .phone{max-height:300px}
+}
 @media (max-width:760px){
   .brief-app .ob-inner{padding:16px 14px 14px}
   .brief-app .pick{padding:12px 13px;gap:10px}
