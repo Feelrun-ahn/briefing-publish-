@@ -669,3 +669,18 @@ header{animation:barSlide .55s var(--easeOut) both}
 #refreshBtn{font-size:14px;line-height:1;padding:7px 12px}
 #refreshBtn.spin{animation:spin .6s var(--ease)}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* 할 일 — 날짜·알림 표시 */
+.td-add{position:relative}
+.td-when{background:transparent;border:none;font-size:15px;opacity:.6;padding:0 2px}
+.td-when:hover{opacity:1}
+.td-opt{display:flex;gap:7px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.td-opt input{flex:1;min-width:120px;padding:8px 11px;border-radius:10px;border:1px solid var(--bd2);
+  background:var(--chip);font-size:13.5px;color:var(--tx)}
+.td-opt .btn{padding:8px 13px;font-size:12.5px}
+.td .when{font-size:11.5px;color:var(--tx3);white-space:nowrap}
+.td .when.now{color:var(--acc)}
+.td .when.late{color:var(--rose)}
+.td .bell{font-size:10px;font-style:normal;opacity:.7}
+.td.done .when,.td.done .bell{opacity:.4}
+.cal-ev .rp{font-size:10px;color:var(--tx3);font-style:normal;margin-left:4px}
