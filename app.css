@@ -684,3 +684,44 @@ header{animation:barSlide .55s var(--easeOut) both}
 .td .bell{font-size:10px;font-style:normal;opacity:.7}
 .td.done .when,.td.done .bell{opacity:.4}
 .cal-ev .rp{font-size:10px;color:var(--tx3);font-style:normal;margin-left:4px}
+
+/* ═══════════ 카드가 많을 때 밀도 조절 ═══════════
+   요소가 늘어나면 카드마다 덜 중요한 부분을 접어 잘림을 막는다 */
+body[data-density="compact"] .card{padding:15px 18px}
+body[data-density="compact"] .chead{margin-bottom:9px}
+body[data-density="compact"] .ck-hm{font-size:66px}
+body[data-density="compact"] .wx-temp{font-size:52px}
+body[data-density="compact"] .fo-score b{font-size:50px}
+body[data-density="compact"] .wx-hourly{padding-top:9px}
+body[data-density="compact"] .fo-head{font-size:14px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+body[data-density="compact"] .cal-c{aspect-ratio:1/.72}
+body[data-density="compact"] .td-list,body[data-density="compact"] .cal-list{max-height:220px}
+
+body[data-density="tight"] .card{padding:13px 16px;border-radius:18px}
+body[data-density="tight"] .chead{margin-bottom:7px}
+body[data-density="tight"] .ck-hm{font-size:54px}
+body[data-density="tight"] .ck-bot{margin-top:9px;padding-top:8px}
+body[data-density="tight"] .wx-temp{font-size:44px}
+body[data-density="tight"] .wx-icon{font-size:34px}
+body[data-density="tight"] .wx-desc{font-size:16px}
+body[data-density="tight"] .fo-score b{font-size:42px}
+body[data-density="tight"] .fo-head{font-size:13px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+body[data-density="tight"] .cal-c{aspect-ratio:1/.62}
+body[data-density="tight"] .cal-c .n{font-size:12px}
+body[data-density="tight"] .td-list,body[data-density="tight"] .cal-list{max-height:170px}
+body[data-density="tight"] .fo-lucky{display:none}          /* 행운 색·숫자·방향은 접음 */
+body[data-density="tight"] .fo-disc{display:none}
+body[data-density="tight"] .wx-hourly .wx-h:nth-child(n+5){display:none}
+body[data-density="tight"] .nw-list .nw:nth-child(n+4){display:none}
+body[data-density="tight"] .sl-bars{height:26px}
+body[data-density="tight"] .qt{font-size:14.5px}
+
+/* 그래도 넘치면 열 스크롤 + 아래쪽 흐림으로 더 있음을 알림 */
+main > .col.over{position:relative;-webkit-overflow-scrolling:touch}
+main > .col.over::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38px;
+  pointer-events:none;background:linear-gradient(180deg,transparent,var(--bg));border-radius:0 0 22px 22px}
+.tt.empty-p .sj{color:var(--tx3)}
+#ttWeek .fld{margin-bottom:10px}
+#ttWeek label{color:var(--tx3)}

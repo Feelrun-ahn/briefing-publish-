@@ -9,8 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=9">
-<link rel="stylesheet" href="onboard.css?v=9">
+<link rel="stylesheet" href="app.css?v=14">
+<link rel="stylesheet" href="onboard.css?v=14">
 <title>Briefing</title>
 </head>
 <body>
@@ -205,34 +205,44 @@
           <section class="slide" data-slide="6" aria-label="기기 연결">
             <div class="slide-head">
               <div class="slide-kicker stagger" style="--i:0">05 · 연결</div>
-              <h1 class="slide-title stagger" style="--i:1">기기를 연결할까요?</h1>
-              <p class="slide-sub stagger" style="--i:2">태블릿과 폰을 이으면 설정이 함께 넘어와요. 나중에 해도 됩니다.</p>
+              <h1 class="slide-title stagger" style="--i:1" id="lkTitle">다른 기기와 연결할까요?</h1>
+              <p class="slide-sub stagger" style="--i:2" id="lkSub">일정과 할 일이 두 기기에서 똑같이 보여요. 지금 건너뛰어도 나중에 설정에서 할 수 있어요.</p>
             </div>
-            <div class="connect-grid">
-              <div class="opt-card stagger" style="--i:3" aria-selected="true">
-                <div class="o-head">
-                  <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 20v.01M17 20v.01M20 17v.01"/></svg></span>
-                  <div class="o-t"><b>QR로 연결</b><span>다른 기기에서 스캔</span></div>
-                </div>
-                <div class="qr" id="obQR">
-                  <span class="qr-note" id="obQRNote">준비 중…</span>
-                </div>
+
+            <!-- 연결 방식 선택 -->
+            <div class="lk-pick stagger" style="--i:3" id="lkPick">
+              <button class="lk-mode" data-mode="host" type="button">
+                <span class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 20v.01M17 20v.01M20 17v.01"/></svg></span>
+                <span class="m-tx"><b id="lkHostT">이 기기에서 코드 만들기</b><span id="lkHostS">다른 기기에서 스캔하거나 입력</span></span>
+              </button>
+              <button class="lk-mode" data-mode="guest" type="button">
+                <span class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
+                <span class="m-tx"><b id="lkGuestT">받은 코드 입력하기</b><span id="lkGuestS">다른 기기에서 만든 코드를 넣어요</span></span>
+              </button>
+            </div>
+
+            <!-- 코드 만들기 -->
+            <div class="lk-panel" id="lkHost" hidden>
+              <div class="lk-qrbox">
+                <div class="qr" id="obQR"><span class="qr-note" id="obQRNote">만드는 중…</span></div>
+                <div class="lk-code-big" id="obCodeBig">······</div>
               </div>
-              <div class="opt-card stagger" style="--i:4">
-                <div class="o-head">
-                  <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
-                  <div class="o-t"><b>코드로 연결</b><span>6자리 코드 입력</span></div>
-                </div>
-                <div class="code-in" id="obCode">
-                  <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 1">
-                  <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 2">
-                  <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 3">
-                  <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 4">
-                  <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 5">
-                  <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 6">
-                </div>
-                <span class="opt-sub">태블릿 설정 → 연결에서 코드를 확인하세요.</span>
+              <ol class="lk-steps" id="lkSteps"></ol>
+              <button class="lk-copy" id="lkCopy" type="button">연결 링크 복사</button>
+            </div>
+
+            <!-- 코드 입력 -->
+            <div class="lk-panel" id="lkGuest" hidden>
+              <div class="code-in" id="obCode">
+                <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 1">
+                <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 2">
+                <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 3">
+                <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 4">
+                <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 5">
+                <input maxlength="1" inputmode="text" autocapitalize="characters" aria-label="코드 6">
               </div>
+              <p class="lk-msg" id="lkMsg"></p>
+              <ol class="lk-steps" id="lkSteps2"></ol>
             </div>
           </section>
 
@@ -255,6 +265,16 @@
     </div>
   </div>
 
+</div>
+
+<div id="welcome" hidden>
+  <div class="wc-inner">
+    <div class="wc-mark"><i></i></div>
+    <div class="wc-hi" id="wcHi">준비됐어요</div>
+    <div class="wc-name" id="wcName"></div>
+    <div class="wc-sub" id="wcSub"></div>
+    <div class="wc-bar"><i></i></div>
+  </div>
 </div>
 
 <div id="root">
@@ -316,6 +336,6 @@
   </div>
 </div>
 
-<script src="app.js?v=9"></script>
+<script src="app.js?v=14"></script>
 </body>
 </html>

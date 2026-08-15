@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Briefing 개인정보처리방침</title>
+<style>
+:root{
+  --bg:#f6f4ee; --tx:#161b24; --tx2:rgba(22,27,36,.68); --tx3:rgba(22,27,36,.5);
+  --acc:#0f8f7c; --bd:rgba(22,27,36,.12); --card:rgba(255,255,255,.7);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#080a14; --tx:#e8ecf6; --tx2:rgba(232,236,246,.62); --tx3:rgba(232,236,246,.4);
+         --acc:#6ee7d4; --bd:rgba(255,255,255,.12); --card:rgba(255,255,255,.05); }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);
+  font-family:'Space Grotesk',"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;line-height:1.75;
+  max-width:760px;margin:0 auto;padding:40px 22px 80px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.mark{width:34px;height:18px;position:relative}
+.mark i{position:absolute;bottom:0;left:0;width:34px;height:17px;border-radius:34px 34px 0 0;
+  background:linear-gradient(180deg,#e0faf3,var(--acc))}
+.mark b{position:absolute;bottom:0;left:-2px;width:38px;height:3px;border-radius:3px;
+  background:linear-gradient(90deg,var(--acc),#8b7cf6)}
+.brand span{font-size:15px;letter-spacing:.18em;font-weight:600}
+h1{font-size:27px;font-weight:500;letter-spacing:-.02em;margin-bottom:8px}
+.upd{font-size:13px;color:var(--tx3);margin-bottom:34px}
+h2{font-size:17px;font-weight:600;margin:34px 0 10px;padding-top:22px;border-top:1px solid var(--bd)}
+h2:first-of-type{border-top:none;padding-top:0}
+p{font-size:15px;color:var(--tx2);margin-bottom:12px}
+ul{margin:0 0 14px 20px}
+li{font-size:15px;color:var(--tx2);margin-bottom:7px}
+b,strong{color:var(--tx);font-weight:600}
+table{width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd);color:var(--tx2)}
+th{color:var(--tx);font-weight:600;font-size:13px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px 20px;margin:16px 0}
+.card p:last-child{margin-bottom:0}
+a{color:var(--acc)}
+.foot{margin-top:44px;padding-top:20px;border-top:1px solid var(--bd);font-size:13px;color:var(--tx3)}
+</style>
+</head>
+<body>
+
+<div class="brand"><span class="mark"><i></i><b></b></span><span>BRIEFING</span></div>
+
+<h1>개인정보처리방침</h1>
+<p class="upd">최종 수정일 2026년 8월 15일</p>
+
+<p>Briefing(이하 "앱")은 이용자의 개인정보를 소중히 다룹니다.
+이 방침은 앱이 어떤 정보를 다루고, 어디에 저장하며, 어떻게 지울 수 있는지를 설명합니다.</p>
+
+<div class="card">
+  <p><b>핵심 요약</b></p>
+  <p>앱이 다루는 정보는 <b>기본적으로 이용자의 기기 안에만</b> 저장됩니다.
+  회원가입이 없고 이름·이메일·전화번호를 요구하지 않습니다.
+  기기 연결 기능을 켠 경우에만 일정과 할 일이 이용자 본인의 저장 공간에 동기화됩니다.</p>
+</div>
+
+<h2>1. 앱이 다루는 정보</h2>
+<table>
+  <tr><th>항목</th><th>쓰임</th><th>저장 위치</th></tr>
+  <tr><td>표시 이름 (선택)</td><td>화면 인사말</td><td>기기 안</td></tr>
+  <tr><td>생년월일·태어난 시각 (선택)</td><td>운세 계산</td><td>기기 안</td></tr>
+  <tr><td>지역 또는 위치 좌표</td><td>날씨 조회</td><td>기기 안</td></tr>
+  <tr><td>일정·할 일·루틴·시간표</td><td>앱 기능</td><td>기기 안 (연결 시 서버)</td></tr>
+  <tr><td>수면 점수·물 기록</td><td>앱 기능</td><td>기기 안</td></tr>
+  <tr><td>카드 구성·언어·알림 시각</td><td>화면 설정</td><td>기기 안 (연결 시 서버)</td></tr>
+</table>
+<p>생년월일은 <b>운세 계산에만</b> 쓰이며 외부로 전송되지 않습니다.
+위치 좌표는 날씨를 받아올 때만 날씨 제공처로 전달되고 앱이 따로 보관하지 않습니다.</p>
+
+<h2>2. 기기 연결을 켠 경우</h2>
+<p>태블릿과 휴대폰을 잇는 기능을 사용하면 다음 정보가 Google Firebase(Firestore)에 저장됩니다.</p>
+<ul>
+  <li>달력 일정, 할 일, 루틴 기록, 물 기록, 시간표, 카드 구성</li>
+</ul>
+<p>이때 계정은 <b>익명으로 자동 생성</b>되며 이름·이메일 등 이용자를 식별할 수 있는 정보는 수집하지 않습니다.
+저장된 내용은 연결된 기기에서만 읽을 수 있도록 보안 규칙으로 제한되어 있습니다.
+날씨·운세·수면 점수는 동기화되지 않고 기기마다 따로 계산·기록됩니다.</p>
+<p>설정 → 기기 연결에서 <b>연결 해제</b>를 누르면 동기화가 중단됩니다.</p>
+
+<h2>3. 오류 제보를 보낸 경우</h2>
+<p>설정 → 도움말에서 제보를 보내면 다음이 저장됩니다.</p>
+<ul>
+  <li>이용자가 적은 내용</li>
+  <li>답장 받을 곳 (이용자가 직접 적은 경우에만)</li>
+  <li>기기 정보 — 앱 버전, 화면 크기, 언어, 켜 둔 카드 목록, 브라우저 종류 (체크박스를 켠 경우에만)</li>
+</ul>
+<p>제보에는 <b>일정·할 일 등 이용자가 적은 내용이 포함되지 않습니다.</b>
+제보 내용은 문제 해결과 기능 개선에만 사용하며, 처리 후 보관할 이유가 없어지면 삭제합니다.</p>
+
+<h2>4. 외부에 연결하는 곳</h2>
+<table>
+  <tr><th>대상</th><th>쓰임</th><th>전달되는 것</th></tr>
+  <tr><td>Open-Meteo</td><td>날씨·미세먼지·지역 검색</td><td>위치 좌표 또는 검색어</td></tr>
+  <tr><td>TheSportsDB</td><td>야구 경기 일정 (카드를 켠 경우)</td><td>선택한 팀</td></tr>
+  <tr><td>Google News</td><td>뉴스 헤드라인 (카드를 켠 경우)</td><td>선택한 분야</td></tr>
+  <tr><td>Google Firebase</td><td>기기 연결·오류 제보 (사용한 경우)</td><td>위 2·3항의 내용</td></tr>
+</table>
+<p>각 서비스는 자체 개인정보처리방침을 따릅니다. 앱은 광고를 표시하지 않으며,
+이용자 정보를 제3자에게 판매하거나 광고 목적으로 제공하지 않습니다.</p>
+
+<h2>5. 권한</h2>
+<ul>
+  <li><b>위치</b> — "현재 위치로 맞추기"를 누를 때만 사용합니다. 거부해도 지역을 직접 검색해 쓸 수 있습니다.</li>
+  <li><b>알림</b> — 할 일과 일정을 알려주는 데 사용합니다. 거부해도 다른 기능은 정상 동작합니다.</li>
+</ul>
+
+<h2>6. 보관 기간과 삭제</h2>
+<p>기기 안의 정보는 이용자가 앱을 삭제하거나 설정 → 데이터 → <b>전체 초기화</b>를 누르면 즉시 지워집니다.</p>
+<p>기기 연결로 저장된 내용은 연결을 해제하거나 아래 연락처로 요청하면 삭제해 드립니다.
+익명 계정이므로 삭제 요청 시 앱에 표시된 연결 코드를 함께 알려 주세요.</p>
+
+<h2>7. 만 14세 미만 이용자</h2>
+<p>앱은 회원가입 없이 사용할 수 있으며 이름·연락처를 수집하지 않습니다.
+만 14세 미만 이용자는 보호자의 동의를 받은 뒤 사용하시기를 권합니다.</p>
+
+<h2>8. 방침 변경</h2>
+<p>내용이 바뀌면 이 페이지에 수정일과 함께 공지합니다.
+중요한 변경은 앱 안에서도 알려 드립니다.</p>
+
+<h2>9. 문의</h2>
+<p>개인정보 관련 문의나 삭제 요청은 아래로 연락해 주세요.<br>
+<a href="mailto:feelrun.ahn@gmail.com">feelrun.ahn@gmail.com</a></p>
+<p>앱 안에서는 <b>설정 → 도움말</b>에서도 문의를 보낼 수 있습니다.</p>
+
+<div class="foot">
+  날씨·대기질 데이터 제공 Open-Meteo.com (CC BY 4.0) · 경기 데이터 TheSportsDB.com<br>
+  운세는 사주 명리 계산에 따른 참고용 콘텐츠이며 재미로 보는 것입니다.
+</div>
+
+</body>
+</html>

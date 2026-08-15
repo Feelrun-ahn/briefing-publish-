@@ -453,6 +453,7 @@ const DEFAULTS = {
   news:null, newsAt:0, newsTopics:['NATION','WORLD','SCIENCE'],
   habits:[], habitLog:{}, waterGoal:8, waterLog:{}, timetable:{},
   nzMin:30, nzVol:45, seenSplash:false,
+  school:null, neisKey:'', ttCache:null,
   notifyOn:false, notifyDaily:'08:00', notifyPre:'21:00', notifyLead:10,
   sync:{ on:false, uid:'', code:'', at:0 },
   wx:null, phoneAll:true, day:''
@@ -508,6 +509,20 @@ const THEME = {
 };
 let modeOverride = null, overrideBase = null;
 const isNight = () => modeOverride ? modeOverride === 'night' : (now.getHours() >= 18 || now.getHours() < 5);
+/* 하루의 기준
+   - 취침 무렵(목표 취침 2시간 전, 최소 18시)부터 자정까지는 '내일' 정보를 본다
+   - 자정을 넘기면 그 '내일'이 곧 오늘이므로 다시 오늘 정보를 본다
+   - 아침·낮에는 언제나 오늘 */
+function dayOff(){
+  if(!isNight()) return 0;
+  const h = now.getHours();
+  if(h < 5) return 0;
+  const bedM = mins(C.bed || '23:00');
+  const start = Math.max(18*60, (bedM >= 300 ? bedM : bedM + 1440) - 120);
+  return (h*60 + now.getMinutes()) >= start ? 1 : 0;
+}
+/* 지금 기준이 되는 날짜 */
+const baseDate = () => dayOff() ? new Date(now.getTime() + 86400000) : now;
 function applyTheme(){
   const t = THEME[isNight() ? 'night' : 'day'], r = document.documentElement.style;
   for(const k in t) r.setProperty(k, t[k]);
@@ -636,15 +651,35 @@ function fit(){
 function fitStage(){
   const st = $('stage');
   if(!st || document.body.classList.contains('phone')) return;
+
+  /* ① 카드 수에 따라 밀도를 먼저 낮춘다 (내용을 줄여 잘림을 막음) */
+  const n = Cards.enabled().length;
+  const dens = n >= 12 ? 'tight' : n >= 9 ? 'compact' : '';
+  document.body.dataset.density = dens;
+
   st.style.transform = 'none';
   st.style.height = '900px';
+
+  /* ② 그래도 넘치면 무대를 늘리고 그만큼 축소 (글씨가 너무 작아지지 않게 한계를 둔다) */
   const cols = [...document.querySelectorAll('main > .col')];
   const need = cols.reduce((m, c) => Math.max(m, c.scrollHeight), 0);
   const view = cols.length ? cols[0].clientHeight : 0;
+  const MAXH = 1500;
   let H = 900;
-  if(need > view + 4) H = Math.min(1600, 900 + (need - view) + 4);
+  if(need > view + 4) H = Math.min(MAXH, 900 + (need - view) + 4);
   st.style.height = H + 'px';
   st.style.transform = `scale(${Math.min(innerWidth/1440, innerHeight/H)})`;
+
+  /* ③ 최대 높이로도 모자라면 각 열을 스크롤 가능하게 하고 안내를 띄운다 */
+  requestAnimationFrame(() => {
+    let over = false;
+    cols.forEach(col => {
+      const o = col.scrollHeight > col.clientHeight + 6;
+      col.classList.toggle('over', o);
+      if(o) over = true;
+    });
+    document.body.classList.toggle('cards-overflow', over);
+  });
 }
 
 /* ── 일정 헬퍼 (캘린더·수행평가·D-day 공용) ── */
@@ -914,6 +949,147 @@ function syncSoon(){ if(!syncReady()) return; clearTimeout(syncTimer); syncTimer
 const _save = save;
 save = function(){ _save(); syncSoon(); };
 
+/* ═══════════ 오류 제보 ═══════════
+   Firestore의 reports 컬렉션에 남깁니다. 관리자 페이지(admin.html)에서 확인합니다. */
+async function sendReport(body){
+  if(!SYNC_CFG.project || !SYNC_CFG.apiKey) return false;
+  try{
+    if(!C.sync || !C.sync.uid || !C.sync.refresh) await anonLogin();
+    const H = await authHeaders();
+    const f = {
+      kind:      { stringValue: body.kind || 'etc' },
+      text:      { stringValue: (body.text || '').slice(0, 4000) },
+      from:      { stringValue: (body.from || '').slice(0, 200) },
+      diag:      { stringValue: body.diag ? JSON.stringify(body.diag).slice(0, 2000) : '' },
+      at:        { integerValue: String(body.at || Date.now()) },
+      uid:       { stringValue: (C.sync && C.sync.uid) || '' },
+      done:      { booleanValue: false }
+    };
+    const r = await fetch(fsUrl('reports'), { method:'POST', headers:H, body: JSON.stringify({ fields:f }) });
+    return r.ok;
+  }catch(e){ return false; }
+}
+
+
+/* ══════ js/neis.js ══════ */
+
+/* ═══════════ 나이스(NEIS) 교육정보 개방 포털 ═══════════
+   학교 검색: schoolInfo · 중학교 시간표: misTimetable
+   (초등 elsTimetable · 고등 hisTimetable 도 같은 방식)
+   인증키는 open.neis.go.kr 에서 무료로 발급받아 설정에 넣습니다. */
+const NEIS_BASE = 'https://open.neis.go.kr/hub/';
+const NEIS_PROXIES = [
+  u => u,
+  u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
+  u => 'https://corsproxy.io/?' + encodeURIComponent(u)
+];
+/* 학교급에 따라 서비스 이름이 다르다 */
+const NEIS_SVC = { els:'elsTimetable', mis:'misTimetable', his:'hisTimetable' };
+
+async function neisFetch(path){
+  const url = NEIS_BASE + path;
+  let lastErr = '';
+  for(const p of NEIS_PROXIES){
+    const ac = new AbortController();
+    const to = setTimeout(() => ac.abort(), 11000);
+    try{
+      const r = await fetch(p(url), { signal: ac.signal });
+      clearTimeout(to);
+      if(!r.ok){ lastErr = 'HTTP ' + r.status; continue; }
+      const txt = await r.text();
+      let j = null;
+      try{ j = JSON.parse(txt); }
+      catch(e){
+        const s = txt.indexOf('{'), e2 = txt.lastIndexOf('}');
+        if(s >= 0 && e2 > s){ try{ j = JSON.parse(txt.slice(s, e2+1)); }catch(e3){} }
+      }
+      if(!j){ lastErr = '응답을 읽지 못했습니다'; continue; }
+      /* 나이스는 결과가 없을 때도 200으로 코드만 담아 보낸다 */
+      if(j.RESULT && j.RESULT.CODE && j.RESULT.CODE !== 'INFO-000'){
+        return { err: neisMsg(j.RESULT.CODE, j.RESULT.MESSAGE) };
+      }
+      return { data: j };
+    }catch(e){ clearTimeout(to); lastErr = '연결 실패'; }
+  }
+  return { err: lastErr || '연결 실패' };
+}
+function neisMsg(code, msg){
+  if(code === 'INFO-200') return '해당 조건의 자료가 없습니다';
+  if(code === 'ERROR-290' || code === 'ERROR-300') return '인증키가 올바르지 않습니다';
+  if(code === 'ERROR-337') return '오늘 요청 한도를 넘었습니다';
+  return msg || code;
+}
+function neisKey(){ return (C.neisKey || '').trim(); }
+function neisRows(j, svc){
+  const arr = j && j[svc];
+  if(!arr || !arr[1] || !arr[1].row) return [];
+  return arr[1].row;
+}
+
+/* 학교 검색 — 이름 일부로 찾는다 */
+async function neisSchools(name){
+  const q = `schoolInfo?Type=json&pIndex=1&pSize=20`
+    + (neisKey() ? '&KEY=' + encodeURIComponent(neisKey()) : '')
+    + '&SCHUL_NM=' + encodeURIComponent(name);
+  const r = await neisFetch(q);
+  if(r.err) return { err: r.err };
+  return { list: neisRows(r.data, 'schoolInfo').map(s => ({
+    office: s.ATPT_OFCDC_SC_CODE, officeName: s.ATPT_OFCDC_SC_NM,
+    code: s.SD_SCHUL_CODE, name: s.SCHUL_NM,
+    kind: s.SCHUL_KND_SC_NM || '', addr: (s.ORG_RDNMA || '').split(' ').slice(0,2).join(' ')
+  })) };
+}
+/* 학교 종류 → 서비스 이름 */
+function neisSvcOf(kind){
+  if(/초등/.test(kind)) return NEIS_SVC.els;
+  if(/고등/.test(kind)) return NEIS_SVC.his;
+  return NEIS_SVC.mis;
+}
+/* 이번 주 시간표를 통째로 받아 요일별로 정리 */
+async function neisTimetable(force){
+  const s = C.school;
+  if(!s || !s.code || !s.grade || !s.cls) return { err:'학교·학년·반을 먼저 설정해 주세요' };
+  const cache = C.ttCache;
+  const monday = (() => { const d = new Date(now); const w = d.getDay();
+    d.setDate(d.getDate() - ((w + 6) % 7)); return ymd(d); })();
+  if(!force && cache && cache.week === monday && cache.key === s.code + s.grade + s.cls)
+    return { table: cache.table, cached: true };
+
+  const sunday = (() => { const d = new Date(monday + 'T00:00:00'); d.setDate(d.getDate() + 6); return ymd(d); })();
+  const svc = neisSvcOf(s.kind);
+  const yy = now.getMonth() + 1 >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  const sem = (now.getMonth() + 1 >= 3 && now.getMonth() + 1 <= 8) ? 1 : 2;
+  const q = `${svc}?Type=json&pIndex=1&pSize=300`
+    + (neisKey() ? '&KEY=' + encodeURIComponent(neisKey()) : '')
+    + `&ATPT_OFCDC_SC_CODE=${encodeURIComponent(s.office)}`
+    + `&SD_SCHUL_CODE=${encodeURIComponent(s.code)}`
+    + `&AY=${yy}&SEM=${sem}`
+    + `&TI_FROM_YMD=${monday.replace(/-/g,'')}&TI_TO_YMD=${sunday.replace(/-/g,'')}`
+    + `&GRADE=${encodeURIComponent(s.grade)}&CLASS_NM=${encodeURIComponent(s.cls)}`;
+  const r = await neisFetch(q);
+  if(r.err) return { err: r.err };
+
+  const rows = neisRows(r.data, svc);
+  if(!rows.length) return { err:'이번 주 시간표가 등록되어 있지 않습니다' };
+  const table = {};                       // { 요일(0~6): ['국어','수학',...] }
+  rows.forEach(x => {
+    const d = String(x.ALL_TI_YMD || '');
+    if(d.length < 8) return;
+    const dow = new Date(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}T00:00:00`).getDay();
+    const no = parseInt(x.PERIO, 10);
+    const subj = (x.ITRT_CNTNT || '').trim();
+    if(!no || !subj) return;
+    table[dow] = table[dow] || [];
+    table[dow][no - 1] = subj;
+  });
+  for(const k in table) table[k] = table[k].map(v => v || '');
+  C.ttCache = { week: monday, key: s.code + s.grade + s.cls, table, at: Date.now() };
+  C.timetable = table;                    // 카드가 바로 쓰도록
+  save();
+  return { table };
+}
+
 
 /* ══════ js/cards/clock.js ══════ */
 
@@ -944,6 +1120,7 @@ Cards.register({
 /* ══════ js/cards/weather.js ══════ */
 
 /* 날씨 — Open-Meteo (키 불필요, 상업적 이용 허용 / 출처 표기) */
+let WX_ERR = '';
 const WICON = c => c===0?'☀':c<=2?'⛅':c===3?'☁':c<=48?'≡':c<=67?'☂':c<=77?'❄':c<=82?'☂':'⚡';
 const WDESC = c => c===0?'맑음':c<=2?'구름 조금':c===3?'흐림':c<=48?'안개':c<=55?'이슬비':c<=67?'비':c<=77?'눈':c<=82?'소나기':'천둥번개';
 const pmGrade = (v, fine) => { const t = fine?[15,35,75]:[30,80,150];
@@ -966,14 +1143,20 @@ async function loadWeather(force){
   const c = C.wx;
   if(c && !force && c.date === today() && Date.now() - c.at < 20*60*1000) return paint();
   try{
+    /* 한반도 안이면 기상청 모델을 쓴다 (Open-Meteo가 KMA 예보를 그대로 제공) */
+    const inKR = C.lat > 33 && C.lat < 39.5 && C.lon > 124 && C.lon < 132;
+    const model = inKR ? '&models=kma_seamless' : '';
     const u1 = `https://api.open-meteo.com/v1/forecast?latitude=${C.lat}&longitude=${C.lon}`
       + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code`
       + `&hourly=temperature_2m,weather_code,precipitation_probability`
-      + `&daily=time,temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,uv_index_max,sunrise,sunset`
-      + `&timezone=Asia%2FSeoul&forecast_days=7`;
+      + `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,uv_index_max,sunrise,sunset`
+      + `&timezone=Asia%2FSeoul&forecast_days=7` + model;
     const u2 = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${C.lat}&longitude=${C.lon}`
       + `&current=pm10,pm2_5&timezone=Asia%2FSeoul`;
-    const j = await (await fetch(u1)).json();
+    let j = await (await fetch(u1)).json();
+    /* 기상청 모델에 값이 비면 기본 모델로 한 번 더 */
+    if(model && (!j || !j.daily || j.daily.temperature_2m_max[0] == null))
+      j = await (await fetch(u1.replace(model, ''))).json();
     const build = di => {
       const base = di*24, startH = di===0 ? now.getHours()+1 : 8, step = di===0 ? 2 : 3;
       const hourly = [];
@@ -996,10 +1179,12 @@ async function loadWeather(force){
         rain: j.daily.precipitation_probability_max[di], uv: Math.round(j.daily.uv_index_max[di]),
         sunrise: (j.daily.sunrise[di]||'').slice(11), sunset: (j.daily.sunset[di]||'').slice(11) };
     };
-    C.wx = { date: today(), at: Date.now(), live:true, today: build(0), tomorrow: build(1), days:{} };
+    C.wx = { date: today(), at: Date.now(), live:true, model: !!model,
+             today: build(0), tomorrow: build(1), days:{} };
     /* 날짜별 예보를 담아 달력에서 고른 날의 날씨를 보여준다 */
-    for(let i = 0; i < 7; i++){
-      const d = j.daily.time && j.daily.time[i];
+    const dayList = (j.daily && j.daily.time) || [];
+    for(let i = 0; i < dayList.length && i < 7; i++){
+      const d = dayList[i];
       if(d) C.wx.days[d] = {
         hi: Math.round(j.daily.temperature_2m_max[i]), lo: Math.round(j.daily.temperature_2m_min[i]),
         code: j.daily.weather_code[i], rain: j.daily.precipitation_probability_max[i],
@@ -1010,10 +1195,18 @@ async function loadWeather(force){
     }
     try{
       const a = await (await fetch(u2)).json();
-      C.wx.air = { pm10: Math.round(a.current.pm10), pm25: Math.round(a.current.pm2_5) };
+      const p10 = a && a.current ? a.current.pm10 : null;
+      const p25 = a && a.current ? a.current.pm2_5 : null;
+      C.wx.air = {
+        pm10: (p10 != null && isFinite(p10)) ? Math.round(p10) : null,
+        pm25: (p25 != null && isFinite(p25)) ? Math.round(p25) : null
+      };
     }catch(e){}
     save();
-  }catch(e){ if(C.wx) C.wx.stale = true; }
+  }catch(e){
+    WX_ERR = (e && e.message) ? e.message : '연결 실패';
+    if(C.wx) C.wx.stale = true;
+  }
   paint();
 }
 
@@ -1040,13 +1233,17 @@ Cards.register({
   },
   render(el){
     /* 달력에서 고른 날짜가 오늘이 아니면 그날 예보를 보여준다 */
-    const sel = (typeof calSel === 'string') ? calSel : today();
+    let sel = (typeof calSel === 'string') ? calSel : today();
+    /* 달력에서 따로 고르지 않았고 취침 무렵이면 내일을 본다 */
+    if(sel === today() && dayOff()) sel = ymd(new Date(now.getTime() + 86400000));
     const isToday = sel === today();
     const dayData = (C.wx && C.wx.days && C.wx.days[sel]) || null;
     const w = isToday ? (C.wx && C.wx.today) : dayData;
 
-    const md = sel.slice(5).replace('-','월 ') + '일';
-    el.querySelector('#wxLab').textContent = (C.place || '내 지역') + ' · ' + (isToday ? '오늘' : md);
+    const md = sel.slice(5).replace(/^0/,'').replace('-','월 ').replace(/-0?/,'') + '일';
+    const tmr = ymd(new Date(now.getTime() + 86400000));
+    const when = isToday ? '오늘' : (sel === tmr ? '내일' : md);
+    el.querySelector('#wxLab').textContent = (C.place || '내 지역') + ' · ' + when;
 
     if(!isToday && !dayData){
       el.querySelector('.wx-main').hidden = true;
@@ -1054,7 +1251,7 @@ Cards.register({
       el.querySelector('#wxTmrw').hidden = true;
       el.querySelector('#wxHourly').hidden = true;
       el.querySelector('#wxSrc').textContent = '';
-      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${md} 날씨 정보 없음<br>
+      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${when} 날씨 정보 없음<br>
         <span class="tiny">예보는 오늘부터 7일까지만 제공돼요.</span></span>`;
       return;
     }
@@ -1067,7 +1264,8 @@ Cards.register({
       el.querySelector('#wxAdv').innerHTML = `<span class="empty">날씨를 불러오지 못했습니다. 인터넷 연결을 확인하고 오른쪽 위를 눌러 주세요.</span>`;
       return;
     }
-    el.querySelector('#wxSrc').textContent = (C.wx.stale ? '이전 기록' : 'Open-Meteo') + ' · 눌러서 새로고침';
+    el.querySelector('#wxSrc').textContent =
+      (C.wx.stale ? '이전 기록' : (C.wx.model ? '기상청 · Open-Meteo' : 'Open-Meteo')) + ' · 눌러서 새로고침';
     el.querySelector('#wxIcon').textContent = WICON(w.code);
     el.querySelector('#wxDesc').textContent = WDESC(w.code);
     if(isToday){
@@ -1083,8 +1281,10 @@ Cards.register({
     el.querySelector('#wxTmrw').hidden = !isToday;
     const air = isToday ? ((C.wx && C.wx.air) || {}) : {};
     const st = [];
-    if(air.pm10 != null){ const g = pmGrade(air.pm10,false); st.push(['미세먼지', air.pm10+' '+g[0], g[1]]); }
-    if(air.pm25 != null){ const g = pmGrade(air.pm25,true); st.push(['초미세먼지', air.pm25+' '+g[0], g[1]]); }
+    const num = v => (v != null && isFinite(v)) ? Math.round(v) : null;
+    const p10 = num(air.pm10), p25 = num(air.pm25);
+    if(p10 != null){ const g = pmGrade(p10,false); st.push(['미세먼지', p10+' '+g[0], g[1]]); }
+    if(p25 != null){ const g = pmGrade(p25,true); st.push(['초미세먼지', p25+' '+g[0], g[1]]); }
     st.push(['강수확률' + (wetRanges(w.wetH) ? ' · '+wetRanges(w.wetH) : ''), (w.rain ?? '—')+'%', w.rain>=60?'var(--acc)':'var(--tx)']);
     st.push(['습도', w.hum+'%', 'var(--tx)']);
     st.push(['자외선', w.uv>=8?w.uv+' 매우높음':w.uv>=6?w.uv+' 높음':w.uv+' 보통', 'var(--tx)']);
@@ -1470,18 +1670,28 @@ async function loadGames(force){
   if(!force && C.games && Date.now() - (C.gamesAt||0) < 3*3600000) return;
   const list = [];
   let err = null;
+  const push = arr => (arr||[]).forEach(e => list.push(e));
   try{
     const [nx, lt] = await Promise.all([
       sdbFetch('eventsnext.php?id='+C.teamId).catch(() => null),
       sdbFetch('eventslast.php?id='+C.teamId).catch(() => null)
     ]);
-    const push = arr => (arr||[]).forEach(e => list.push(e));
     if(nx) push(nx.events);
     if(lt) push(lt.results || lt.events);
-    if(!list.length){
-      // 폴백: 시즌 전체를 한 번 받아 내 팀 경기만 추림
-      const s = await sdbFetch(`eventsseason.php?id=${KBO_LEAGUE}&s=${now.getFullYear()}`);
-      (s.events||[]).forEach(e => {
+
+    /* 끝난 경기가 3개에 못 미치면 시즌 전체에서 보충한다
+       (eventslast 는 요청 시점에 따라 1~2건만 주는 경우가 있음) */
+    const t = ymd(now);
+    const done = list.filter(e => {
+      const d = String(e.gameDate || e.dateEvent || '').replace(/\D/g,'').slice(0,8);
+      const ds = d.length === 8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : '';
+      const a = e.intHomeScore, b2 = e.intAwayScore;
+      return ds && ds < t && a != null && a !== '' && b2 != null && b2 !== '';
+    }).length;
+
+    if(!list.length || done < 3){
+      const s = await sdbFetch(`eventsseason.php?id=${KBO_LEAGUE}&s=${now.getFullYear()}`).catch(() => null);
+      if(s) (s.events||[]).forEach(e => {
         if(e.idHomeTeam === C.teamId || e.idAwayTeam === C.teamId) list.push(e);
       });
     }
@@ -1501,7 +1711,9 @@ async function loadGames(force){
     }).filter(g => g.date)
       .sort((a,b) => a.date.localeCompare(b.date));
     // 중복 제거
-    const seen = {}; C.games = C.games.filter(g => seen[g.date+g.opp] ? false : (seen[g.date+g.opp] = 1));
+    const seen = {};
+    C.games = C.games.filter(g => { const k = g.date + '|' + g.opp;
+      return seen[k] ? false : (seen[k] = 1); });
     C.gamesAt = Date.now(); C.gamesErr = null;
   } else C.gamesErr = err || '경기 정보를 찾지 못했습니다';
   save(); paint();
@@ -1520,7 +1732,7 @@ Cards.register({
   },
   render(el){
     const team = KBO_TEAMS.find(t => t.id === C.teamId);
-    el.querySelector('#bbLab').textContent = team ? team.kr : '야구';
+    el.querySelector('#bbLab').textContent = (team ? team.kr : '야구') + (dayOff() ? ' · 내일' : '');
     if(!C.teamId){
       el.querySelector('#bbSrc').textContent = '';
       el.querySelector('#bbBody').innerHTML = `<div class="empty">설정 → 카드 구성에서 응원 팀을 골라 주세요.</div>`;
@@ -1533,7 +1745,7 @@ Cards.register({
       el.querySelector('#bbRecent').innerHTML = ''; return;
     }
     el.querySelector('#bbSrc').textContent = 'TheSportsDB';
-    const t = today();
+    const t = ymd(baseDate());
     const g = games.find(x => x.date === t), next = games.find(x => x.date > t);
     if(g){
       el.querySelector('#bbBody').innerHTML =
@@ -1545,10 +1757,10 @@ Cards.register({
          </div>`;
     } else {
       el.querySelector('#bbBody').innerHTML =
-        `<div class="bb-head sm">오늘은 경기가 없습니다</div>` +
+        `<div class="bb-head sm">${dayOff() ? '내일은' : '오늘은'} 경기가 없습니다</div>` +
         (next ? `<div class="bb-chips"><span class="lc">다음 ${next.date.slice(5).replace('-','/')} · ${next.home ? esc(next.opp)+' vs '+team.s : team.s+' vs '+esc(next.opp)} ${next.time}</span></div>` : '');
     }
-    const past = games.filter(x => x.date < t && x.my != null && x.op != null && (x.my + x.op) > 0).slice(-3);
+    const past = games.filter(x => x.date < today() && x.my != null && x.op != null && (x.my + x.op) > 0).slice(-3);
     if(past.length){
       let w=0,l=0,d=0;
       const cells = past.map(x => {
@@ -1574,18 +1786,40 @@ const NEWS_TOPICS = [
   { id:'SPORTS',   name:'스포츠', q:'스포츠 소식' },
   { id:'ENTERTAINMENT', name:'연예', q:'연예 소식' }
 ];
+/* 구글 뉴스 RSS는 CORS 헤더가 없어 직접 호출이 막힌다.
+   프록시를 순서대로 시도한다. (Capacitor로 감싸면 첫 번째가 바로 통과) */
+const NEWS_PROXIES = [
+  u => u,
+  u => 'https://r.jina.ai/' + u,
+  u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u)
+];
 async function rssFirst(url){
-  const ac = new AbortController(); const to = setTimeout(() => ac.abort(), 11000);
-  try{
-    const r = await fetch(url, { signal: ac.signal }); clearTimeout(to);
-    if(!r.ok) throw 0;
-    const xml = new DOMParser().parseFromString(await r.text(), 'text/xml');
-    const it = xml.querySelector('item'); if(!it) throw 0;
-    const raw = (it.querySelector('title')||{}).textContent || '';
-    const m = raw.match(/^(.*?)\s+-\s+([^-]+)$/);
-    return { text: (m ? m[1] : raw).trim(), src: m ? m[2].trim() : '',
-             url: ((it.querySelector('link')||{}).textContent||'').trim() };
-  }catch(e){ clearTimeout(to); return null; }
+  for(const p of NEWS_PROXIES){
+    const ac = new AbortController();
+    const to = setTimeout(() => ac.abort(), 9000);
+    try{
+      const r = await fetch(p(url), { signal: ac.signal });
+      clearTimeout(to);
+      if(!r.ok) continue;
+      const text = await r.text();
+      let xml = new DOMParser().parseFromString(text, 'text/xml');
+      let it = xml.querySelector('item');
+      if(!it){                                   // 텍스트로 감싸 오는 프록시 대비
+        const s = text.indexOf('<item');
+        if(s < 0) continue;
+        xml = new DOMParser().parseFromString(text.slice(text.indexOf('<')), 'text/xml');
+        it = xml.querySelector('item');
+        if(!it) continue;
+      }
+      const raw = (it.querySelector('title') || {}).textContent || '';
+      if(!raw.trim()) continue;
+      const m = raw.match(/^(.*?)\s+-\s+([^-]+)$/);
+      return { text: (m ? m[1] : raw).trim(), src: m ? m[2].trim() : '',
+               url: ((it.querySelector('link') || {}).textContent || '').trim() };
+    }catch(e){ clearTimeout(to); }
+  }
+  return null;
 }
 async function loadNews(force){
   if(!Cards.isOn('news')) return;
@@ -1631,7 +1865,7 @@ Cards.register({
   desc:'생년월일로 절기·일진·십신을 계산한 사주 운세 (재미로 보는 참고용)',
   init(el){
     el.innerHTML = `
-      <div class="chead"><span class="clab">오늘의 운세</span><span class="cmeta" id="foWho"></span></div>
+      <div class="chead"><span class="clab" id="foLab">오늘의 운세</span><span class="cmeta" id="foWho"></span></div>
       <div class="fo-score"><b class="big" id="foScore">--</b><i id="foGrade"></i></div>
       <div class="fo-badges" id="foBadges"></div>
       <p class="fo-head" id="foHead"></p>
@@ -1646,7 +1880,10 @@ Cards.register({
       return;
     }
     let f = null;
-    try{ f = fortune(C.birth, C.birthTime, new Date(now.getFullYear(), now.getMonth(), now.getDate())); }catch(e){ return; }
+    const bd = baseDate();
+    try{ f = fortune(C.birth, C.birthTime, new Date(bd.getFullYear(), bd.getMonth(), bd.getDate())); }catch(e){ return; }
+    const lab = el.querySelector('#foLab');
+    if(lab) lab.textContent = dayOff() ? '내일의 운세' : '오늘의 운세';
     const g = f.score>=90?'대길(大吉)':f.score>=75?'길(吉)':f.score>=62?'소길(小吉)':f.score>=52?'평(平)':'신중(愼)';
     const col = v => v>=78?'var(--acc)':v>=60?'var(--amber)':'var(--rose)';
     const b = now.getFullYear() - new Date(C.birth+'T00:00:00').getFullYear();
@@ -1660,7 +1897,7 @@ Cards.register({
       f.che ? ['천을귀인','good'] : null,
       ['일간 '+GANH[f.me.dg]+f.A.me+' · '+(f.A.strong?'신강':'신약'),'']
     ].filter(Boolean).map(x => `<span class="${x[1]}">${x[0]}</span>`).join('');
-    el.querySelector('#foHead').textContent = SS_TEXT[f.ss] + (f.rel[2] ? ' ' + f.rel[2] + '.' : '')
+    el.querySelector('#foHead').textContent = (dayOff() ? '내일은 ' : '') + SS_TEXT[f.ss] + (f.rel[2] ? ' ' + f.rel[2] + '.' : '')
       + (f.mun ? ' 문창귀인이 들어 암기와 글쓰기가 잘 붙습니다.' : '')
       + (f.che ? ' 천을귀인이 들어 도와주는 사람이 붙습니다.' : '');
     el.querySelector('#foBars').innerHTML = [['공부',f.study],['사람',f.rela],['건강',f.body],['행운',f.score]]
@@ -1966,33 +2203,48 @@ Cards.register({
 
 /* ══════ js/cards/timetable.js ══════ */
 
-/* 시간표 — 요일별 과목 */
+/* 시간표 — 나이스 자동 연동 + 직접 입력(일주일치) */
 Cards.register({
   id:'timetable', name:'오늘 시간표', size:'S', def:false, tag:'학생',
-  desc:'요일별 시간표를 넣어 두면 오늘 것만 보여줍니다',
+  desc:'학교를 연결하면 자동으로, 직접 일주일치를 넣을 수도 있어요',
   init(el){
     el.innerHTML = `
       <div class="chead"><span class="clab">오늘 시간표</span>
-        <button class="cbtn" id="ttEdit">편집</button></div>
+        <span class="cmeta" id="ttMeta"></span></div>
       <div class="tt-list" id="ttList"></div>`;
-    el.querySelector('#ttEdit').onclick = () => {
-      const dow = now.getDay();
-      const cur = ((C.timetable||{})[dow] || []).join(', ');
-      const v = prompt(`${DAYS_KR[dow]}요일 시간표를 쉼표로 구분해 적어 주세요.\n예: 국어, 수학, 영어, 과학, 체육`, cur);
-      if(v == null) return;
-      C.timetable = C.timetable || {};
-      C.timetable[dow] = v.split(',').map(x => x.trim()).filter(Boolean);
-      save(); paint();
+    el.querySelector('#ttMeta').onclick = () => {
+      if(C.school && C.school.code) ttRefresh(true);
+      else openSettings('cards');
     };
   },
   render(el){
     const dow = now.getDay();
-    const list = (C.timetable||{})[dow] || [];
+    const list = (C.timetable || {})[dow] || [];
+    const auto = !!(C.school && C.school.code);
+    el.querySelector('#ttMeta').textContent = auto
+      ? (C.school.name + ' ' + C.school.grade + '-' + C.school.cls)
+      : (list.length ? '' : '설정에서 넣기');
     el.querySelector('#ttList').innerHTML = list.length
-      ? list.map((s,i) => `<div class="tt"><span class="no">${i+1}</span><span class="sj">${esc(s)}</span></div>`).join('')
-      : `<div class="empty">${DAYS_KR[dow]}요일 시간표가 없습니다. 편집을 눌러 넣어 주세요.</div>`;
+      ? list.map((s,i) => s
+          ? `<div class="tt"><span class="no">${i+1}</span><span class="sj">${esc(s)}</span></div>`
+          : `<div class="tt empty-p"><span class="no">${i+1}</span><span class="sj">—</span></div>`).join('')
+      : `<div class="empty">${
+          dow === 0 || dow === 6 ? '주말이에요. 시간표가 없습니다.'
+          : auto ? '오늘 시간표가 없습니다. 눌러서 다시 불러오세요.'
+          : '설정 → 카드 구성에서 학교를 연결하거나 직접 넣어 보세요.'}</div>`;
   }
 });
+
+/* 시간표 새로 불러오기 */
+async function ttRefresh(force){
+  const c = Cards.get('timetable');
+  const meta = c && c._el && c._el.querySelector('#ttMeta');
+  if(meta) meta.textContent = '불러오는 중…';
+  const r = await neisTimetable(force);
+  if(r.err && meta) meta.textContent = r.err;
+  paint();
+  return r;
+}
 
 
 /* ══════ js/cards/countdown.js ══════ */
@@ -2185,43 +2437,118 @@ const OB = {
   },
 
   /* ── 기기 연결 ── */
+  deviceKind(){
+    const ua = navigator.userAgent || '';
+    const w = Math.min(screen.width, screen.height);
+    if(/iPad/.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document)) return 'tablet';
+    if(/Android/.test(ua) && !/Mobile/.test(ua)) return 'tablet';
+    if(/iPhone|Android.*Mobile|Windows Phone/.test(ua)) return 'phone';
+    return w >= 700 ? 'tablet' : 'phone';
+  },
+  otherName(){ return this.deviceKind() === 'tablet' ? '휴대폰' : '태블릿'; },
+  myName(){ return this.deviceKind() === 'tablet' ? '태블릿' : '휴대폰'; },
+
   async bindLink(){
+    const pick = document.getElementById('lkPick');
+    if(!pick || pick.dataset.bound) return;
+    pick.dataset.bound = '1';
+
+    const me = this.myName(), other = this.otherName();
+    const T = document.getElementById('lkTitle');
+    const S = document.getElementById('lkSub');
+    if(T) T.textContent = `${other}과 연결할까요?`;
+    if(S) S.textContent = `지금 보고 있는 ${me}의 일정과 할 일이 ${other}에서도 똑같이 보여요. 나중에 설정에서 해도 됩니다.`;
+    const ht = document.getElementById('lkHostT'), hs = document.getElementById('lkHostS');
+    const gt = document.getElementById('lkGuestT'), gs = document.getElementById('lkGuestS');
+    if(ht) ht.textContent = `${me}에서 코드 만들기`;
+    if(hs) hs.textContent = `${other}로 QR을 찍거나 코드를 입력해요`;
+    if(gt) gt.textContent = `${other}에서 받은 코드 넣기`;
+    if(gs) gs.textContent = `${other}에서 먼저 코드를 만들었다면`;
+
+    const host = document.getElementById('lkHost');
+    const guest = document.getElementById('lkGuest');
+
+    pick.addEventListener('click', e => {
+      const b = e.target.closest('[data-mode]'); if(!b) return;
+      [...pick.children].forEach(x => x.setAttribute('aria-selected', x === b ? 'true' : 'false'));
+      const isHost = b.dataset.mode === 'host';
+      host.hidden = !isHost; guest.hidden = isHost;
+      if(isHost) this.makeCode(); else setTimeout(() => guest.querySelector('input').focus(), 120);
+    });
+
+    /* 안내 문구 */
+    const steps = document.getElementById('lkSteps');
+    if(steps) steps.innerHTML = [
+      `${other}에서 이 앱을 엽니다`,
+      `카메라로 위 QR을 찍거나, 소개 화면의 <b>받은 코드 넣기</b>에 코드를 입력합니다`,
+      `연결되면 두 기기의 일정·할 일이 같아집니다`
+    ].map(s => `<li>${s}</li>`).join('');
+    const steps2 = document.getElementById('lkSteps2');
+    if(steps2) steps2.innerHTML = [
+      `${other}에서 <b>${other}에서 코드 만들기</b>를 누릅니다`,
+      `화면에 나온 6자리 코드를 위에 입력합니다`
+    ].map(s => `<li>${s}</li>`).join('');
+
+    /* 코드 입력 */
+    const inputs = [...guest.querySelectorAll('input')];
+    const msg = document.getElementById('lkMsg');
+    const tryJoin = async () => {
+      const v = inputs.map(i => i.value).join('').toUpperCase();
+      if(v.length < 6) return;
+      msg.textContent = '연결하는 중…'; msg.className = 'lk-msg';
+      try{
+        await syncJoin(v);
+        this.joined = true;
+        msg.textContent = `연결됐어요. ${this.otherName()}의 내용을 가져왔습니다.`;
+        msg.className = 'lk-msg ok';
+        build(); paint();
+      }catch(e){
+        msg.textContent = e.message || '코드를 찾지 못했어요. 다시 확인해 주세요.';
+        msg.className = 'lk-msg err';
+        document.getElementById('obCode').classList.add('err');
+        setTimeout(() => document.getElementById('obCode').classList.remove('err'), 900);
+      }
+    };
+    inputs.forEach((inp,i) => {
+      inp.addEventListener('input', () => {
+        inp.value = inp.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase();
+        if(inp.value && inputs[i+1]) inputs[i+1].focus();
+        tryJoin();
+      });
+      inp.addEventListener('keydown', e => {
+        if(e.key === 'Backspace' && !inp.value && inputs[i-1]) inputs[i-1].focus();
+      });
+      inp.addEventListener('paste', e => {
+        const t = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9A-Za-z]/g,'').toUpperCase();
+        if(t.length >= 6){ e.preventDefault(); inputs.forEach((x,k) => x.value = t[k] || ''); tryJoin(); }
+      });
+    });
+
+    /* 기본은 코드 만들기 */
+    pick.querySelector('[data-mode="host"]').click();
+  },
+
+  async makeCode(){
     const qr = document.getElementById('obQR');
     const note = document.getElementById('obQRNote');
-    const code = document.getElementById('obCode');
-    if(!qr || qr.dataset.bound) return;
-    qr.dataset.bound = '1';
-
-    /* QR 발급 */
+    const big = document.getElementById('obCodeBig');
+    if(!qr || qr.dataset.made) return;
+    qr.dataset.made = '1';
     try{
-      const c = await syncCreate();
-      qr.insertAdjacentHTML('afterbegin', QR.svg(joinLink(c), 120));
-      if(note) note.textContent = c;
-    }catch(e){
-      if(note) note.textContent = '나중에 설정에서';
-    }
-
-    /* 코드 6칸 입력 */
-    if(code){
-      const inputs = [...code.querySelectorAll('input')];
-      const tryJoin = async () => {
-        const v = inputs.map(i => i.value).join('').toUpperCase();
-        if(v.length < 6) return;
-        code.classList.add('busy');
-        try{ await syncJoin(v); this.joined = true; code.classList.remove('busy'); code.classList.add('ok'); build(); paint(); }
-        catch(e){ code.classList.remove('busy'); code.classList.add('err');
-          setTimeout(() => code.classList.remove('err'), 1200); }
+      const c = (C.sync && C.sync.on && C.sync.code) ? C.sync.code : await syncCreate();
+      const url = joinLink(c);
+      qr.innerHTML = QR.svg(url, 150);
+      if(note) note.remove();
+      if(big) big.textContent = c;
+      const cp = document.getElementById('lkCopy');
+      if(cp) cp.onclick = async () => {
+        try{ await navigator.clipboard.writeText(url); cp.textContent = '복사했어요'; }
+        catch(e){ cp.textContent = c; }
       };
-      inputs.forEach((inp,i) => {
-        inp.addEventListener('input', () => {
-          inp.value = inp.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase();
-          if(inp.value && inputs[i+1]) inputs[i+1].focus();
-          tryJoin();
-        });
-        inp.addEventListener('keydown', e => {
-          if(e.key === 'Backspace' && !inp.value && inputs[i-1]) inputs[i-1].focus();
-        });
-      });
+    }catch(e){
+      qr.dataset.made = '';
+      if(note) note.textContent = '연결 준비 실패';
+      if(big) big.textContent = '나중에 설정에서';
     }
   },
 
@@ -2291,12 +2618,35 @@ const OB = {
   finish(silent){
     C.onboarded = true; save();
     this.app.classList.add('is-done');
-    setTimeout(() => {
-      this.app.remove();
+    const enter = () => {
       document.getElementById('stage').classList.add('entering');
       setTimeout(() => document.getElementById('stage').classList.remove('entering'), 700);
       build(); paint(); loadWeather(true);
-    }, silent ? 420 : 520);
+    };
+    if(silent){
+      setTimeout(() => { this.app.remove(); enter(); }, 420);
+      return;
+    }
+    /* 소개를 막 마친 사람에게만 환영 화면을 한 번 보여준다 */
+    const wc = document.getElementById('welcome');
+    const night = (now.getHours() >= 18 || now.getHours() < 5);
+    setTimeout(() => {
+      this.app.remove();
+      if(!wc){ enter(); return; }
+      wc.hidden = false;
+      document.getElementById('wcName').textContent = C.name ? C.name + '님' : '반가워요';
+      document.getElementById('wcHi').textContent = night ? '오늘 하루 수고했어요' : '준비됐어요';
+      const on = Cards.enabled().length;
+      document.getElementById('wcSub').textContent =
+        `카드 ${on}개로 시작합니다` + (this.joined ? ' · 기기 연결됨' : '');
+      requestAnimationFrame(() => wc.classList.add('show'));
+      setTimeout(() => {
+        wc.classList.add('out');
+        wc.style.pointerEvents = 'none';
+        enter();
+        setTimeout(() => { if(wc.parentNode) wc.remove(); }, 700);
+      }, 2100);
+    }, 480);
   }
 };
 
@@ -2399,6 +2749,37 @@ function renderSettings(){
         <div class="pickgrid">${NEWS_TOPICS.map(t =>
           `<button class="pick sm ${(C.newsTopics||[]).includes(t.id)?'on':''}" data-nw="${t.id}"><b>${t.name}</b></button>`).join('')}</div>
       </div>
+      <div id="ttSetting" ${Cards.isOn('timetable')?'':'hidden'}>
+        <h3 class="sectitle" style="margin-top:26px">시간표 설정</h3>
+        <p class="sechelp">학교를 연결하면 나이스(교육정보 개방 포털)에서 일주일치를 자동으로 가져옵니다.
+          연결하지 않으면 직접 넣을 수 있어요.</p>
+        <div class="segbar" id="ttMode">
+          <button class="${C.school&&C.school.code?'on':''}" data-tt="auto">학교 연결</button>
+          <button class="${C.school&&C.school.code?'':'on'}" data-tt="manual">직접 넣기</button>
+        </div>
+
+        <div id="ttAuto" ${C.school&&C.school.code?'':'hidden'}>
+          <div class="fld"><label>학교 검색</label>
+            <input id="ttQ" placeholder="학교 이름 (예: 목운중학교)" value="${esc((C.school&&C.school.name)||'')}">
+            <div class="searchres" id="ttRes"></div></div>
+          <div class="row2">
+            <div class="fld"><label>학년</label><input data-k="__grade" id="ttGrade" type="number" min="1" max="6" value="${(C.school&&C.school.grade)||''}"></div>
+            <div class="fld"><label>반</label><input data-k="__cls" id="ttCls" type="number" min="1" max="20" value="${(C.school&&C.school.cls)||''}"></div>
+          </div>
+          <div class="fld"><label>나이스 인증키 (선택)</label>
+            <input id="ttKey" value="${esc(C.neisKey||'')}" placeholder="비워 두면 제한된 횟수로 조회합니다">
+            <span class="hint">open.neis.go.kr 에서 무료로 발급받아 넣으면 더 안정적입니다.</span></div>
+          <button class="btn primary" id="ttFetch">시간표 가져오기</button>
+          <div class="lk-msg" id="ttMsg"></div>
+        </div>
+
+        <div id="ttManual" ${C.school&&C.school.code?'hidden':''}>
+          <p class="sechelp">쉼표로 구분해 과목을 적으세요. 없는 교시는 비워 두면 됩니다.</p>
+          <div id="ttWeek"></div>
+          <button class="btn primary" id="ttSave">일주일치 저장</button>
+          <div class="lk-msg" id="ttMsg2"></div>
+        </div>
+      </div>
       <div id="wtSetting" ${Cards.isOn('water')?'':'hidden'}>
         <h3 class="sectitle" style="margin-top:26px">물 마시기 설정</h3>
         <div class="fld"><label>하루 목표 (잔)</label><input data-k="waterGoal" type="number" min="1" max="20" value="${C.waterGoal||8}"></div>
@@ -2419,7 +2800,86 @@ function renderSettings(){
     $('setBody').querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('change', () => {
       saveSettingsInputs(); C.games = []; C.gamesAt = 0; loadGames(true);
     }));
-    const segs = B.querySelector('.segbar');
+    /* ── 시간표 설정 ── */
+    const ttMode = B.querySelector('#ttMode');
+    if(ttMode) ttMode.onclick = e => {
+      const btn = e.target.closest('[data-tt]'); if(!btn) return;
+      [...ttMode.children].forEach(x => x.classList.toggle('on', x === btn));
+      const auto = btn.dataset.tt === 'auto';
+      B.querySelector('#ttAuto').hidden = !auto;
+      B.querySelector('#ttManual').hidden = auto;
+      if(!auto){ C.school = null; save(); drawWeek(); }
+    };
+    const drawWeek = () => {
+      const box = B.querySelector('#ttWeek'); if(!box) return;
+      const t = C.timetable || {};
+      box.innerHTML = [1,2,3,4,5].map(d =>
+        `<div class="fld"><label>${DAYS_KR[d]}요일</label>
+          <input data-dow="${d}" value="${esc((t[d]||[]).join(', '))}" placeholder="국어, 수학, 영어"></div>`).join('');
+    };
+    drawWeek();
+    const ttSave = B.querySelector('#ttSave');
+    if(ttSave) ttSave.onclick = () => {
+      const t = {};
+      B.querySelectorAll('#ttWeek [data-dow]').forEach(inp => {
+        const list = inp.value.split(',').map(x => x.trim()).filter(Boolean);
+        if(list.length) t[+inp.dataset.dow] = list;
+      });
+      C.timetable = t; C.ttCache = null; save(); paint();
+      B.querySelector('#ttMsg2').textContent = '저장했어요.';
+      B.querySelector('#ttMsg2').className = 'lk-msg ok';
+    };
+    const ttQ = B.querySelector('#ttQ');
+    if(ttQ){
+      let tq = null;
+      ttQ.addEventListener('input', () => {
+        clearTimeout(tq);
+        const v = ttQ.value.trim();
+        const res = B.querySelector('#ttRes');
+        if(v.length < 2){ res.innerHTML = ''; return; }
+        res.innerHTML = '<span class="hint">찾는 중…</span>';
+        tq = setTimeout(async () => {
+          const r = await neisSchools(v);
+          if(r.err){ res.innerHTML = `<span class="hint">${esc(r.err)}</span>`; return; }
+          res.innerHTML = r.list.length ? r.list.map(s =>
+            `<button data-code="${esc(s.code)}" data-office="${esc(s.office)}" data-nm="${esc(s.name)}" data-kind="${esc(s.kind)}">
+              <b>${esc(s.name)}</b><span class="tiny">${esc(s.addr)} · ${esc(s.kind)}</span></button>`).join('')
+            : '<span class="hint">검색 결과가 없습니다.</span>';
+        }, 400);
+      });
+      B.querySelector('#ttRes').onclick = e => {
+        const btn = e.target.closest('[data-code]'); if(!btn) return;
+        C.school = Object.assign({}, C.school, {
+          code: btn.dataset.code, office: btn.dataset.office,
+          name: btn.dataset.nm, kind: btn.dataset.kind
+        });
+        save();
+        ttQ.value = btn.dataset.nm;
+        B.querySelector('#ttRes').innerHTML = `<span class="hint">선택: <b>${esc(btn.dataset.nm)}</b></span>`;
+      };
+    }
+    const ttFetch = B.querySelector('#ttFetch');
+    if(ttFetch) ttFetch.onclick = async () => {
+      const msg = B.querySelector('#ttMsg');
+      const g = B.querySelector('#ttGrade').value.trim();
+      const cl = B.querySelector('#ttCls').value.trim();
+      C.neisKey = B.querySelector('#ttKey').value.trim();
+      if(!C.school || !C.school.code){ msg.textContent = '학교를 먼저 골라 주세요.'; msg.className='lk-msg err'; return; }
+      if(!g || !cl){ msg.textContent = '학년과 반을 넣어 주세요.'; msg.className='lk-msg err'; return; }
+      C.school = Object.assign({}, C.school, { grade:g, cls:cl });
+      save();
+      msg.textContent = '가져오는 중…'; msg.className = 'lk-msg';
+      const r = await neisTimetable(true);
+      if(r.err){ msg.textContent = r.err; msg.className = 'lk-msg err'; }
+      else {
+        const days = Object.keys(r.table).length;
+        msg.textContent = `${days}일치를 가져왔어요.`;
+        msg.className = 'lk-msg ok';
+        paint();
+      }
+    };
+
+    const segs = B.querySelector('.segbar:not(#ttMode)');
     if(segs) segs.onclick = e => {
       const btn = e.target.closest('[data-lay]'); if(!btn) return;
       C.layoutMode = btn.dataset.lay; save(); build(); paint(); renderSettings();
@@ -2523,10 +2983,7 @@ function renderSettings(){
         <input id="fbFrom" placeholder="이메일이나 연락처"></div>
       <label class="chk"><input type="checkbox" id="fbDiag" checked>
         <span>기기 정보 함께 보내기 <i class="hint">기종·화면 크기·앱 버전·켜 둔 카드 목록. 개인 일정이나 할 일 내용은 포함되지 않습니다.</i></span></label>
-      <div class="lk-btns">
-        <button class="btn primary" id="fbSend">메일로 보내기</button>
-        <button class="btn" id="fbCopy">내용 복사</button>
-      </div>
+      <button class="btn primary" id="fbSend">보내기</button>
       <div class="lk-msg" id="fbMsg"></div>
 
       <h3 class="sectitle" style="margin-top:30px">자주 묻는 것</h3>
@@ -2542,7 +2999,8 @@ function renderSettings(){
       </div>
 
       <h3 class="sectitle" style="margin-top:30px">정보</h3>
-      <p class="sechelp">버전 ${BUILD}<br>
+      <p class="sechelp"><a href="privacy.html" target="_blank" rel="noopener" style="color:var(--acc)">개인정보처리방침</a><br><br>
+        버전 ${BUILD}<br>
         날씨·대기질 Open-Meteo.com · 경기 데이터 TheSportsDB.com · 뉴스 Google News</p>`;
 
     let fbKind = 'bug';
@@ -2551,29 +3009,31 @@ function renderSettings(){
       fbKind = btn.dataset.k;
       [...btn.parentNode.children].forEach(x => x.classList.toggle('on', x === btn));
     };
-    const compose = () => {
-      const kindName = { bug:'오류 제보', idea:'기능 제안', etc:'기타 문의' }[fbKind];
-      let body = `[${kindName}]\n\n${B.querySelector('#fbBody').value.trim()}\n\n`;
-      const from = B.querySelector('#fbFrom').value.trim();
-      if(from) body += `답장 받을 곳: ${from}\n`;
-      if(B.querySelector('#fbDiag').checked){
-        body += `\n--- 기기 정보 ---\n앱 ${BUILD}\n화면 ${innerWidth}x${innerHeight}\n언어 ${lang()}\n`
-              + `켜 둔 카드 ${Cards.enabled().map(c => c.id).join(', ')}\n기기 ${navigator.userAgent}\n`;
+    const diag = () => ({
+      build: BUILD, screen: innerWidth + 'x' + innerHeight, lang: lang(),
+      cards: Cards.enabled().map(c => c.id).join(','), ua: navigator.userAgent
+    });
+    B.querySelector('#fbSend').onclick = async () => {
+      const text = B.querySelector('#fbBody').value.trim();
+      const msg = B.querySelector('#fbMsg');
+      if(!text){ msg.textContent = '내용을 적어 주세요.'; return; }
+      msg.textContent = '보내는 중…';
+      const body = {
+        kind: fbKind, text,
+        from: B.querySelector('#fbFrom').value.trim(),
+        diag: B.querySelector('#fbDiag').checked ? diag() : null,
+        at: Date.now()
+      };
+      const ok = await sendReport(body);
+      if(ok){
+        msg.textContent = '보냈어요. 읽고 반영할게요. 고맙습니다.';
+        msg.className = 'lk-msg ok';
+        B.querySelector('#fbBody').value = '';
+      } else {
+        msg.innerHTML = '전송에 실패했어요. 메일로 보낼까요? '
+          + `<a href="mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('[Briefing] 제보')}&body=${encodeURIComponent(text)}">메일 열기</a>`;
+        msg.className = 'lk-msg err';
       }
-      return { subject:`[Briefing] ${kindName}`, body };
-    };
-    B.querySelector('#fbSend').onclick = () => {
-      const t = B.querySelector('#fbBody').value.trim();
-      if(!t){ B.querySelector('#fbMsg').textContent = '내용을 적어 주세요.'; return; }
-      const m = compose();
-      location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
-      B.querySelector('#fbMsg').textContent = '메일 앱이 열리지 않으면 아래 복사 버튼을 쓰세요.';
-    };
-    B.querySelector('#fbCopy').onclick = async () => {
-      const m = compose();
-      try{ await navigator.clipboard.writeText(m.subject + '\n\n' + m.body);
-           B.querySelector('#fbMsg').textContent = `복사했습니다. ${FEEDBACK_EMAIL} 로 붙여넣어 보내 주세요.`; }
-      catch(e){ B.querySelector('#fbMsg').textContent = FEEDBACK_EMAIL + ' 로 보내 주세요.'; }
     };
   }
   else if(setTab === 'data'){
@@ -2873,6 +3333,7 @@ async function boot(){
   if(C.notifyOn) Notify.ask().then(() => Notify.tick());
   setInterval(() => loadGames(false), 60*60*1000);
   setInterval(() => loadNews(false), 60*60*1000);
+  if(Cards.isOn('timetable') && C.school && C.school.code) ttRefresh(false);
   setInterval(() => { if(syncReady()) syncPull(); }, 45000);
 
   try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}

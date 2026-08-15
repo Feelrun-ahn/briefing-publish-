@@ -511,7 +511,7 @@ html.theme-night, .brief-app.theme-night{
 
 /* ── 앱 연동 보정 ── */
 .brief-app{position:fixed;inset:0;z-index:300;background:var(--ob-bg);color:var(--ob-ink);
-  height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+  height:100vh;height:100dvh;overflow:hidden}
 .brief-app.is-done{opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s}
 .brief-app .qr svg{width:120px;height:120px;border-radius:10px;background:#fff;padding:6px}
 .brief-app .qr-note{letter-spacing:.22em;font-weight:600}
@@ -529,13 +529,18 @@ html.theme-night, .brief-app.theme-night{
 .brief-app .card-grid{max-width:100%}
 
 /* 세로가 짧은 화면에서도 아래 버튼이 항상 보이게 */
-.brief-app .onboard{height:auto;min-height:100vh;min-height:100dvh}
-.brief-app .ob-inner{height:auto;min-height:100vh;min-height:100dvh}
-/* 아래 버튼은 화면 맨 아래에 항상 붙어 있게 */
-.brief-app .ob-foot{position:sticky;bottom:0;z-index:6;margin-top:auto;
-  padding:14px 0 max(10px, env(safe-area-inset-bottom));
-  background:linear-gradient(180deg, transparent, var(--ob-bg) 34%)}
-.brief-app .stage{flex:1 1 auto;min-height:280px}
+/* 화면 = [상단바][스크롤 영역][하단 버튼] 3층. 가운데만 스크롤한다 */
+.brief-app .onboard{height:100%;display:flex;flex-direction:column;overflow:hidden}
+.brief-app .ob-inner{height:100%;display:flex;flex-direction:column;overflow:hidden;
+  padding-bottom:0}
+.brief-app .stage{flex:1 1 auto;min-height:0;overflow:hidden}
+.brief-app .slide{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  padding-bottom:8px;scroll-padding-bottom:12px}
+.brief-app .ob-foot{flex:0 0 auto;position:relative;z-index:6;
+  margin:0 calc(-1 * clamp(20px,5vw,64px));
+  padding:12px clamp(20px,5vw,64px) max(12px, env(safe-area-inset-bottom));
+  border-top:1px solid var(--ob-border);
+  background:var(--ob-bg)}
 .brief-app .stage{flex:1 1 0;min-height:0}
 .brief-app .ob-foot{flex:0 0 auto}
 @media (max-height:720px){
@@ -578,3 +583,73 @@ html.theme-night .brief-app .btn-primary{
   box-shadow:0 12px 30px -12px rgba(110,231,212,.5);
 }
 .brief-app .btn-primary:active{transform:scale(.97)}
+
+/* ── 기기 연결 (재설계) ── */
+.brief-app .lk-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.brief-app .lk-mode{display:flex;align-items:center;gap:12px;padding:14px 15px;text-align:left;
+  border-radius:var(--ob-r-ctrl);border:1px solid var(--ob-border);background:var(--ob-card);
+  cursor:pointer;transition:border-color .2s,background .2s,transform .12s}
+.brief-app .lk-mode:active{transform:scale(.98)}
+.brief-app .lk-mode[aria-selected="true"]{border-color:var(--ob-accent);
+  background:var(--ob-accent-soft);box-shadow:0 0 0 1px var(--ob-accent) inset}
+.brief-app .lk-mode .m-ic{width:38px;height:38px;flex:none;border-radius:11px;display:grid;place-items:center;
+  background:var(--ob-accent-soft);color:var(--ob-accent)}
+.brief-app .lk-mode .m-ic svg{width:19px;height:19px}
+.brief-app .lk-mode .m-tx{min-width:0}
+.brief-app .lk-mode .m-tx b{display:block;font-size:14.5px;font-weight:600}
+.brief-app .lk-mode .m-tx span{display:block;font-size:11.5px;color:var(--ob-ink-dim);margin-top:2px}
+
+.brief-app .lk-panel{padding:16px;border-radius:var(--ob-r-card);
+  border:1px solid var(--ob-border);background:var(--ob-card)}
+.brief-app .lk-qrbox{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brief-app .lk-qrbox .qr{padding:10px;border-radius:14px;background:#fff;line-height:0;flex:none;
+  box-shadow:0 8px 24px -12px rgba(0,0,0,.35)}
+.brief-app .lk-qrbox .qr svg{width:150px;height:150px;display:block}
+.brief-app .lk-code-big{font-size:34px;letter-spacing:.24em;font-weight:700;color:var(--ob-accent);
+  font-variant-numeric:tabular-nums}
+.brief-app .lk-steps{margin:16px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
+.brief-app .lk-steps li{font-size:13px;line-height:1.55;color:var(--ob-ink-dim)}
+.brief-app .lk-steps b{color:var(--ob-ink);font-weight:600}
+.brief-app .lk-copy{margin-top:14px;padding:10px 16px;border-radius:11px;font-size:13px;
+  border:1px solid var(--ob-border);background:transparent;color:var(--ob-ink-dim);cursor:pointer}
+.brief-app .lk-msg{margin:12px 0 0;font-size:13px;color:var(--ob-ink-dim)}
+.brief-app .lk-msg.ok{color:var(--ob-accent)}
+.brief-app .lk-msg.err{color:#e2708a}
+.brief-app .code-in.err input{border-color:#e2708a;animation:obShake .35s}
+@media (max-width:760px){
+  .brief-app .lk-pick{grid-template-columns:1fr;gap:8px}
+  .brief-app .lk-qrbox{justify-content:center;text-align:center}
+  .brief-app .lk-qrbox .qr svg{width:132px;height:132px}
+  .brief-app .lk-code-big{font-size:28px;width:100%;text-align:center}
+}
+
+/* ── 시작 직후 환영 화면 ── */
+#welcome{position:fixed;inset:0;z-index:290;display:flex;align-items:center;justify-content:center;
+  background:var(--rootBg);opacity:0;transition:opacity .5s ease}
+/* hidden 속성이 걸려도 flex 때문에 화면을 덮어 클릭을 가로채는 것을 막는다 */
+#welcome[hidden]{display:none!important}
+#welcome.out{pointer-events:none}
+html.theme-day #welcome{background:#f6f4ee}
+html.theme-night #welcome{background:#080a14}
+#welcome.show{opacity:1}
+#welcome.out{opacity:0}
+.wc-inner{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:24px}
+.wc-mark{width:64px;height:34px;position:relative;margin-bottom:14px}
+.wc-mark i{position:absolute;left:50%;bottom:0;margin-left:-30px;width:60px;height:30px;
+  border-radius:60px 60px 0 0;background:linear-gradient(180deg,#e0faf3,#6ee7d4);
+  box-shadow:0 0 34px -6px rgba(110,231,212,.75);
+  transform:translateY(30px);animation:wcRise .8s .1s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes wcRise{to{transform:translateY(0)}}
+.wc-hi{font-size:13px;letter-spacing:.24em;color:var(--acc);opacity:0;animation:wcIn .5s .5s ease forwards}
+.wc-name{font-size:30px;font-weight:300;letter-spacing:-.02em;opacity:0;animation:wcIn .5s .65s ease forwards}
+.wc-sub{font-size:13.5px;color:var(--tx2);opacity:0;animation:wcIn .5s .8s ease forwards}
+.wc-bar{width:120px;height:3px;border-radius:3px;background:var(--track);overflow:hidden;margin-top:16px;
+  opacity:0;animation:wcIn .4s .9s ease forwards}
+.wc-bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--barFill);
+  animation:wcBar 1.5s .95s linear forwards}
+@keyframes wcIn{to{opacity:1}}
+@keyframes wcBar{to{width:100%}}
+@media (prefers-reduced-motion:reduce){
+  #welcome *{animation:none!important;opacity:1!important;transform:none!important}
+  .wc-bar i{width:100%}
+}

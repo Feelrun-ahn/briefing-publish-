@@ -30,6 +30,17 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // 오류 제보 — 누구나 남길 수 있고, 관리자만 읽는다
+    match /reports/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.text is string
+        && request.resource.data.text.size() < 5000;
+      allow read, update: if request.auth != null
+        && request.auth.token.email == 'feelrun.ahn@gmail.com';   // ← 관리자 이메일로 바꾸세요
+      allow delete: if request.auth != null
+        && request.auth.token.email == 'feelrun.ahn@gmail.com';
+    }
+
     // 데이터 공간 — 소유자이거나 members 에 들어 있는 사람만
     match /spaces/{uid} {
       allow create: if request.auth != null
@@ -81,3 +92,70 @@ service cloud.firestore {
 > Google Firebase(Firestore)에 저장됩니다. 계정은 익명으로 생성되며 이름·이메일 등
 > 개인 식별 정보는 수집하지 않습니다. 기기 연결을 사용하지 않으면 모든 정보는
 > 이용자의 기기 안에만 저장됩니다.
+
+
+---
+
+## 관리자 페이지 (admin.html)
+
+앱에서 들어온 오류 제보와 기능 제안을 확인하는 페이지입니다.
+
+### 준비
+
+1. **Firebase 콘솔 → Authentication → Sign-in method → 이메일/비밀번호 사용 설정**
+2. **Users 탭 → 사용자 추가**로 관리자 계정을 하나 만듭니다
+3. Firestore 규칙의 `reports` 항목에서 이메일을 그 계정으로 바꾸고 게시합니다
+
+### 사용
+
+`https://<주소>/admin.html` 로 접속해 관리자 계정으로 로그인하면
+제보 목록이 최신순으로 보입니다.
+
+- 처리 전 / 전체 / 오류 / 제안 으로 걸러 보기
+- **처리 완료** 버튼으로 표시 (되돌리기 가능)
+- 기기 정보는 접힌 상태로, 눌러서 펼쳐 봅니다
+
+`admin.html`에는 `noindex`가 걸려 있어 검색에 잡히지 않지만
+주소를 아는 사람은 접근할 수 있으므로 **보안은 로그인과 Firestore 규칙이 담당합니다.**
+규칙을 반드시 게시하세요.
+
+---
+
+## 개인정보처리방침 (privacy.html)
+
+플레이스토어 등록 시 방침 URL이 필요합니다.
+`https://<주소>/privacy.html` 을 쓰면 됩니다.
+
+앱 안에서는 설정 → 도움말에서 링크로 열 수 있습니다.
+
+
+---
+
+## 시간표 자동 연동 (나이스)
+
+앱은 나이스 교육정보 개방 포털의 **중학교시간표(misTimetable)** 를 사용합니다.
+(초등 `elsTimetable`, 고등 `hisTimetable` 도 학교 종류에 따라 자동 선택)
+
+### 인증키 발급 (선택이지만 권장)
+
+1. `open.neis.go.kr` 접속 → 회원가입 → 로그인
+2. **마이페이지 → 인증키 발급**
+3. 앱에서 **설정 → 카드 구성 → 시간표 설정 → 나이스 인증키**에 붙여넣기
+
+키 없이도 조회되지만 횟수 제한이 빡빡합니다.
+
+### 쓰는 법
+
+설정 → 카드 구성 → 시간표 설정에서
+
+- **학교 연결** — 학교 이름 검색 → 선택 → 학년·반 입력 → "시간표 가져오기"
+  일주일치를 한 번에 받아 요일별로 저장합니다. 매주 자동으로 새로 받습니다.
+- **직접 넣기** — 월~금 다섯 칸에 과목을 쉼표로 구분해 입력
+
+### 참고
+
+- 학교가 나이스에 시간표를 올리지 않았거나, 방학·주말이면
+  "이번 주 시간표가 등록되어 있지 않습니다"가 뜹니다
+- 2023학년도 8월 ~ 2024학년도 자료는 API로 조회되지 않습니다 (제공처 안내)
+- 나이스는 CORS를 열어두지 않을 수 있어 프록시 체인을 거칩니다.
+  Capacitor로 감싸면 직접 호출이 바로 통과합니다
