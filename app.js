@@ -79,21 +79,24 @@ const CARD_I18N = {
        habit:['Daily habits','Check off habits and track your streak'],
        water:['Water','Fill up your daily cup goal'],
        timetable:['Timetable','Shows only today\u2019s classes'],
-       countdown:['Big D-day','The nearest D-day, large'] },
+       countdown:['Big D-day','The nearest D-day, large'],
+       whitenoise:['Sleep sounds','White noise, rain and waves with a timer'] },
   ja:{ clock:['時計・日付','時刻と直近のDデー'], weather:['天気','気温・大気質・時間別・明日'],
        calendar:['カレンダー','予定・課題・Dデー'], todo:['やること','今日と明日を分けて'],
        exam:['課題','カレンダーの課題をまとめて'], baseball:['野球','応援チームの試合と結果'],
        news:['ニュース','分野ごとに1本'], fortune:['今日の運勢','生年月日から四柱推命（娯楽用）'],
        sleep:['睡眠スコア','ウォッチの点数と7日間の推移'], quote:['今日の一言','朝と夜で変わります'],
        habit:['毎日の習慣','チェックと連続日数'], water:['水を飲む','1日の目標杯数'],
-       timetable:['時間割','今日の分だけ表示'], countdown:['大きなDデー','一番近いDデーを大きく'] },
+       timetable:['時間割','今日の分だけ表示'], countdown:['大きなDデー','一番近いDデーを大きく'],
+       whitenoise:['睡眠サウンド','ホワイトノイズ・雨・波'] },
   zh:{ clock:['时钟 · 日期','时间、日期与最近的倒数日'], weather:['天气','气温、空气质量、逐时与明天'],
        calendar:['日历','日程、作业与倒数日'], todo:['待办','今天与明天分开'],
        exam:['作业提醒','汇总日历中的作业'], baseball:['棒球','球队今日比赛与近期战绩'],
        news:['新闻简报','每个分类一条'], fortune:['今日运势','根据生日的四柱推算（娱乐向）'],
        sleep:['睡眠评分','记录手表评分与7天趋势'], quote:['每日一句','早晚各不同'],
        habit:['每日习惯','打卡与连续天数'], water:['喝水','完成每日杯数目标'],
-       timetable:['今日课表','只显示今天'], countdown:['大倒数日','最近的倒数日'] }
+       timetable:['今日课表','只显示今天'], countdown:['大倒数日','最近的倒数日'],
+       whitenoise:['助眠音','白噪音·雨声·海浪'] }
 };
 function lang(){ return (C && C.lang) || 'ko'; }
 function T(k, vars){
@@ -442,13 +445,15 @@ const DEFAULTS = {
   place:'서울', lat:37.5665, lon:126.9780,
   wake:'07:00', out:'08:00', bed:'23:00',
   cardOrder:[], cardOff:[], cardCol:{}, layoutMode:'auto',
-  events:[],            // {id,title,date,time,memo,type:'event'|'exam'|'dday',repeat,color}
+  events:[],   // {id,title,date,time,memo,type:'event'|'todo'|'exam'|'dday',repeat,done,anyday}
+  todoMigrated:false,
   todos:[], todosNext:[],
   sleep:null, sleepHist:{},
   teamId:'', sdbKey:'', games:[], gamesAt:0, gamesErr:null,
   news:null, newsAt:0, newsTopics:['NATION','WORLD','SCIENCE'],
   habits:[], habitLog:{}, waterGoal:8, waterLog:{}, timetable:{},
   nzMin:30, nzVol:45, seenSplash:false,
+  notifyOn:false, notifyDaily:'08:00', notifyPre:'21:00', notifyLead:10,
   sync:{ on:false, uid:'', code:'', at:0 },
   wx:null, phoneAll:true, day:''
 };
@@ -578,12 +583,14 @@ function build(){
     setTimeout(() => art.classList.add('settled'), 700 + idx*40);
   });
   cols.forEach(c => grid.appendChild(c.node));
+  if(!phone) requestAnimationFrame(fitStage);
 }
 
 function paint(){
   applyTheme();
   Cards.enabled().forEach(c => { if(c._el && c.render) { try{ c.render(c._el); }catch(e){ console.warn(c.id, e); } } });
   paintHeader();
+  if(!document.body.classList.contains('phone')) requestAnimationFrame(fitStage);
 }
 
 function paintHeader(){
@@ -618,11 +625,26 @@ function fit(){
     document.body.classList.toggle('showall', !!C.phoneAll);
     $('allBtn').textContent = C.phoneAll ? '간단히 보기' : '전체 보기';
     $('stage').style.transform = 'none';
+    $('stage').style.height = '';
   } else {
     document.body.classList.remove('showall');
-    $('stage').style.transform = `scale(${Math.min(innerWidth/1440, innerHeight/900)})`;
+    fitStage();
   }
   if(was !== phone) build();
+}
+/* 카드가 많아 한 화면을 넘치면 무대를 키우고 그만큼 축소해 전부 보이게 한다 */
+function fitStage(){
+  const st = $('stage');
+  if(!st || document.body.classList.contains('phone')) return;
+  st.style.transform = 'none';
+  st.style.height = '900px';
+  const cols = [...document.querySelectorAll('main > .col')];
+  const need = cols.reduce((m, c) => Math.max(m, c.scrollHeight), 0);
+  const view = cols.length ? cols[0].clientHeight : 0;
+  let H = 900;
+  if(need > view + 4) H = Math.min(1600, 900 + (need - view) + 4);
+  st.style.height = H + 'px';
+  st.style.transform = `scale(${Math.min(innerWidth/1440, innerHeight/H)})`;
 }
 
 /* ── 일정 헬퍼 (캘린더·수행평가·D-day 공용) ── */
@@ -632,6 +654,7 @@ const EV = {
   onDate(dateStr){
     const d = new Date(dateStr+'T00:00:00');
     return this.all().filter(e => {
+      if(e.done) return false;
       if(e.date === dateStr) return true;
       if(!e.repeat || !e.repeat.type) return false;
       if(dateStr < e.date) return false;
@@ -656,22 +679,97 @@ const EV = {
 };
 const EV_TYPES = [
   { id:'event', name:'일정',    color:'var(--acc)' },
+  { id:'todo',  name:'할 일',   color:'#7fa8e8' },
   { id:'exam',  name:'수행평가', color:'var(--violetRaw)' },
   { id:'dday',  name:'D-day',   color:'var(--amber)' }
 ];
 const evColor = t => (EV_TYPES.find(x => x.id === t) || EV_TYPES[0]).color;
 
 /* ── 자정 넘어가면 정리 ── */
+/* 예전 버전의 할 일 목록을 일정으로 옮긴다 (한 번만) */
+function migrateTodos(){
+  if(C.todoMigrated) return;
+  const t = today(), tm = ymd(new Date(Date.now()+86400000));
+  (C.todos||[]).forEach(x => EV.add({ title:x.text, type:'todo', date:t, anyday:true, done:!!x.done }));
+  (C.todosNext||[]).forEach(x => EV.add({ title:x.text, type:'todo', date:tm, done:!!x.done }));
+  C.todos = []; C.todosNext = []; C.todoMigrated = true; save();
+}
 function rollover(){
   const t = today();
   if(C.day !== t){
     C.day = t;
-    C.todos = (C.todosNext||[]).concat((C.todos||[]).filter(x => !x.done));
-    C.todosNext = [];
     if(!(C.sleepHist||{})[t]) C.sleep = null;
     save();
   }
 }
+
+
+/* ══════ js/notify.js ══════ */
+
+/* ═══════════ 알림 ═══════════
+   기기 안에서 예약합니다(서버 없음). 앱이 열려 있거나 백그라운드에 살아 있을 때 울립니다.
+   Capacitor로 감싸면 앱이 꺼져 있어도 울리도록 로컬 알림 플러그인으로 교체 예정. */
+const Notify = {
+  fired: {},                       // 같은 알림을 두 번 울리지 않도록
+  async ask(){
+    if(!('Notification' in window)) return 'unsupported';
+    if(Notification.permission === 'granted') return 'granted';
+    if(Notification.permission === 'denied') return 'denied';
+    try{ return await Notification.requestPermission(); }catch(e){ return 'denied'; }
+  },
+  can(){ return ('Notification' in window) && Notification.permission === 'granted'; },
+  show(title, body, tag){
+    if(!this.can()) return;
+    try{
+      if(navigator.serviceWorker && navigator.serviceWorker.ready){
+        navigator.serviceWorker.ready.then(r => r.showNotification(title, {
+          body, tag, icon:'icon-192.png', badge:'icon-192.png', vibrate:[200,100,200]
+        })).catch(() => new Notification(title, { body, tag, icon:'icon-192.png' }));
+      } else new Notification(title, { body, tag, icon:'icon-192.png' });
+    }catch(e){}
+  },
+  /* 1분마다 호출 — 오늘 할 일·일정 중 알림 시각이 된 것을 찾아 울린다 */
+  tick(){
+    if(!C.notifyOn || !this.can()) return;
+    const t = today(), nowM = now.getHours()*60 + now.getMinutes();
+    this.fired = this.fired[t] ? this.fired : { [t]: {} };
+    const done = this.fired[t] = this.fired[t] || {};
+
+    /* ① 시각이 정해진 일정·할 일 — 설정한 분 전에 */
+    const lead = +(C.notifyLead || 10);
+    EV.onDate(t).forEach(e => {
+      if(!e.time || e.notify === false) return;
+      const at = mins(e.time) - lead;
+      const key = 'ev:' + e.id;
+      if(done[key] || nowM < at || nowM > at + 3) return;
+      done[key] = 1;
+      const label = e.type === 'todo' ? '할 일' : e.type === 'exam' ? '수행평가' : '일정';
+      this.show(`${label} · ${e.time}`, e.title + (lead ? ` (${lead}분 뒤)` : ''), key);
+    });
+
+    /* ② 시각이 없는 오늘 항목 — 아침 알림 시각에 한 번 모아서 */
+    const dm = mins(C.notifyDaily || '08:00');
+    if(!done['daily'] && nowM >= dm && nowM <= dm + 3){
+      done['daily'] = 1;
+      const list = EV.onDate(t).filter(e => !e.time);
+      const exam = EV.upcoming('exam', 3).filter(e => dleft(e.date) <= 3);
+      const parts = [];
+      if(list.length) parts.push(list.slice(0,3).map(e => e.title).join(', ') + (list.length>3?` 외 ${list.length-3}건`:''));
+      if(exam.length) parts.push(exam.map(e => `${e.title} ${dtxt(dleft(e.date))}`).join(', '));
+      if(parts.length) this.show('오늘 할 일', parts.join(' · '), 'daily');
+    }
+
+    /* ③ 하루 전 알림 (수행평가·중요 일정) */
+    if(!done['pre'] && nowM >= mins(C.notifyPre || '21:00') && nowM <= mins(C.notifyPre || '21:00') + 3){
+      done['pre'] = 1;
+      const tm = ymd(new Date(now.getTime() + 86400000));
+      const list = EV.onDate(tm);
+      if(list.length) this.show('내일 준비',
+        list.slice(0,3).map(e => (e.time ? e.time+' ' : '') + e.title).join(', ')
+        + (list.length>3 ? ` 외 ${list.length-3}건` : ''), 'pre');
+    }
+  }
+};
 
 
 /* ══════ js/sync.js ══════ */
@@ -1105,7 +1203,9 @@ Cards.register({
       <div class="cal-ev" data-ev="${e.id}">
         <i class="bar" style="background:${evColor(e.type)}"></i>
         <span class="tm">${e.time || '종일'}</span>
-        <span class="tt">${esc(e.title)}${e.repeat && e.repeat.type ? ' <i class="rp">반복</i>' : ''}</span>
+        <span class="tt">${esc(e.title)}${e.repeat && e.repeat.type ? ' <i class="rp">반복</i>' : ''}
+          ${e.type === 'todo' ? '<i class="rp">할 일</i>' : ''}</span>
+        ${e.time && e.notify !== false ? '<i class="rp">🔔</i>' : ''}
       </div>`).join('') : `<div class="empty">일정이 없습니다. + 버튼으로 추가하세요.</div>`;
   }
 });
@@ -1146,7 +1246,9 @@ function openEvent(id, dateStr){
       <input id="evUntil" type="date" value="${rep.until||''}" placeholder="종료일">
       <span class="hint">종료일을 비우면 계속 반복됩니다.</span>
     </div>
-    <div class="fld"><label>메모 (선택)</label><textarea id="evM">${esc(e ? e.memo : '')}</textarea></div>`;
+    <div class="fld"><label>메모 (선택)</label><textarea id="evM">${esc(e ? e.memo : '')}</textarea></div>
+    <label class="chk"><input type="checkbox" id="evN" ${(!e || e.notify !== false) ? 'checked' : ''}>
+      <span>알림 받기 <i class="hint">시각을 정하면 그 시각 전에, 시각이 없으면 아침에 알려 줍니다.</i></span></label>`;
 
   $('evType').onclick = ev => {
     const b = ev.target.closest('[data-t]'); if(!b) return;
@@ -1170,6 +1272,7 @@ function saveEvent(){
   const patch = {
     title, date: $('evD').value || today(), time: $('evTm').value || '',
     type, memo: $('evM').value.trim(),
+    notify: $('evN') ? $('evN').checked : true,
     repeat: repType ? {
       type: repType,
       days: repType === 'weekly' ? [...$('evDow').querySelectorAll('.on')].map(b => +b.dataset.d) : [],
@@ -1179,6 +1282,7 @@ function saveEvent(){
   if(patch.repeat && patch.repeat.type === 'weekly' && !patch.repeat.days.length)
     patch.repeat.days = [new Date(patch.date+'T00:00:00').getDay()];
   if(editingId) EV.update(editingId, patch); else EV.add(patch);
+  if(patch.notify) Notify.ask();
   calSel = patch.date;
   closeEvent(); paint();
 }
@@ -1186,51 +1290,100 @@ function saveEvent(){
 
 /* ══════ js/cards/todo.js ══════ */
 
-/* 할 일 — 오늘 / 내일 탭 */
-let todoTab = 'todos';
+/* 할 일 — 달력 일정과 하나로 통합 (type:'todo')
+   날짜를 비우면 '언제든', 날짜를 넣으면 달력에 함께 표시되고 알림도 갑니다. */
+let todoFilter = 'today';   // today | all | done
 Cards.register({
   id:'todo', name:'할 일', size:'M', grow:true,
-  desc:'오늘·내일 할 일. 내일 목록은 자정에 오늘로 넘어옵니다',
+  desc:'날짜·시각을 붙이면 달력에 뜨고 알림도 옵니다',
   init(el){
     el.innerHTML = `
       <div class="chead">
-        <div class="tabs" id="tdTabs"><button class="on" data-k="todos">오늘</button><button data-k="todosNext">내일</button></div>
+        <div class="tabs" id="tdTabs">
+          <button class="on" data-k="today">오늘</button>
+          <button data-k="all">전체</button>
+          <button data-k="done">완료</button>
+        </div>
         <span class="cmeta" id="tdCount"></span>
       </div>
-      <div class="td-add"><span>+</span><input id="tdIn" maxlength="90" placeholder="할 일을 적고 Enter"></div>
+      <div class="td-add">
+        <span>+</span>
+        <input id="tdIn" maxlength="90" placeholder="할 일을 적고 Enter">
+        <button class="td-when" id="tdWhen" title="날짜·시각">📅</button>
+      </div>
+      <div class="td-opt" id="tdOpt" hidden>
+        <input type="date" id="tdDate"><input type="time" id="tdTime">
+        <button class="btn" id="tdClear">지우기</button>
+      </div>
       <div class="td-list" id="tdList"></div>`;
+
+    const inp = el.querySelector('#tdIn');
+    const opt = el.querySelector('#tdOpt');
+    el.querySelector('#tdWhen').onclick = () => {
+      opt.hidden = !opt.hidden;
+      if(!opt.hidden && !el.querySelector('#tdDate').value) el.querySelector('#tdDate').value = today();
+    };
+    el.querySelector('#tdClear').onclick = () => {
+      el.querySelector('#tdDate').value = ''; el.querySelector('#tdTime').value = '';
+      opt.hidden = true; inp.focus();
+    };
+    const add = () => {
+      const v = inp.value.trim(); if(!v) return;
+      const d = el.querySelector('#tdDate').value;
+      const tm = el.querySelector('#tdTime').value;
+      EV.add({ title:v, type:'todo', date: d || today(), time: tm || '',
+               anyday: !d, done:false });
+      inp.value = ''; el.querySelector('#tdDate').value = ''; el.querySelector('#tdTime').value = '';
+      opt.hidden = true; paint();
+      if(tm) Notify.ask();
+    };
+    inp.addEventListener('keydown', e => { if(e.key === 'Enter') add(); });
+
     el.querySelector('#tdTabs').onclick = e => {
       const b = e.target.closest('button'); if(!b) return;
-      todoTab = b.dataset.k;
+      todoFilter = b.dataset.k;
       [...b.parentNode.children].forEach(x => x.classList.toggle('on', x === b));
-      paint(); el.querySelector('#tdIn').focus();
+      const c = Cards.get('todo'); c.render(c._el);
     };
-    el.querySelector('#tdIn').addEventListener('keydown', e => {
-      if(e.key !== 'Enter') return;
-      const v = e.target.value.trim(); if(!v) return;
-      C[todoTab] = (C[todoTab]||[]).concat([{ text:v, done:false }]);
-      e.target.value = ''; save(); paint();
-    });
     el.querySelector('#tdList').onclick = e => {
-      const row = e.target.closest('[data-i]'); if(!row) return;
-      const i = +row.dataset.i, a = e.target.dataset.a, arr = (C[todoTab]||[]).slice();
-      if(a === 'del') arr.splice(i,1);
-      else if(a === 'tog') arr[i] = { text: arr[i].text, done: !arr[i].done };
-      else return;
-      C[todoTab] = arr; save(); paint();
+      const row = e.target.closest('[data-ev]'); if(!row) return;
+      const id = row.dataset.ev, a = e.target.dataset.a;
+      if(a === 'del'){ EV.remove(id); paint(); }
+      else if(a === 'tog'){
+        const ev = EV.all().find(x => x.id === id);
+        if(ev){ EV.update(id, { done: !ev.done }); paint(); }
+      }
+      else openEvent(id);
     };
   },
   render(el){
-    const list = C[todoTab] || [];
-    el.querySelector('#tdIn').placeholder = todoTab === 'todosNext' ? '내일 할 일을 적고 Enter' : '할 일을 적고 Enter';
-    el.querySelector('#tdCount').textContent = list.length ? `${list.filter(x=>!x.done).length} / ${list.length}` : '';
-    el.querySelector('#tdList').innerHTML = list.length ? list.map((t,i) => `
-      <div class="td ${t.done?'done':''}" data-i="${i}">
+    const t = today();
+    let list = EV.all().filter(e => e.type === 'todo');
+    if(todoFilter === 'today') list = list.filter(e => !e.done && (e.anyday || e.date <= t));
+    else if(todoFilter === 'done') list = list.filter(e => e.done);
+    else list = list.filter(e => !e.done);
+    list.sort((a,b) => (a.date+(a.time||'99:99')).localeCompare(b.date+(b.time||'99:99')));
+
+    const left = EV.all().filter(e => e.type === 'todo' && !e.done && (e.anyday || e.date <= t)).length;
+    el.querySelector('#tdCount').textContent = left ? `남은 일 ${left}` : '';
+
+    el.querySelector('#tdList').innerHTML = list.length ? list.map(e => {
+      const dl = e.anyday ? null : dleft(e.date);
+      const late = dl != null && dl < 0 && !e.done;
+      const when = e.anyday ? '' :
+        (dl === 0 ? (e.time || '오늘') : dl === 1 ? '내일' + (e.time ? ' '+e.time : '') :
+         late ? `${-dl}일 지남` : `${e.date.slice(5).replace('-','/')}${e.time ? ' '+e.time : ''}`);
+      return `<div class="td ${e.done?'done':''}" data-ev="${e.id}">
         <button class="ck" data-a="tog"></button>
-        <span class="tx" data-a="tog">${esc(t.text)}</span>
+        <span class="tx" data-a="tog">${esc(e.title)}</span>
+        ${when ? `<span class="when ${late?'late':''} ${dl===0?'now':''}">${when}</span>` : ''}
+        ${e.time ? '<i class="bell" title="알림">🔔</i>' : ''}
         <button class="rm" data-a="del">×</button>
-      </div>`).join('')
-      : `<div class="empty">${todoTab==='todosNext'?'내일 할 일을 적어 두면 아침에 자동으로 넘어옵니다.':'적어 둔 할 일이 없습니다.'}</div>`;
+      </div>`;
+    }).join('') : `<div class="empty">${
+      todoFilter === 'done' ? '완료한 일이 없습니다.' :
+      todoFilter === 'all' ? '할 일이 없습니다.' :
+      '오늘 할 일이 없습니다. 위에 적어 보세요.'}</div>`;
   }
 });
 
@@ -1252,7 +1405,7 @@ Cards.register({
     };
   },
   render(el){
-    const list = EV.upcoming('exam', 4);
+    const list = EV.upcoming('exam', 4).filter(x => !x.done);
     el.querySelector('#exList').innerHTML = list.length ? list.map(e => {
       const dl = dleft(e.date);
       return `<div class="ex" data-ev="${e.id}">
@@ -1862,6 +2015,292 @@ Cards.register({
 });
 
 
+/* ══════ js/onboard.js ══════ */
+
+/* ═══════════ 시작 화면 · 소개 (새 디자인 연동) ═══════════ */
+const OB = {
+  root:null, app:null, step:1, MAX:6, cards:[], geoT:null, myPos:null, joined:false,
+
+  start(){
+    this.app  = document.getElementById('briefApp');
+    this.root = document.getElementById('obRoot');
+    if(!this.app || !this.root) return;
+
+    /* 테마는 앱과 동일한 규칙(5시~18시 아침) */
+    this.syncTheme();
+
+    /* 스플래시 → 소개 */
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wait = C.onboarded ? (reduce ? 150 : 900) : (reduce ? 300 : 2000);
+    setTimeout(() => {
+      if(C.onboarded){ this.finish(true); return; }   // 이미 마친 사람은 스플래시만
+      this.app.setAttribute('data-view','onboard');
+      this.go(1);
+    }, wait);
+
+    this.buildCards();
+    this.bind();
+  },
+
+  syncTheme(){
+    const night = (now.getHours() >= 18 || now.getHours() < 5);
+    const r = document.documentElement.classList;
+    r.remove('theme-day','theme-night');
+    r.add(night ? 'theme-night' : 'theme-day');
+  },
+
+  /* ── 카드 선택 ── */
+  buildCards(){
+    const grid = document.getElementById('obCards');
+    if(!grid) return;
+    const ICON = {
+      weather:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+      todo:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>',
+      fortune:'<path d="M12 3l2.2 5.6L20 9.2l-4.2 3.9L17 19l-5-3-5 3 1.2-5.9L4 9.2l5.8-.6z"/>',
+      clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      calendar:'<rect x="3" y="4" width="18" height="18" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/>',
+      exam:'<path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h5"/>',
+      baseball:'<circle cx="12" cy="12" r="9"/><path d="M5 6c3 3 3 9 0 12M19 6c-3 3-3 9 0 12"/>',
+      news:'<rect x="3" y="5" width="15" height="14" rx="2"/><path d="M18 8h3v9a2 2 0 0 1-2 2M7 9h7M7 13h7M7 17h4"/>',
+      sleep:'<path d="M3 17l5-6 4 4 5-7 4 5"/>',
+      whitenoise:'<path d="M11 5L6 9H3v6h3l5 4zM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>',
+      quote:'<path d="M8 7H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v3M18 7h-3a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v3"/>',
+      habit:'<path d="M20 6L9 17l-5-5"/><path d="M4 20h16"/>',
+      water:'<path d="M12 3s6 6.5 6 10a6 6 0 0 1-12 0c0-3.5 6-10 6-10z"/>',
+      timetable:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M9 10v11M15 10v11"/>',
+      countdown:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'
+    };
+    grid.innerHTML = '';
+    Cards.list.filter(c => !c.fixed).forEach(c => {
+      const on = Cards.isOn(c.id);
+      const el = document.createElement('div');
+      el.className = 'pick';
+      el.setAttribute('role','button');
+      el.setAttribute('aria-pressed', on ? 'true' : 'false');
+      el.dataset.card = c.id;
+      el.innerHTML =
+        `<span class="p-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[c.id]||ICON.clock}</svg></span>`
+        + `<span class="p-tx"><b>${cardName(c)}</b><span>${cardDesc(c)}</span></span>`
+        + `<span class="p-sw"></span>`;
+      el.addEventListener('click', () => {
+        Cards.toggle(c.id);
+        el.setAttribute('aria-pressed', Cards.isOn(c.id) ? 'true' : 'false');
+        this.count();
+      });
+      grid.appendChild(el);
+    });
+    this.count();
+  },
+  count(){
+    const n = Cards.list.filter(c => !c.fixed && Cards.isOn(c.id)).length;
+    const el = document.getElementById('obCnt');
+    if(el) el.textContent = n;
+  },
+
+  /* ── 지역 검색 (앱과 같은 방식, 가까운 순) ── */
+  bindGeo(){
+    const q = document.getElementById('obGeoQ');
+    const res = document.getElementById('obGeoRes');
+    const btn = document.getElementById('obGeoBtn');
+    if(!q || q.dataset.bound) return;
+    q.dataset.bound = '1';
+    q.value = C.place || '';
+
+    if(navigator.geolocation) navigator.geolocation.getCurrentPosition(
+      p => { this.myPos = [p.coords.latitude, p.coords.longitude]; }, () => {},
+      { enableHighAccuracy:false, timeout:8000, maximumAge:600000 });
+
+    const dist = (a,b,c,d) => {
+      const R=6371, rad=x=>x*Math.PI/180;
+      const dLa=rad(c-a), dLo=rad(d-b);
+      const h=Math.sin(dLa/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dLo/2)**2;
+      return 2*R*Math.asin(Math.sqrt(h));
+    };
+    const fmt = k => k<1 ? '바로 여기' : k<100 ? Math.round(k)+'km' : Math.round(k/10)*10+'km';
+
+    const draw = list => {
+      res.innerHTML = list.map((r,i) => `
+        <div class="result" data-lat="${r.latitude}" data-lon="${r.longitude}" data-nm="${esc(r.name)}"
+             aria-selected="${i===0?'true':'false'}">
+          <span class="r-main">${esc(r.name)}</span>
+          <span class="r-sub">${esc([r.admin2, r.admin1].filter(Boolean).join(' ') || r.country || '')} · ${fmt(r._d)}</span>
+          <svg class="r-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>
+        </div>`).join('') || '<div class="result"><span class="r-main">결과가 없습니다</span></div>';
+    };
+
+    const search = async v => {
+      const url = n => `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(n)}&count=20&language=ko&format=json`;
+      let list = [];
+      try{ list = ((await (await fetch(url(v))).json()).results) || []; }catch(e){}
+      if(list.length < 3 && !/[동구시군읍면]$/.test(v)){
+        for(const suf of ['동','시','구']){
+          try{ list = list.concat(((await (await fetch(url(v+suf))).json()).results) || []); }catch(e){}
+          if(list.length >= 6) break;
+        }
+      }
+      const seen = {};
+      list = list.filter(r => { const k=r.latitude.toFixed(3)+','+r.longitude.toFixed(3);
+        return seen[k] ? false : (seen[k]=1); });
+      const base = this.myPos || [C.lat, C.lon];
+      list.forEach(r => { r._d = dist(base[0], base[1], r.latitude, r.longitude);
+        r._kr = (r.country_code === 'KR') ? 0 : 1; });
+      list.sort((a,b) => a._kr-b._kr || a._d-b._d);
+      draw(list.slice(0,5));
+    };
+
+    q.addEventListener('input', () => {
+      clearTimeout(this.geoT);
+      const v = q.value.trim();
+      if(v.length < 2){ res.innerHTML = ''; return; }
+      res.innerHTML = '<div class="result"><span class="r-main">찾는 중…</span></div>';
+      this.geoT = setTimeout(() => search(v), 350);
+    });
+    res.addEventListener('click', e => {
+      const r = e.target.closest('[data-lat]'); if(!r) return;
+      res.querySelectorAll('.result').forEach(x => x.setAttribute('aria-selected','false'));
+      r.setAttribute('aria-selected','true');
+      C.place = r.dataset.nm; C.lat = +r.dataset.lat; C.lon = +r.dataset.lon;
+      C.wx = null; save();
+    });
+    if(btn) btn.addEventListener('click', () => {
+      if(!navigator.geolocation) return;
+      btn.classList.add('busy');
+      const ok = p => {
+        this.myPos = [p.coords.latitude, p.coords.longitude];
+        C.lat = +p.coords.latitude.toFixed(4); C.lon = +p.coords.longitude.toFixed(4);
+        C.wx = null; save();
+        btn.classList.remove('busy');
+        res.innerHTML = `<div class="result" aria-selected="true"><span class="r-main">현재 위치</span>
+          <span class="r-sub">${C.lat}, ${C.lon}</span>
+          <svg class="r-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></div>`;
+      };
+      navigator.geolocation.getCurrentPosition(ok,
+        () => navigator.geolocation.getCurrentPosition(ok,
+          () => { btn.classList.remove('busy'); },
+          { enableHighAccuracy:true, timeout:30000, maximumAge:3600000 }),
+        { enableHighAccuracy:false, timeout:15000, maximumAge:3600000 });
+    });
+  },
+
+  /* ── 기기 연결 ── */
+  async bindLink(){
+    const qr = document.getElementById('obQR');
+    const note = document.getElementById('obQRNote');
+    const code = document.getElementById('obCode');
+    if(!qr || qr.dataset.bound) return;
+    qr.dataset.bound = '1';
+
+    /* QR 발급 */
+    try{
+      const c = await syncCreate();
+      qr.insertAdjacentHTML('afterbegin', QR.svg(joinLink(c), 120));
+      if(note) note.textContent = c;
+    }catch(e){
+      if(note) note.textContent = '나중에 설정에서';
+    }
+
+    /* 코드 6칸 입력 */
+    if(code){
+      const inputs = [...code.querySelectorAll('input')];
+      const tryJoin = async () => {
+        const v = inputs.map(i => i.value).join('').toUpperCase();
+        if(v.length < 6) return;
+        code.classList.add('busy');
+        try{ await syncJoin(v); this.joined = true; code.classList.remove('busy'); code.classList.add('ok'); build(); paint(); }
+        catch(e){ code.classList.remove('busy'); code.classList.add('err');
+          setTimeout(() => code.classList.remove('err'), 1200); }
+      };
+      inputs.forEach((inp,i) => {
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase();
+          if(inp.value && inputs[i+1]) inputs[i+1].focus();
+          tryJoin();
+        });
+        inp.addEventListener('keydown', e => {
+          if(e.key === 'Backspace' && !inp.value && inputs[i-1]) inputs[i-1].focus();
+        });
+      });
+    }
+  },
+
+  /* ── 단계 이동 ── */
+  go(step){
+    step = Math.max(1, Math.min(this.MAX, step));
+    this.collect();
+    this.step = step;
+    this.root.setAttribute('data-step', step);
+    if(step === 4) this.bindGeo();
+    if(step === 5) this.buildCards();
+    if(step === 6) this.bindLink();
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(() => this.mark(), reduce ? 0 : 260);
+  },
+  mark(){
+    const slides = this.root.querySelectorAll('.slide');
+    slides.forEach(s => s.classList.remove('is-active'));
+    void this.root.querySelector('.track').offsetWidth;
+    const cur = slides[this.step-1];
+    if(cur) cur.classList.add('is-active');
+    const prev = this.root.querySelector('[data-action="prev"]');
+    const next = this.root.querySelector('[data-action="next"]');
+    if(prev) prev.disabled = this.step <= 1;
+    if(next){
+      const last = this.step >= this.MAX;
+      const lb = next.querySelector('.next-label');
+      const ic = next.querySelector('.next-ic');
+      if(lb) lb.textContent = last ? '시작하기' : '다음';
+      if(ic) ic.style.display = last ? 'none' : '';
+    }
+    const pb = this.root.querySelector('.progress');
+    if(pb) pb.setAttribute('aria-valuenow', this.step);
+  },
+  collect(){
+    const n = document.getElementById('ob-name');
+    const b = document.getElementById('ob-birth');
+    const t = document.getElementById('ob-time');
+    if(n) C.name = n.value.trim();
+    if(b && b.value) C.birth = b.value;
+    if(t) C.birthTime = t.value;
+    save();
+  },
+
+  bind(){
+    const prev = this.root.querySelector('[data-action="prev"]');
+    const next = this.root.querySelector('[data-action="next"]');
+    if(prev) prev.addEventListener('click', () => this.go(this.step - 1));
+    if(next) next.addEventListener('click', () => {
+      if(this.step >= this.MAX){ this.collect(); this.finish(); return; }
+      this.go(this.step + 1);
+    });
+    this.root.querySelectorAll('.opt-card').forEach(o => {
+      o.addEventListener('click', () => {
+        this.root.querySelectorAll('.opt-card').forEach(x => x.setAttribute('aria-selected','false'));
+        o.setAttribute('aria-selected','true');
+      });
+    });
+    /* 생일 기본값 비우기 (디자인의 예시값 제거) */
+    const b = document.getElementById('ob-birth');
+    if(b && !C.birth) b.value = '';
+    else if(b) b.value = C.birth;
+    const n = document.getElementById('ob-name');
+    if(n) n.value = C.name || '';
+  },
+
+  finish(silent){
+    C.onboarded = true; save();
+    this.app.classList.add('is-done');
+    setTimeout(() => {
+      this.app.remove();
+      document.getElementById('stage').classList.add('entering');
+      setTimeout(() => document.getElementById('stage').classList.remove('entering'), 700);
+      build(); paint(); loadWeather(true);
+    }, silent ? 420 : 520);
+  }
+};
+
+
 /* ══════ js/boot.js ══════ */
 
 const FEEDBACK_EMAIL = 'feelrun.ahn@gmail.com';   // 배포 전 확인
@@ -2017,6 +2456,47 @@ function renderSettings(){
       </div>
       <h3 class="sectitle" style="margin-top:26px">화면</h3>
       <p class="sechelp">아침 5시부터 밝은 화면, 저녁 6시부터 어두운 화면으로 자동 전환됩니다. 헤더 버튼으로 직접 바꿔도 다음 전환 시각에 자동으로 돌아옵니다.</p>`;
+  }
+  else if(setTab === 'notify'){
+    const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+    B.innerHTML = `
+      <h3 class="sectitle">알림</h3>
+      <p class="sechelp">할 일과 일정에 시각을 정하면 그 시각 전에 알려 줍니다.
+        시각이 없는 항목은 아침에 한 번 모아서 알려 줍니다.</p>
+      <div class="cardrow" style="margin-bottom:16px">
+        <span class="nm"><b>알림 사용</b><i>${
+          perm === 'granted' ? '이 기기에서 알림이 허용되어 있습니다' :
+          perm === 'denied' ? '브라우저에서 알림이 차단되어 있습니다. 사이트 설정에서 허용해 주세요' :
+          perm === 'unsupported' ? '이 브라우저는 알림을 지원하지 않습니다' :
+          '켜면 알림 권한을 요청합니다'}</i></span>
+        <button class="sw ${C.notifyOn && perm==='granted' ? 'on':''}" id="ntSw"></button>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>아침 알림 시각</label><input data-k="notifyDaily" type="time" value="${C.notifyDaily||'08:00'}">
+          <span class="hint">그날 할 일을 모아서 알려 줍니다.</span></div>
+        <div class="fld"><label>전날 밤 알림</label><input data-k="notifyPre" type="time" value="${C.notifyPre||'21:00'}">
+          <span class="hint">내일 일정을 미리 알려 줍니다.</span></div>
+      </div>
+      <div class="fld"><label>시각 있는 항목은 몇 분 전에</label>
+        <select data-k="notifyLead">
+          ${[0,5,10,15,30,60].map(m => `<option value="${m}"${+C.notifyLead===m?' selected':''}>${m?m+'분 전':'정각'}</option>`).join('')}
+        </select></div>
+      <button class="btn" id="ntTest">알림 미리 보기</button>
+      <p class="sechelp" style="margin-top:18px">앱을 완전히 종료하면 알림이 오지 않을 수 있습니다.
+        홈 화면에 설치해 두고, 기기 설정에서 이 앱의 배터리 최적화를 해제하면 더 잘 옵니다.</p>`;
+    B.querySelector('#ntSw').onclick = async () => {
+      if(!C.notifyOn){
+        const r = await Notify.ask();
+        C.notifyOn = (r === 'granted');
+        if(r === 'denied') alert('브라우저에서 알림이 차단되어 있어요.\n주소창 왼쪽 자물쇠 → 권한 → 알림에서 허용해 주세요.');
+      } else C.notifyOn = false;
+      save(); renderSettings();
+    };
+    B.querySelector('#ntTest').onclick = async () => {
+      const r = await Notify.ask();
+      if(r !== 'granted') return alert('알림 권한이 필요해요.');
+      Notify.show('알림 미리 보기', '이렇게 알려 드릴게요 · 할 일과 일정', 'test');
+    };
   }
   else if(setTab === 'link'){
     B.innerHTML = `
@@ -2226,82 +2706,6 @@ function bindGeo(root){
   };
 }
 
-/* ═══════════ 소개 · 시작하기 ═══════════ */
-let obStep = 0;
-const OB_STEPS = 6;
-function renderOnboard(){
-  $('obDots').innerHTML = Array.from({length:OB_STEPS}, (_,i) => `<i class="${i<=obStep?'on':''}"></i>`).join('');
-  const B = $('obBody');
-  const back = $('obBack'), next = $('obNext');
-  back.style.visibility = obStep === 0 ? 'hidden' : 'visible';
-  next.textContent = obStep === OB_STEPS-1 ? '시작하기' : '다음';
-
-  if(obStep === 0){
-    B.innerHTML = `
-      <div class="ob-hero">
-        <div class="ob-mark"><i></i></div>
-        <h2>하루를 한 화면에</h2>
-        <p class="lead">아침에 켜면 오늘 필요한 것이, 밤에 켜면 내일 준비할 것이 보여요.<br>
-          필요한 카드만 골라서 나만의 화면을 만들 수 있어요.</p>
-        <div class="ob-feats">
-          <div><b>날씨</b><i>기온 · 미세먼지 · 비 오는 시간</i></div>
-          <div><b>달력</b><i>일정 · 수행평가 · D-day</i></div>
-          <div><b>할 일</b><i>오늘과 내일을 따로</i></div>
-          <div><b>운세</b><i>생년월일로 보는 사주</i></div>
-        </div>
-      </div>`;
-    back.style.visibility = 'hidden';
-    next.textContent = '시작하기';
-  }
-  else if(obStep === 1){
-    B.innerHTML = `<h2>어떻게 부를까요?</h2>
-      <p class="lead">인사말에만 쓰여요. 비워 둬도 괜찮아요.</p>
-      <div class="fld"><label>이름</label><input id="obName" value="${esc(C.name)}" placeholder="예: 태현"></div>`;
-  }
-  else if(obStep === 2){
-    B.innerHTML = `<h2>생년월일</h2>
-      <p class="lead">운세를 계산하는 데만 쓰이고, 이 기기 안에만 저장돼요.</p>
-      <div class="fld"><label>생년월일 (양력)</label><input id="obBirth" type="date" value="${C.birth}"></div>
-      <div class="fld"><label>태어난 시각 (선택)</label><input id="obBTime" type="time" value="${C.birthTime}">
-        <span class="hint">알면 더 정확해지고, 몰라도 괜찮아요.</span></div>`;
-  }
-  else if(obStep === 3){
-    B.innerHTML = `<h2>어디에 사세요?</h2>
-      <p class="lead">날씨를 가져올 지역이에요.</p>
-      <div class="fld"><input id="geoQ" placeholder="도시나 동네 이름 (예: 목동, 대구)">
-        <div class="searchres" id="geoRes"></div></div>
-      <div class="fld"><span class="hint">지금 선택: <b id="obPlace">${esc(C.place)}</b></span></div>
-      <button class="btn" id="geoBtn">현재 위치로 맞추기</button>`;
-    bindGeo(B);
-  }
-  else if(obStep === 4){
-    B.innerHTML = `<h2>어떤 카드를 볼까요?</h2>
-      <p class="lead">나중에 설정에서 언제든 켜고 끌 수 있어요.</p>
-      <div class="pickgrid ob-cards">
-        ${Cards.list.filter(c => !c.fixed).map(c => `
-          <button class="pick ${Cards.isOn(c.id)?'on':''}" data-c="${c.id}">
-            <b>${cardName(c)}${c.tag?` <i class="tag">${c.tag}</i>`:''}</b><i>${cardDesc(c)}</i></button>`).join('')}
-      </div>`;
-    B.querySelector('.pickgrid').onclick = e => {
-      const btn = e.target.closest('[data-c]'); if(!btn) return;
-      Cards.toggle(btn.dataset.c);
-      btn.classList.toggle('on', Cards.isOn(btn.dataset.c));
-    };
-  }
-  else {
-    B.innerHTML = `<h2>다른 기기와 연결</h2>
-      <p class="lead">태블릿에서 적은 일정과 할 일을 휴대폰에서도 볼 수 있어요.<br>지금 안 해도 되고, 나중에 설정에서 할 수 있어요.</p>
-      <div class="linkbox"></div>`;
-    renderLinkBox(B.querySelector('.linkbox'));
-  }
-}
-function obCollect(){
-  if($('obName')) C.name = $('obName').value.trim();
-  if($('obBirth')) C.birth = $('obBirth').value;
-  if($('obBTime')) C.birthTime = $('obBTime').value;
-  save();
-}
-
 /* ── 기기 연결 UI (온보딩·설정 공용) ──
    같은 화면이 두 곳에 들어가므로 id 대신 클래스를 쓰고 box 안에서만 찾는다 */
 function renderLinkBox(box){
@@ -2438,6 +2842,7 @@ async function boot(){
     C.cardOff = Cards.list.filter(c => c.def === false).map(c => c.id);   // 기본 꺼짐 카드
   }
   if(!C.lang) C.lang = detectLang();
+  migrateTodos();
   rollover();
   /* 화면 회전·창 크기 변경에 안정적으로 대응 */
   let fitT = null;
@@ -2452,7 +2857,7 @@ async function boot(){
   loadNews(false);
 
   const joined = await handleJoinLink();
-  if(!C.onboarded && !joined){ obStep = 0; renderOnboard(); $('onboard').classList.add('show'); }
+  OB.start();
 
   setInterval(() => {
     now = new Date();
@@ -2461,25 +2866,15 @@ async function boot(){
       if(overrideBase && natural !== overrideBase){ modeOverride = null; overrideBase = null; }
     }
     paintHeader();
-    if(now.getSeconds() === 0) paint();
+    if(now.getSeconds() === 0){ paint(); Notify.tick(); }
     if(now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 2){ rollover(); paint(); }
   }, 1000);
   setInterval(() => loadWeather(false), 15*60*1000);
+  if(C.notifyOn) Notify.ask().then(() => Notify.tick());
   setInterval(() => loadGames(false), 60*60*1000);
   setInterval(() => loadNews(false), 60*60*1000);
   setInterval(() => { if(syncReady()) syncPull(); }, 45000);
 
-  /* 시작 화면을 걷어내고 본체를 스윽 등장시킨다 */
-  const sp = $('splash');
-  if(sp){
-    const done = () => {
-      sp.classList.add('gone');
-      $('stage').classList.add('entering');
-      setTimeout(() => { sp.remove(); $('stage').classList.remove('entering'); }, 700);
-    };
-    setTimeout(done, C.seenSplash ? 900 : 1750);
-    C.seenSplash = true; save();
-  }
   try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).catch(()=>{});
 }
@@ -2518,12 +2913,6 @@ $('evSave').onclick = saveEvent;
 $('evCancel').onclick = closeEvent;
 $('evClose').onclick = closeEvent;
 $('evDelete').onclick = () => { if(editingId && confirm('이 일정을 삭제할까요?')){ EV.remove(editingId); closeEvent(); paint(); } };
-$('obNext').onclick = () => {
-  obCollect();
-  if(obStep < OB_STEPS-1){ obStep++; renderOnboard(); }
-  else { C.onboarded = true; save(); $('onboard').classList.remove('show'); build(); paint(); loadWeather(true); }
-};
-$('obBack').onclick = () => { obCollect(); if(obStep > 0){ obStep--; renderOnboard(); } };
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
   if($('evEdit').classList.contains('show')) closeEvent();
