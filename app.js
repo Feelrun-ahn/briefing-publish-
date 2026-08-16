@@ -892,11 +892,11 @@ const QR = (function(){
   function svg(text, px){
     const q = make(text);
     if(!q) return '';
-    const n = q.size, pad = 2, total = n + pad*2, s = (px || 200) / total;
+    const n = q.size, pad = 1, total = n + pad*2, s = (px || 200) / total;
     let path = '';
     for(let r = 0; r < n; r++) for(let c = 0; c < n; c++)
       if(q.modules[r][c]) path += `M${(c+pad)*s},${(r+pad)*s}h${s}v${s}h${-s}z`;
-    return `<svg viewBox="0 0 ${px||200} ${px||200}" width="${px||200}" height="${px||200}" xmlns="http://www.w3.org/2000/svg">`
+    return `<svg viewBox="0 0 ${px||200} ${px||200}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">`
       + `<rect width="100%" height="100%" fill="#fff" rx="${s*2}"/>`
       + `<path d="${path}" fill="#0b0e18"/></svg>`;
   }
@@ -1287,8 +1287,9 @@ function fit(){
   const was = document.body.classList.contains('phone');
   document.body.classList.toggle('phone', phone);
   /* 스크롤 잠금/해제를 html 클래스로 확실히 제어 */
-  document.documentElement.classList.toggle('scrollable', phone);
-  document.documentElement.classList.toggle('fixed', !phone);
+  /* 어떤 기기에서도 내용이 넘치면 스크롤할 수 있게 둔다 */
+  document.documentElement.classList.add('scrollable');
+  document.documentElement.classList.remove('fixed');
   $('allBtn').hidden = !phone;
   if(phone){
     document.body.classList.toggle('showall', !!C.phoneAll);
@@ -1307,44 +1308,19 @@ function fit(){
 function fitStage(){
   const st = $('stage');
   if(!st || document.body.classList.contains('phone')) return;
-  if(typing()) return;                      // 입력 중에는 배치를 건드리지 않는다
+  if(typing()) return;
 
-  /* ① 카드 수에 따라 밀도를 먼저 낮춘다 */
+  /* 카드 수에 따라 여백만 조금 줄인다 (내용은 자르지 않는다) */
   const n = Cards.enabled().length;
-  /* 화면 높이도 함께 본다 — 낮은 화면일수록 일찍 촘촘하게 */
-  const per = n / 3;                       // 열당 카드 수
-  const roomy = innerHeight >= 980;
-  document.body.dataset.density =
-    (per >= 4 && !roomy) || per >= 5 ? 'tight' : (per >= 3 && !roomy) || per >= 4 ? 'compact' : '';
+  document.body.dataset.density = n >= 12 ? 'tight' : n >= 9 ? 'compact' : '';
 
   st.style.transform = 'none';
   st.style.zoom = '';
   st.style.width = '100%';
-  st.style.height = '100%';
+  st.style.height = '';
 
-  requestAnimationFrame(() => {
-    rebalance();
-    requestAnimationFrame(() => {
-      /* ③ 그래도 넘치면 전체를 조금씩 줄여 한 화면에 담는다 */
-      const over = () => {
-        let max = 0;
-        document.querySelectorAll('main > .col').forEach(col => {
-          max = Math.max(max, col.scrollHeight - col.clientHeight);
-        });
-        return max;
-      };
-      let z = 1;
-      for(let i = 0; i < 10 && over() > 4 && z > 0.76; i++){
-        z = Math.round((z - 0.04) * 100) / 100;
-        st.style.zoom = z;
-      }
-      const rest = over() > 4;
-      document.querySelectorAll('main > .col').forEach(col => {
-        col.classList.toggle('over', col.scrollHeight > col.clientHeight + 6);
-      });
-      document.body.classList.toggle('cards-overflow', rest);
-    });
-  });
+  /* 열을 고르게 나눈 뒤, 넘치는 만큼은 페이지가 아래로 스크롤된다 */
+  requestAnimationFrame(() => rebalance());
 }
 
 /* 실제 높이를 재서 열을 고르게 다시 나눈다 (사용자가 열을 지정한 카드는 그대로 둔다) */
@@ -3792,6 +3768,10 @@ const OB = {
   finish(silent){
     C.onboarded = true; save();
     this.app.classList.add('is-done');
+    if(silent !== true){
+      const w0 = document.getElementById('welcome');
+      if(w0){ w0.hidden = false; requestAnimationFrame(() => w0.classList.add('show')); }
+    }
     const enter = () => {
       document.getElementById('stage').classList.add('entering');
       setTimeout(() => document.getElementById('stage').classList.remove('entering'), 700);
@@ -3804,16 +3784,19 @@ const OB = {
     /* 소개를 막 마친 사람에게만 환영 화면을 한 번 보여준다 */
     const wc = document.getElementById('welcome');
     const night = (now.getHours() >= 18 || now.getHours() < 5);
+    /* 환영 화면을 먼저 띄운 뒤에 소개 화면을 걷어낸다 (홈 화면이 잠깐 비치는 것 방지) */
+    if(wc){
+      wc.hidden = false;
+      wc.classList.add('show');
+    }
     setTimeout(() => {
       this.app.remove();
       if(!wc){ enter(); return; }
-      wc.hidden = false;
       document.getElementById('wcName').textContent = C.name || T('wcHello');
       document.getElementById('wcHi').textContent = night ? T('wcNight') : T('wcReady');
       const on = Cards.enabled().length;
       document.getElementById('wcSub').textContent =
         T('wcCards', { n: on }) + (this.joined ? T('wcLinked') : '');
-      requestAnimationFrame(() => wc.classList.add('show'));
       setTimeout(() => {
         wc.classList.add('out');
         wc.style.pointerEvents = 'none';
@@ -3904,10 +3887,7 @@ function renderSettings(){
       <h3 class="sectitle">${T('stCardsTitle')}</h3>
       <p class="sechelp">${T('stCardsHint')}</p>
       <p class="sechelp" style="color:var(--acc)">${T('stDragHint')}</p>
-      <div class="segbar">
-        <button class="${manual?'':'on'}" data-lay="auto">${T('stAuto')}</button>
-        <button class="${manual?'on':''}" data-lay="manual">${T('stManual')}</button>
-      </div>
+      <button class="btn" id="layReset" ${manual?'':'hidden'}>${T('stAuto')}</button>
       <div class="cardlist" id="cardList">
         ${Cards.ordered().map(c => `
           <div class="cardrow ${Cards.isOn(c.id)?'':'off'}" data-id="${c.id}">
@@ -3916,10 +3896,6 @@ function renderSettings(){
               <button data-mv="1" title="아래로">▼</button>
             </div>
             <span class="nm"><b>${cardName(c)}${c.tag?` <i class="tag">${T(c.tag)}</i>`:''}</b><i>${cardDesc(c)}</i></span>
-            ${manual && Cards.isOn(c.id) ? `<div class="colpick">
-              ${[0,1,2].map(i => `<button data-col="${i}" class="${(C.cardCol||{})[c.id]===i?'on':''}">${[T('stColL'),T('stColC'),T('stColR')][i]}</button>`).join('')}
-              <button data-col="auto" class="${(C.cardCol||{})[c.id]==null?'on':''}">${T('stColA')}</button>
-            </div>` : ''}
             ${c.fixed ? `<span class="tiny">${T('stAlways')}</span>`
                       : `<button class="sw ${Cards.isOn(c.id)?'on':''}" data-sw="1"></button>`}
           </div>`).join('')}
@@ -4059,10 +4035,10 @@ function renderSettings(){
       }
     };
 
-    const segs = B.querySelector('.segbar:not(#ttMode)');
-    if(segs) segs.onclick = e => {
-      const btn = e.target.closest('[data-lay]'); if(!btn) return;
-      C.layoutMode = btn.dataset.lay; save(); build(); paint(); renderSettings();
+    const lr = B.querySelector('#layReset');
+    if(lr) lr.onclick = () => {
+      C.layoutMode = 'auto'; C.cardCol = {}; save();
+      build(); paint(); renderSettings();
     };
     const nwPick = $('setBody').querySelector('[data-nw]');
     if(nwPick) nwPick.parentNode.onclick = e => {

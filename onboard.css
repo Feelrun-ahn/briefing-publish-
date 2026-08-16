@@ -601,9 +601,9 @@ html.theme-night .brief-app .btn-primary{
 .brief-app .lk-panel{padding:16px;border-radius:var(--ob-r-card);
   border:1px solid var(--ob-border);background:var(--ob-card)}
 .brief-app .lk-qrbox{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.brief-app .lk-qrbox .qr{padding:10px;border-radius:14px;background:#fff;line-height:0;flex:none;
+.brief-app .lk-qrbox .qr{padding:14px;border-radius:16px;background:#fff;line-height:0;flex:none;
   box-shadow:0 8px 24px -12px rgba(0,0,0,.35)}
-.brief-app .lk-qrbox .qr svg{width:150px;height:150px;display:block}
+.brief-app .lk-qrbox .qr svg{width:190px;height:190px;display:block;shape-rendering:crispEdges}
 .brief-app .lk-code-big{font-size:34px;letter-spacing:.24em;font-weight:700;color:var(--ob-accent);
   font-variant-numeric:tabular-nums}
 .brief-app .lk-steps{margin:16px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
@@ -618,7 +618,7 @@ html.theme-night .brief-app .btn-primary{
 @media (max-width:760px){
   .brief-app .lk-pick{grid-template-columns:1fr;gap:8px}
   .brief-app .lk-qrbox{justify-content:center;text-align:center}
-  .brief-app .lk-qrbox .qr svg{width:132px;height:132px}
+  .brief-app .lk-qrbox .qr svg{width:158px;height:158px}
   .brief-app .lk-code-big{font-size:28px;width:100%;text-align:center}
 }
 
@@ -652,3 +652,8 @@ html.theme-night #welcome{background:#080a14}
   #welcome *{animation:none!important;opacity:1!important;transform:none!important}
   .wc-bar i{width:100%}
 }
+
+
+/* 환영 화면이 소개 화면보다 위에 오도록 */
+#welcome{z-index:320}
+.brief-app.is-done{pointer-events:none}
