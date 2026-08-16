@@ -735,6 +735,8 @@ const I18N3 = {"ko": {"tagStudent": "학생", "tagSport": "스포츠", "colGreen
 
 (function(){ const D={"ko": "카드 제목을 길게 누른 뒤 끌면 원하는 자리로 옮길 수 있어요.", "en": "Press and hold a card\\u2019s header, then drag it where you want.", "ja": "カードの見出しを長押ししてドラッグすると好きな位置に移せます。", "zh": "长按卡片标题后拖动即可移动到想要的位置。"}; for(const l in D){ I18N[l].stDragHint = D[l]; } })();
 
+(function(){ const D={"ko": {"stUse": "사용", "stUseHint": "끄면 헤더의 남은 시간 표시가 나타나지 않습니다.", "stNextDay": "내일 정보로 바뀌는 시각", "stNextDayHint": "밤이 되면 날씨·운세·야구가 내일 것으로 바뀝니다. 자정을 넘기면 다시 오늘 것을 봅니다.", "stNextDayFrom": "언제부터", "stNextDayAuto": "취침 2시간 전 (자동)", "stNextDayAt": "{h}시부터", "stNextDayOff": "바꾸지 않음 (항상 오늘)", "faq5": "밤에 왜 내일 날씨가 뜨나요?", "faq5a": "잠들기 전에는 내일 준비가 더 중요해서, 취침 2시간 전(기본 21시)부터 자정까지는 날씨·운세·야구가 내일 것으로 바뀝니다. 자정을 넘기면 그 내일이 곧 오늘이므로 다시 오늘 것을 보여 줍니다. 설정 → 시간에서 시각을 바꾸거나 끌 수 있어요.", "stArrange": "직접 조절", "stArrangeOn": "화면에서 카드를 끌어 옮기세요", "stDone": "완료"}, "en": {"stUse": "Use", "stUseHint": "When off, the countdown does not appear in the header.", "stNextDay": "When tomorrow takes over", "stNextDayHint": "At night the weather, fortune and baseball switch to tomorrow. After midnight they go back to today.", "stNextDayFrom": "Starting from", "stNextDayAuto": "2 hours before bedtime (auto)", "stNextDayAt": "From {h}:00", "stNextDayOff": "Never (always today)", "faq5": "Why does it show tomorrow at night?", "faq5a": "Before bed, tomorrow matters more, so from two hours before your bedtime (9pm by default) until midnight the weather, fortune and baseball show tomorrow. After midnight that tomorrow is today, so it switches back. You can change or turn this off in Settings → Times.", "stArrange": "Arrange by hand", "stArrangeOn": "Drag the cards on the screen", "stDone": "Done"}, "ja": {"stUse": "使う", "stUseHint": "オフにするとヘッダーの残り時間は表示されません。", "stNextDay": "明日の情報に切り替わる時刻", "stNextDayHint": "夜になると天気・運勢・野球が明日のものに変わります。深夜0時を過ぎると今日に戻ります。", "stNextDayFrom": "いつから", "stNextDayAuto": "就寝2時間前（自動）", "stNextDayAt": "{h}時から", "stNextDayOff": "切り替えない（常に今日）", "faq5": "夜に明日の天気が出るのはなぜ？", "faq5a": "寝る前は明日の準備が大切なので、就寝2時間前（既定21時）から0時までは天気・運勢・野球が明日のものになります。0時を過ぎるとその明日が今日になるため戻ります。設定→時刻で変更・解除できます。", "stArrange": "手で並べる", "stArrangeOn": "画面上でカードをドラッグしてください", "stDone": "完了"}, "zh": {"stUse": "使用", "stUseHint": "关闭后顶部不会显示倒计时。", "stNextDay": "切换到明天的时刻", "stNextDayHint": "入夜后天气、运势与棒球会切换为明天。过了午夜会回到今天。", "stNextDayFrom": "从何时开始", "stNextDayAuto": "就寝前2小时（自动）", "stNextDayAt": "{h}点起", "stNextDayOff": "不切换（始终今天）", "faq5": "为什么晚上显示明天的天气？", "faq5a": "睡前更需要为明天做准备，所以从就寝前两小时（默认21点）到午夜，天气、运势和棒球会显示明天。过了午夜那个明天就是今天，于是切回。可在设置→时间中修改或关闭。", "stArrange": "手动排列", "stArrangeOn": "在屏幕上拖动卡片", "stDone": "完成"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
 
 /* ══════ js/qr.js ══════ */
 
@@ -1069,7 +1071,7 @@ const DEFAULTS = {
   name:'', birth:'', birthTime:'',
   place:'서울', lat:37.5665, lon:126.9780,
   wake:'07:00', out:'08:00', bed:'23:00',
-  useWake:true, useOut:true, useBed:true,
+  useWake:true, useOut:true, useBed:true, nextDay:'auto',
   cardOrder:[], cardOff:[], cardCol:{}, layoutMode:'auto',
   events:[],   // {id,title,date,time,memo,type:'event'|'todo'|'exam'|'dday',repeat,done,anyday}
   todoMigrated:false,
@@ -1140,13 +1142,16 @@ const isNight = () => modeOverride ? modeOverride === 'night' : (now.getHours() 
    - 자정을 넘기면 그 '내일'이 곧 오늘이므로 다시 오늘 정보를 본다
    - 아침·낮에는 언제나 오늘 */
 function dayOff(){
+  if(C.nextDay === 'off') return 0;                  // 설정에서 끈 경우
   if(!isNight()) return 0;
   const h = now.getHours();
-  if(h < 5) return 0;
-  if(C.useBed === false) return h >= 21 ? 1 : 0;      // 취침 시각을 안 쓰면 21시 기준
+  if(h < 5) return 0;                                // 자정을 넘기면 그 내일이 곧 오늘
+  const m = h*60 + now.getMinutes();
+  if(C.nextDay && C.nextDay !== 'auto') return m >= (+C.nextDay)*60 ? 1 : 0;
+  if(C.useBed === false) return h >= 21 ? 1 : 0;
   const bedM = mins(C.bed || '23:00');
   const start = Math.max(18*60, (bedM >= 300 ? bedM : bedM + 1440) - 120);
-  return (h*60 + now.getMinutes()) >= start ? 1 : 0;
+  return m >= start ? 1 : 0;
 }
 /* 지금 기준이 되는 날짜 */
 const baseDate = () => dayOff() ? new Date(now.getTime() + 86400000) : now;
@@ -1811,7 +1816,6 @@ const Drag = {
   },
 
   down(e){
-    if(document.body.classList.contains('phone')) return;   // 폰은 한 열이라 순서만 의미
     if(e.button != null && e.button !== 0) return;
     const card = e.target.closest && e.target.closest('.card');
     if(!card) return;
@@ -1819,7 +1823,9 @@ const Drag = {
     if(e.target.closest('button, input, textarea, select, a, .cal-c, .td, .hb')) return;
     this.el = card; this.startX = e.clientX; this.startY = e.clientY; this.moved = false;
     clearTimeout(this.timer);
-    this.timer = setTimeout(() => this.begin(e), 320);       // 길게 눌러야 시작
+    /* 편집 모드에서는 바로, 평소에는 길게 눌러야 시작 */
+    const wait = document.body.classList.contains('edit-cards') ? 60 : 320;
+    this.timer = setTimeout(() => this.begin(e), wait);
   },
 
   begin(){
@@ -1902,6 +1908,23 @@ const Drag = {
     C.layoutMode = 'manual';
     save();
   }
+};
+
+
+/* ── 화면에서 직접 옮기는 편집 모드 ── */
+Drag.edit = function(on){
+  document.body.classList.toggle('edit-cards', !!on);
+  let bar = document.getElementById('editBar');
+  if(on){
+    if(!bar){
+      bar = document.createElement('div');
+      bar.id = 'editBar';
+      bar.innerHTML = `<span>${T('stArrangeOn')}</span><button class="btn primary" id="editDone">${T('stDone')}</button>`;
+      document.body.appendChild(bar);
+      bar.querySelector('#editDone').onclick = () => Drag.edit(false);
+    }
+    bar.hidden = false;
+  } else if(bar) bar.remove();
 };
 
 
@@ -3842,6 +3865,17 @@ function closeSettings(){
   saveSettingsInputs();
   closeModal($('settings'), () => { build(); paint(); loadWeather(true); loadGames(false); loadNews(false); });
 }
+/* 설정 입력은 바꾸는 즉시 저장한다 (탭을 옮기지 않아도 반영되도록) */
+function bindLiveSave(){
+  document.querySelectorAll('#setBody [data-k]').forEach(inp => {
+    if(inp.dataset.live) return;
+    inp.dataset.live = '1';
+    inp.addEventListener('change', () => {
+      saveSettingsInputs();
+      paintHeader(); paint(true);
+    });
+  });
+}
 function saveSettingsInputs(){
   document.querySelectorAll('#setBody [data-k]').forEach(inp => {
     const k = inp.dataset.k;
@@ -3852,6 +3886,7 @@ function saveSettingsInputs(){
 }
 function renderSettings(){
   const B = $('setBody');
+  setTimeout(bindLiveSave, 0);
   if(setTab === 'general'){
     B.innerHTML = `
       <h3 class="sectitle">${T('stLang')}</h3>
@@ -3887,14 +3922,13 @@ function renderSettings(){
       <h3 class="sectitle">${T('stCardsTitle')}</h3>
       <p class="sechelp">${T('stCardsHint')}</p>
       <p class="sechelp" style="color:var(--acc)">${T('stDragHint')}</p>
-      <button class="btn" id="layReset" ${manual?'':'hidden'}>${T('stAuto')}</button>
+      <div class="segbar" id="layMode">
+        <button class="${manual?'':'on'}" data-lay="auto">${T('stAuto')}</button>
+        <button class="${manual?'on':''}" data-lay="manual">${T('stArrange')}</button>
+      </div>
       <div class="cardlist" id="cardList">
         ${Cards.ordered().map(c => `
           <div class="cardrow ${Cards.isOn(c.id)?'':'off'}" data-id="${c.id}">
-            <div class="ord">
-              <button data-mv="-1" title="위로">▲</button>
-              <button data-mv="1" title="아래로">▼</button>
-            </div>
             <span class="nm"><b>${cardName(c)}${c.tag?` <i class="tag">${T(c.tag)}</i>`:''}</b><i>${cardDesc(c)}</i></span>
             ${c.fixed ? `<span class="tiny">${T('stAlways')}</span>`
                       : `<button class="sw ${Cards.isOn(c.id)?'on':''}" data-sw="1"></button>`}
@@ -4035,10 +4069,18 @@ function renderSettings(){
       }
     };
 
-    const lr = B.querySelector('#layReset');
-    if(lr) lr.onclick = () => {
-      C.layoutMode = 'auto'; C.cardCol = {}; save();
-      build(); paint(); renderSettings();
+    const lm = B.querySelector('#layMode');
+    if(lm) lm.onclick = e => {
+      const btn = e.target.closest('[data-lay]'); if(!btn) return;
+      if(btn.dataset.lay === 'auto'){
+        C.layoutMode = 'auto'; C.cardCol = {}; C.cardOrder = []; save();
+        build(); paint(); renderSettings();
+      } else {
+        /* 화면에서 직접 옮기도록 설정을 닫고 편집 모드로 */
+        C.layoutMode = 'manual'; save();
+        closeSettings();
+        setTimeout(() => Drag.edit(true), 420);
+      }
     };
     const nwPick = $('setBody').querySelector('[data-nw]');
     if(nwPick) nwPick.parentNode.onclick = e => {
@@ -4054,11 +4096,7 @@ function renderSettings(){
       const row = e.target.closest('[data-id]'); if(!row) return;
       const id = row.dataset.id;
       if(e.target.dataset.sw){ Cards.toggle(id); renderSettings(); }
-      else if(e.target.dataset.mv){ Cards.move(id, +e.target.dataset.mv); renderSettings(); }
-      else if(e.target.dataset.col){
-        const v = e.target.dataset.col;
-        Cards.setCol(id, v === 'auto' ? null : +v); renderSettings();
-      }
+
     };
   }
   else if(setTab === 'schedule'){
@@ -4068,25 +4106,35 @@ function renderSettings(){
       <div class="row3">
         <div class="fld"><label>${T('stWake')}</label>
           <input data-k="wake" type="time" value="${C.wake}" ${C.useWake===false?'disabled':''}>
-          <label class="chk sm"><input type="checkbox" id="offWake" ${C.useWake===false?'checked':''}>
-            <span>${T('stOff')}</span></label></div>
+          <div class="useline"><span>${T('stUse')}</span>
+            <button class="sw ${C.useWake!==false?'on':''}" id="offWake"></button></div></div>
         <div class="fld"><label>${T('stOut')}</label>
           <input data-k="out" type="time" value="${C.out}" ${C.useOut===false?'disabled':''}>
-          <label class="chk sm"><input type="checkbox" id="offOut" ${C.useOut===false?'checked':''}>
-            <span>${T('stOff')}</span></label></div>
+          <div class="useline"><span>${T('stUse')}</span>
+            <button class="sw ${C.useOut!==false?'on':''}" id="offOut"></button></div></div>
         <div class="fld"><label>${T('stBed')}</label>
           <input data-k="bed" type="time" value="${C.bed}" ${C.useBed===false?'disabled':''}>
-          <label class="chk sm"><input type="checkbox" id="offBed" ${C.useBed===false?'checked':''}>
-            <span>${T('stOff')}</span></label></div>
+          <div class="useline"><span>${T('stUse')}</span>
+            <button class="sw ${C.useBed!==false?'on':''}" id="offBed"></button></div></div>
       </div>
-      <p class="sechelp">${T('stOffHint')}</p>
+      <p class="sechelp">${T('stUseHint')}</p>
+
+      <h3 class="sectitle" style="margin-top:26px">${T('stNextDay')}</h3>
+      <p class="sechelp">${T('stNextDayHint')}</p>
+      <div class="fld"><label>${T('stNextDayFrom')}</label>
+        <select data-k="nextDay">
+          <option value="auto"${(C.nextDay||'auto')==='auto'?' selected':''}>${T('stNextDayAuto')}</option>
+          ${[18,19,20,21,22,23].map(h => `<option value="${h}"${String(C.nextDay)===String(h)?' selected':''}>${T('stNextDayAt',{h})}</option>`).join('')}
+          <option value="off"${C.nextDay==='off'?' selected':''}>${T('stNextDayOff')}</option>
+        </select></div>
       <h3 class="sectitle" style="margin-top:26px">${T('stScreen')}</h3>
       <p class="sechelp">${T('stScreenHint')}</p>`;
     ['offWake','offOut','offBed'].forEach(id => {
       const el = B.querySelector('#'+id); if(!el) return;
-      el.onchange = () => {
-        C[{offWake:'useWake', offOut:'useOut', offBed:'useBed'}[id]] = !el.checked;
-        save(); renderSettings(); paintHeader();
+      el.onclick = () => {
+        const key = { offWake:'useWake', offOut:'useOut', offBed:'useBed' }[id];
+        C[key] = !(C[key] !== false);          // 켜짐 ↔ 꺼짐
+        save(); renderSettings(); paintHeader(); paint();
       };
     });
   }
@@ -4157,7 +4205,7 @@ function renderSettings(){
 
       <h3 class="sectitle" style="margin-top:30px">${T('stFaq')}</h3>
       <div class="faq">
-        ${[1,2,3,4].map(i => `<details><summary>${T('faq'+i)}</summary><p>${T('faq'+i+'a')}</p></details>`).join('')}
+        ${[1,2,3,4,5].map(i => `<details><summary>${T('faq'+i)}</summary><p>${T('faq'+i+'a')}</p></details>`).join('')}
       </div>
 
       <h3 class="sectitle" style="margin-top:30px">${T('stSource')}</h3>

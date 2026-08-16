@@ -865,3 +865,23 @@ body[data-density="tight"] .sl-bars,
 body[data-density="tight"] .nz-vol,
 body[data-density="tight"] .fo-lucky,
 body[data-density="tight"] .fo-disc{display:''}
+.useline{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.useline span{font-size:12px;color:var(--tx3)}
+
+/* ═══════════ 카드 배치 편집 모드 ═══════════ */
+#editBar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:180;
+  display:flex;align-items:center;gap:14px;padding:11px 14px 11px 18px;border-radius:999px;
+  background:var(--card);border:1px solid var(--bd);backdrop-filter:blur(22px);
+  box-shadow:0 16px 40px -18px rgba(0,0,0,.55);animation:slideUp .3s var(--easeOut) both}
+#editBar span{font-size:13px;color:var(--tx2);white-space:nowrap}
+#editBar .btn{padding:8px 16px;font-size:13px}
+body.edit-cards .card{animation:wiggle 1.4s ease-in-out infinite;cursor:grab}
+body.edit-cards .card:active{cursor:grabbing}
+body.edit-cards.dragging .card{animation:none}
+@keyframes wiggle{
+  0%,100%{transform:rotate(-.35deg)}
+  50%{transform:rotate(.35deg)}}
+body.edit-cards .card::before{content:"";position:absolute;inset:0;border-radius:inherit;
+  border:1.5px dashed var(--accBd);pointer-events:none}
+body.edit-cards .card{position:relative}
+@media (prefers-reduced-motion:reduce){ body.edit-cards .card{animation:none} }
