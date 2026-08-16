@@ -68,8 +68,8 @@ main{position:relative;display:grid;gap:14px;min-height:0}
   padding:clamp(14px,1.2vw,20px) clamp(15px,1.4vw,24px);
   display:flex;flex-direction:column;overflow:visible;
   flex:0 0 auto;min-height:fit-content;animation:rise .45s ease both}
-/* 늘어나는 카드는 남는 높이를 채우되, 내용보다 작아지지 않는다 */
-.card.grow{flex:1 1 auto;min-height:fit-content}
+/* 카드는 내용 높이만 갖는다 (남는 높이를 억지로 채우지 않는다) */
+.card.grow{flex:0 0 auto;min-height:fit-content}
 .card.accent{border-color:var(--accBd);background:var(--cardAcc)}
 .card.violet{border-color:var(--violetBd);background:var(--violet)}
 .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px;flex:0 0 auto}
@@ -885,3 +885,17 @@ body.edit-cards .card::before{content:"";position:absolute;inset:0;border-radius
   border:1.5px dashed var(--accBd);pointer-events:none}
 body.edit-cards .card{position:relative}
 @media (prefers-reduced-motion:reduce){ body.edit-cards .card{animation:none} }
+
+
+/* 열 끝에 억지로 늘어나는 카드가 없도록 */
+main > .col{justify-content:flex-start;align-content:start}
+.card.grow{flex:0 0 auto!important}
+.card > .cd{flex:0 0 auto}
+/* 카드 안에서도 빈 공간을 만들지 않는다 */
+.card{justify-content:flex-start}
+
+
+/* 내용이 짧으면 아래를 비워 두되, 무대가 불필요하게 늘어나지 않게 */
+#root{min-height:100dvh;align-items:flex-start}
+#stage{min-height:100dvh;align-content:start}
+main{align-items:start}

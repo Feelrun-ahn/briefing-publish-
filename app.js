@@ -1324,8 +1324,12 @@ function fitStage(){
   st.style.width = '100%';
   st.style.height = '';
 
-  /* 열을 고르게 나눈 뒤, 넘치는 만큼은 페이지가 아래로 스크롤된다 */
-  requestAnimationFrame(() => rebalance());
+  /* 열을 고르게 나눈다 — 카드 높이가 자리 잡은 뒤 한 번 더 맞춘다 */
+  requestAnimationFrame(() => {
+    rebalance();
+    clearTimeout(fitStage._t);
+    fitStage._t = setTimeout(() => { if(!typing()) rebalance(); }, 400);
+  });
 }
 
 /* 실제 높이를 재서 열을 고르게 다시 나눈다 (사용자가 열을 지정한 카드는 그대로 둔다) */
@@ -1350,11 +1354,37 @@ function rebalance(){
   const load = cols.map((_, i) => (fixed[i] || []).reduce((s, el) => s + h(el), 0));
   const plan = cols.map((_, i) => (fixed[i] || []).slice());
 
-  flow.forEach(el => {
+  /* 자동 배치일 때는 큰 카드부터 넣어야 열 길이가 고르게 된다.
+     (순서대로 넣으면 큰 카드가 한 열에 몰린다) */
+  const order = manual ? flow.slice()
+                       : flow.slice().sort((a, b) => h(b) - h(a));
+  const pos = new Map(flow.map((el, i) => [el, i]));
+  order.forEach(el => {
     let t = 0;
     for(let i = 1; i < cols.length; i++) if(load[i] < load[t]) t = i;
     plan[t].push(el); load[t] += h(el);
   });
+  /* 열 안에서는 원래 순서를 지킨다 */
+  if(!manual) plan.forEach(list => list.sort((a, b) =>
+    (pos.has(a) ? pos.get(a) : -1) - (pos.has(b) ? pos.get(b) : -1)));
+
+  /* 한쪽이 크게 길어졌으면 마지막 카드를 짧은 열로 옮겨 균형을 맞춘다 */
+  for(let n = 0; n < 6; n++){
+    let hi = 0, lo = 0;
+    for(let i = 1; i < cols.length; i++){
+      if(load[i] > load[hi]) hi = i;
+      if(load[i] < load[lo]) lo = i;
+    }
+    if(load[hi] - load[lo] < 120) break;
+    const src = plan[hi];
+    if(src.length < 2) break;
+    const el = src[src.length - 1];
+    const eh = h(el);
+    /* 옮겨서 오히려 더 벌어지면 그만둔다 */
+    if(Math.abs((load[hi] - eh) - (load[lo] + eh)) >= load[hi] - load[lo]) break;
+    src.pop(); plan[lo].push(el);
+    load[hi] -= eh; load[lo] += eh;
+  }
 
   /* 순서가 이미 같으면 건드리지 않는다 (깜빡임 방지) */
   let same = true;
