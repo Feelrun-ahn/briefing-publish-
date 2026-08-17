@@ -1234,6 +1234,7 @@ function build(){
   cols.forEach(c => grid.appendChild(c.node));
   if(!phone) requestAnimationFrame(fitStage);
   if(typeof Drag !== 'undefined') Drag.init();
+  if(typeof OpenLink !== 'undefined') OpenLink.attach();
 }
 
 /* 지금 사용자가 입력 중인가? (입력 중에는 화면을 다시 그리지 않는다) */
@@ -1258,6 +1259,7 @@ function paint(quiet){
     try{ c.render(c._el); }catch(e){ console.warn(c.id, e); }
   });
   paintHeader();
+  if(typeof OpenLink !== 'undefined') OpenLink.attach();
   /* 주기적 갱신에서는 배치를 다시 계산하지 않는다 (화면이 들썩이지 않도록) */
   if(!document.body.classList.contains('phone') && !quiet) requestAnimationFrame(fitStage);
 }
@@ -1958,6 +1960,63 @@ Drag.edit = function(on){
 };
 
 
+/* ══════ js/links.js ══════ */
+
+/* ═══════════ 카드에서 원문 열기 ═══════════
+   카드 오른쪽 위의 작은 링크 버튼을 누르면 관련 사이트가 새 탭으로 열립니다.
+   (카드 전체를 누르면 오작동이 잦아 버튼으로 분리했습니다) */
+const OpenLink = {
+  url(id){
+    const enc = encodeURIComponent;
+    switch(id){
+      case 'weather': {
+        const p = C.place || '';
+        return p ? `https://search.naver.com/search.naver?query=${enc(p + ' 날씨')}`
+                 : 'https://weather.naver.com/';
+      }
+      case 'baseball': {
+        const t = (typeof KBO_TEAMS !== 'undefined') && KBO_TEAMS.find(x => x.id === C.teamId);
+        return t ? `https://search.naver.com/search.naver?query=${enc(t.kr + ' 경기일정')}`
+                 : 'https://sports.news.naver.com/kbaseball/index';
+      }
+      case 'news':      return 'https://news.naver.com/';
+      case 'timetable': return 'https://open.neis.go.kr/';
+      case 'fortune':   return `https://search.naver.com/search.naver?query=${enc('오늘의 운세')}`;
+      case 'sleep':     return 'https://www.mi.com/global/support/';
+      case 'calendar':  return `https://search.naver.com/search.naver?query=${enc('달력')}`;
+      default: return '';
+    }
+  },
+  label(id){
+    return id === 'weather'  ? '네이버 날씨'
+         : id === 'baseball' ? '경기 일정'
+         : id === 'news'     ? '네이버 뉴스'
+         : id === 'timetable'? '나이스'
+         : id === 'fortune'  ? '더 보기'
+         : '열기';
+  },
+  /* 카드마다 링크 버튼을 하나씩 달아 준다 */
+  attach(){
+    Cards.enabled().forEach(c => {
+      const el = c._el; if(!el) return;
+      const u = this.url(c.id);
+      const old = el.querySelector('.card-open');
+      if(!u){ if(old) old.remove(); return; }
+      if(old) return;
+      const a = document.createElement('a');
+      a.className = 'card-open';
+      a.href = u; a.target = '_blank'; a.rel = 'noopener';
+      a.title = this.label(c.id);
+      a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h6v6"/><path d="M19 5l-8 8"/>
+        <path d="M19 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4"/></svg>`;
+      a.addEventListener('click', e => e.stopPropagation());
+      el.appendChild(a);
+    });
+  }
+};
+
+
 /* ══════ js/cards/clock.js ══════ */
 
 /* 시계 · 날짜 · D-day */
@@ -2138,6 +2197,7 @@ Cards.register({
     }
     el.querySelector('#wxSrc').textContent =
       (C.wx.stale ? '—' : (C.wx.model && lang()==='ko' ? '기상청 · Open-Meteo' : 'Open-Meteo')) + ' · ' + T('wxRefresh');
+    el.querySelector('.wx-main').classList.toggle('pair', !isToday);
     el.querySelector('#wxIcon').textContent = WICON(w.code);
     el.querySelector('#wxDesc').textContent = WDESC(w.code);
     if(isToday){
@@ -2151,6 +2211,7 @@ Cards.register({
       el.querySelector('#wxS1').textContent = T('wxLoHi');
       el.querySelector('#wxS2').innerHTML =
         `${T('wxRain')} <b style="color:${w.rain>=60?'var(--acc)':'inherit'}">${w.rain != null ? w.rain : '—'}%</b>`;
+      el.querySelector('.wx-main').classList.add('pair');
     }
 
     el.querySelector('#wxTmrw').hidden = !isToday;
@@ -3204,7 +3265,9 @@ Cards.register({
   id:'quote', name:'오늘의 한마디', size:'S',
   desc:'아침·밤에 맞춘 문장 하나',
   init(el){
-    el.innerHTML = `<p class="qt" id="qtText"></p><span class="qtsrc" id="qtSrc"></span>`;
+    el.innerHTML = `<div class="chead"><span class="clab">${T('quoteLab')}</span>`
+      + `<span class="cmeta">${T('wxRefresh').split('·')[0].trim() || ''}</span></div>`
+      + `<p class="qt" id="qtText"></p><span class="qtsrc" id="qtSrc"></span>`;
     el.style.cursor = 'pointer';
     el.onclick = () => { quoteSeed++; const c = Cards.get('quote'); c.render(c._el); };
   },
