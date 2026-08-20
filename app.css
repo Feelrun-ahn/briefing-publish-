@@ -17,11 +17,11 @@
 html,body{margin:0;padding:0;background:var(--rootBg);color:var(--tx);
   font-family:'Space Grotesk',"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
-html,body{overflow-x:hidden}
+html{overflow-x:hidden}
 /* 한 화면 고정 여부는 JS가 html에 클래스로 지정 (:has() 미지원 대비) */
-html.fixed,html.fixed body{overflow-x:hidden;overflow-y:auto;height:auto;min-height:100%}
+html.fixed,html.fixed body{height:auto;min-height:100%}
 html.scrollable{overflow-y:auto;height:auto;-webkit-overflow-scrolling:touch}
-html.scrollable body{overflow-y:visible;height:auto;min-height:100%;position:static}
+html.scrollable body{height:auto;min-height:100%;position:static}
 html.scrollable #root{position:static!important;height:auto!important;overflow:visible!important}
 html.scrollable #stage{height:auto!important;min-height:100dvh}
 *{box-sizing:border-box}
@@ -49,7 +49,7 @@ main{gap:clamp(10px,1.1vw,16px)}
 .col{gap:clamp(10px,1.1vw,16px)}
 .blob{position:absolute;border-radius:50%;filter:blur(54px);pointer-events:none}
 #b1{width:860px;height:660px;left:-210px;top:-250px;background:var(--blob1);animation:drift 18s ease-in-out infinite}
-#b2{width:800px;height:640px;right:-190px;bottom:-270px;background:var(--blob2);animation:drift 22s ease-in-out infinite reverse}
+#b2{width:800px;height:640px;right:0;bottom:-270px;background:var(--blob2);animation:drift 22s ease-in-out infinite reverse}
 
 header{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .brandwrap{display:flex;align-items:center;gap:14px}
@@ -157,13 +157,13 @@ main{position:relative;display:grid;gap:14px;min-height:0}
 .searchres button{text-align:left;padding:10px 13px;border-radius:11px;border:1px solid var(--bd);background:var(--chip);font-size:13.5px}
 
 /* ── 폰 ── */
-body.phone{overflow-x:hidden;overflow-y:visible;height:auto}
+body.phone{overflow:visible;height:auto}
 body.phone #root{position:static;display:block;height:auto;overflow:visible;background:transparent}
-body.phone #stage{overflow:hidden}
+body.phone #stage{overflow:visible}
 body.phone #stage{width:100%;max-width:100%;height:auto;min-height:100dvh;transform:none!important;
   display:flex;flex-direction:column;gap:11px;padding:14px 12px 30px}
 body.phone #b1{width:340px;height:270px;left:-100px;top:-60px}
-body.phone #b2{width:320px;height:260px;right:-100px;bottom:-40px}
+body.phone #b2{width:320px;height:260px;right:0;bottom:-40px}
 body.phone header{flex-wrap:wrap;gap:8px}
 body.phone .brandwrap{width:100%;gap:9px}
 body.phone .greet{font-size:14px}
@@ -681,8 +681,11 @@ header{animation:barSlide .55s var(--easeOut) both}
 .td-when{background:transparent;border:none;font-size:15px;opacity:.6;padding:0 2px}
 .td-when:hover{opacity:1}
 .td-opt{display:flex;gap:7px;margin-top:8px;align-items:center;flex-wrap:wrap}
-.td-opt input{flex:1;min-width:120px;padding:8px 11px;border-radius:10px;border:1px solid var(--bd2);
-  background:var(--chip);font-size:13.5px;color:var(--tx)}
+.td-opt input{flex:0 1 auto;width:auto;min-width:0;max-width:150px;
+  padding:6px 9px;border-radius:9px;border:1px solid var(--bd2);
+  background:var(--chip);font-size:12.5px;color:var(--tx)}
+.td-opt input[type=date]{max-width:132px}
+.td-opt input[type=time]{max-width:104px}
 .td-opt .btn{padding:8px 13px;font-size:12.5px}
 .td .when{font-size:11.5px;color:var(--tx3);white-space:nowrap}
 .td .when.now{color:var(--acc)}
@@ -839,13 +842,7 @@ body.phone header{padding:4px 4px 0}
 main > .col.over::after,main > .col::after{content:none!important;background:none!important}
 .brief-app .ob-foot{background:transparent!important}
 
-/* ═══════════ 카드 끌어 옮기기 ═══════════ */
-body.dragging{cursor:grabbing;user-select:none}
-body.dragging .card{transition:transform .16s var(--ease)}
-.card.drag-src{opacity:.35;transform:scale(.98)}
-.drop-mark{height:64px;border-radius:20px;border:2px dashed var(--accBd);
-  background:var(--accSoft);flex:0 0 auto;animation:markIn .18s var(--easeOut)}
-@keyframes markIn{from{opacity:0;transform:scaleY(.6)}to{opacity:1;transform:none}}
+
 /* 옮길 수 있다는 표시 */
 body:not(.phone) .card > .chead{cursor:grab}
 body:not(.phone) .card > .chead:active{cursor:grabbing}
@@ -922,3 +919,113 @@ main{align-items:start}
 /* 터치 기기에서는 항상 보이게 (마우스가 없으므로) */
 @media (hover:none){ .card-open{opacity:.5} }
 body.edit-cards .card-open{display:none}
+
+
+/* 할 일 날짜·시각 칸은 작게 */
+.td-opt{gap:6px;flex-wrap:wrap;align-items:center}
+.td-opt .td-lb{flex:0 0 auto}
+.td-opt .btn{padding:6px 11px;font-size:12px;flex:0 0 auto}
+body:not(.phone) .td-opt input{max-width:140px}
+
+
+/* 어떤 기기에서도 아래까지 스크롤되게 (마지막 카드가 가려지지 않도록) */
+html,html.scrollable,html.fixed{overflow-y:auto!important;height:auto!important}
+/* body 에 overflow-x:hidden 을 주면 overflow-y:visible 이 auto 로 바뀌어
+   body 가 스크롤 상자가 되고 내용이 그 안에 갇힌다. 절대 함께 쓰지 말 것. */
+body{overflow:visible!important;height:auto!important;min-height:100dvh}
+#root{height:auto!important;overflow:visible!important}
+#stage{height:auto!important;overflow:visible!important;
+  padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+body.phone #stage{padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+
+
+/* body 는 flex 컨테이너가 아니어야 한다 (온보딩 CSS 잔재로 #root 가 눌리던 문제) */
+body{display:block!important}
+#root{flex:none;height:auto!important;min-height:100dvh}
+
+
+/* 배경 장식이 화면 밖으로 나가지 않게 (가로 스크롤 방지)
+   ─ body 에 overflow-x:hidden 을 주면 세로 스크롤이 망가지므로
+     장식을 감싸는 요소에서만 잘라낸다 */
+.aurora,.bg,.blobs{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+#stage > .b1,#stage > .b2,#stage > .b3,.b1,.b2,.b3{max-width:100%}
+#root{overflow-x:clip}
+#stage{overflow-x:clip}
+
+#b1{left:max(-210px, -10vw)}
+
+/* 시계 초 */
+.ck-sec{font-size:.32em;font-weight:300;color:var(--tx3);margin-left:6px;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;align-self:flex-end;padding-bottom:.55em}
+.ck-sec:empty{display:none}
+body[data-density="tight"] .ck-sec{display:none}
+
+/* 꺼진 카드의 세부 설정 — 보이되 만질 수 없음 */
+.locked{position:relative}
+.locked > *:not(.lock-note){opacity:.42;filter:saturate(.5)}
+.locked > *:not(.lock-note){pointer-events:none}
+.lock-note{display:block;width:100%;margin:10px 0 4px;z-index:4;
+  padding:11px 14px;border-radius:12px;font-size:12.5px;text-align:left;
+  background:var(--accSoft);border:1px solid var(--accBd);color:var(--acc);
+  cursor:pointer;opacity:1;filter:none;position:relative}
+.lock-note::after{content:"›";position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:16px;opacity:.7}
+.locked .lock-note{opacity:1}
+.lock-note.shake{animation:lockShake .34s}
+@keyframes lockShake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+#setBody .locked{padding-bottom:8px}
+
+/* 수동 배치 — 가로로 넓은 카드 */
+main.manual{align-items:start}
+main.manual > .col{min-width:0}
+
+
+
+/* ═══════════ 타일 편집 ═══════════ */
+
+/* 편집 모드 — 살짝 흔들리고 테두리가 강조된다 */
+body.edit-cards .card{animation:wiggle 1.6s ease-in-out infinite;
+  touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+body.edit-cards .card:nth-child(2n){animation-delay:-.35s}
+body.edit-cards .card:nth-child(3n){animation-delay:-.7s}
+body.edit-cards .card::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  border:1.5px dashed var(--accBd);pointer-events:none;z-index:2}
+body.edit-cards .card.picked::after{border:2px solid var(--acc);
+  box-shadow:0 0 0 4px var(--accSoft)}
+body.edit-cards .card > *:not(.card-open){pointer-events:none}
+body.edit-cards .card-open{display:none}
+@keyframes wiggle{0%,100%{transform:rotate(-.4deg)}50%{transform:rotate(.4deg)}}
+@media (prefers-reduced-motion:reduce){ body.edit-cards .card{animation:none} }
+
+/* 끌고 있는 동안 */
+body.dragging{cursor:grabbing;overscroll-behavior:contain}
+body.dragging .card{animation:none}
+.card.drag-src{visibility:hidden}
+.drag-ghost{position:fixed;z-index:400;margin:0;pointer-events:none;
+  transform-origin:center;box-shadow:0 26px 60px -20px rgba(0,0,0,.6);
+  animation:none!important;opacity:.96;scale:1.03}
+.drag-ghost::after{display:none}
+
+/* 놓일 자리 */
+.drop-mark{border-radius:20px;border:2px dashed var(--accBd);background:var(--accSoft);
+  flex:0 0 auto;animation:markIn .16s var(--easeOut)}
+@keyframes markIn{from{opacity:0;transform:scaleY(.7)}to{opacity:1;transform:none}}
+
+/* 다른 카드가 밀리는 움직임 */
+main.manual .card{transition:transform .18s var(--ease)}
+body.dragging main.manual .card{transition:none}
+
+/* 아래쪽 편집 막대 */
+#editBar{position:fixed;left:50%;bottom:max(20px, env(safe-area-inset-bottom));
+  transform:translateX(-50%);z-index:220;display:flex;align-items:center;gap:12px;
+  padding:10px 12px 10px 18px;border-radius:999px;max-width:calc(100vw - 24px);
+  background:var(--card);border:1px solid var(--bd);backdrop-filter:blur(24px);
+  box-shadow:0 18px 44px -18px rgba(0,0,0,.6);animation:slideUp .28s var(--easeOut) both}
+#editBar .eb-name{font-size:13px;color:var(--tx2);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+#editBar .btn{padding:8px 16px;font-size:13px;white-space:nowrap}
+@media (max-width:520px){
+  #editBar{gap:8px;padding:8px 10px 8px 14px}
+  #editBar .eb-name{max-width:26vw;font-size:12px}
+  #editBar .eb-size button{padding:6px 9px;font-size:12px}
+}

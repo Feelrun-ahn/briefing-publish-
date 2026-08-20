@@ -737,6 +737,115 @@ const I18N3 = {"ko": {"tagStudent": "학생", "tagSport": "스포츠", "colGreen
 
 (function(){ const D={"ko": {"stUse": "사용", "stUseHint": "끄면 헤더의 남은 시간 표시가 나타나지 않습니다.", "stNextDay": "내일 정보로 바뀌는 시각", "stNextDayHint": "밤이 되면 날씨·운세·야구가 내일 것으로 바뀝니다. 자정을 넘기면 다시 오늘 것을 봅니다.", "stNextDayFrom": "언제부터", "stNextDayAuto": "취침 2시간 전 (자동)", "stNextDayAt": "{h}시부터", "stNextDayOff": "바꾸지 않음 (항상 오늘)", "faq5": "밤에 왜 내일 날씨가 뜨나요?", "faq5a": "잠들기 전에는 내일 준비가 더 중요해서, 취침 2시간 전(기본 21시)부터 자정까지는 날씨·운세·야구가 내일 것으로 바뀝니다. 자정을 넘기면 그 내일이 곧 오늘이므로 다시 오늘 것을 보여 줍니다. 설정 → 시간에서 시각을 바꾸거나 끌 수 있어요.", "stArrange": "직접 조절", "stArrangeOn": "화면에서 카드를 끌어 옮기세요", "stDone": "완료"}, "en": {"stUse": "Use", "stUseHint": "When off, the countdown does not appear in the header.", "stNextDay": "When tomorrow takes over", "stNextDayHint": "At night the weather, fortune and baseball switch to tomorrow. After midnight they go back to today.", "stNextDayFrom": "Starting from", "stNextDayAuto": "2 hours before bedtime (auto)", "stNextDayAt": "From {h}:00", "stNextDayOff": "Never (always today)", "faq5": "Why does it show tomorrow at night?", "faq5a": "Before bed, tomorrow matters more, so from two hours before your bedtime (9pm by default) until midnight the weather, fortune and baseball show tomorrow. After midnight that tomorrow is today, so it switches back. You can change or turn this off in Settings → Times.", "stArrange": "Arrange by hand", "stArrangeOn": "Drag the cards on the screen", "stDone": "Done"}, "ja": {"stUse": "使う", "stUseHint": "オフにするとヘッダーの残り時間は表示されません。", "stNextDay": "明日の情報に切り替わる時刻", "stNextDayHint": "夜になると天気・運勢・野球が明日のものに変わります。深夜0時を過ぎると今日に戻ります。", "stNextDayFrom": "いつから", "stNextDayAuto": "就寝2時間前（自動）", "stNextDayAt": "{h}時から", "stNextDayOff": "切り替えない（常に今日）", "faq5": "夜に明日の天気が出るのはなぜ？", "faq5a": "寝る前は明日の準備が大切なので、就寝2時間前（既定21時）から0時までは天気・運勢・野球が明日のものになります。0時を過ぎるとその明日が今日になるため戻ります。設定→時刻で変更・解除できます。", "stArrange": "手で並べる", "stArrangeOn": "画面上でカードをドラッグしてください", "stDone": "完了"}, "zh": {"stUse": "使用", "stUseHint": "关闭后顶部不会显示倒计时。", "stNextDay": "切换到明天的时刻", "stNextDayHint": "入夜后天气、运势与棒球会切换为明天。过了午夜会回到今天。", "stNextDayFrom": "从何时开始", "stNextDayAuto": "就寝前2小时（自动）", "stNextDayAt": "{h}点起", "stNextDayOff": "不切换（始终今天）", "faq5": "为什么晚上显示明天的天气？", "faq5a": "睡前更需要为明天做准备，所以从就寝前两小时（默认21点）到午夜，天气、运势和棒球会显示明天。过了午夜那个明天就是今天，于是切回。可在设置→时间中修改或关闭。", "stArrange": "手动排列", "stArrangeOn": "在屏幕上拖动卡片", "stDone": "完成"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
 
+(function(){ const D={"ko": {"ttSetHint": "설정에서 넣기", "ttNone": "최근 등록된 시간표가 없습니다. 설정에서 다시 불러와 보세요.", "ttSetHint2": "설정 → 카드 구성에서 학교를 연결하거나 직접 넣어 보세요.", "ttGotDays": "{n}일치를 가져왔어요."}, "en": {"ttSetHint": "Set it up", "ttNone": "No recent timetable found. Try fetching again in Settings.", "ttSetHint2": "Link your school or type it in from Settings → Cards.", "ttGotDays": "Fetched {n} days."}, "ja": {"ttSetHint": "設定する", "ttNone": "最近の時間割が見つかりません。設定から再取得してください。", "ttSetHint2": "設定→カードで学校を連携するか手入力してください。", "ttGotDays": "{n}日分を取得しました。"}, "zh": {"ttSetHint": "去设置", "ttNone": "未找到最近的课表，请在设置中重新获取。", "ttSetHint2": "请在设置→卡片中连接学校或手动填写。", "ttGotDays": "已获取 {n} 天。"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
+(function(){ const D={"ko": {"stDetail": "카드 설정", "stDetailHint": "각 카드에서 쓸 내용을 정합니다. 꺼져 있는 카드는 흐리게 보이며, 카드 구성에서 먼저 켜야 바꿀 수 있어요.", "stLocked": "{c} 카드가 꺼져 있어요 · 눌러서 켜러 가기"}, "en": {"stDetail": "Card options", "stDetailHint": "Set up what each card shows. Cards that are off appear dimmed — turn them on in Cards first.", "stLocked": "{c} is turned off · tap to go turn it on"}, "ja": {"stDetail": "カード設定", "stDetailHint": "各カードの内容を設定します。オフのカードは薄く表示され、まず「カード」で有効にしてください。", "stLocked": "{c} はオフです・押して有効にする"}, "zh": {"stDetail": "卡片设置", "stDetailHint": "设置每张卡片的内容。已关闭的卡片会变暗，请先在“卡片”中开启。", "stLocked": "{c} 已关闭 · 点击前往开启"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
+(function(){ const D={"ko": {"sz1": "작게", "sz2": "중간", "sz3": "크게", "stArrangeOn": "카드를 끌어 옮기세요"}, "en": {"sz1": "Small", "sz2": "Medium", "sz3": "Large", "stArrangeOn": "Drag the cards to rearrange"}, "ja": {"sz1": "小", "sz2": "中", "sz3": "大", "stArrangeOn": "カードをドラッグして並べ替え"}, "zh": {"sz1": "小", "sz2": "中", "sz3": "大", "stArrangeOn": "拖动卡片进行排列"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
+
+/* ══════ js/render.js ══════ */
+
+/* ═══════════ 렌더 계층 ═══════════
+   카드는 "지금 화면이 어때야 하는지"를 그대로 계산하고,
+   실제 DOM 반영은 여기서 맡습니다.
+
+   핵심 규칙: 값이 이전과 같으면 DOM을 건드리지 않습니다.
+   DOM을 건드리지 않으면
+     - 입력 중인 글자와 커서가 살아 있고
+     - 스크롤 위치가 그대로이며
+     - 애니메이션이 처음부터 다시 시작하지 않습니다.
+
+   그래서 카드가 1초에 한 번 render 되더라도 바뀐 부분만 실제로 갱신됩니다. */
+
+/* 마지막으로 넣은 값을 요소에 기억시켜 둔다 */
+const RKEY = '__r';
+
+function setHTML(el, html){
+  if(!el) return false;
+  html = html == null ? '' : String(html);
+  if(el[RKEY] === html) return false;          // 그대로면 아무것도 하지 않는다
+  /* 이 안에 포커스가 있으면 값을 지키기 위해 되돌려 놓는다 */
+  const a = document.activeElement;
+  const keep = (a && el.contains(a) && isField(a))
+    ? { id:a.id, cls:a.className, v:a.value, s:a.selectionStart, e:a.selectionEnd } : null;
+  el.innerHTML = html;
+  el[RKEY] = html;
+  if(keep) restoreFocus(el, keep);
+  return true;
+}
+
+function setText(el, txt){
+  if(!el) return false;
+  txt = txt == null ? '' : String(txt);
+  if(el[RKEY + 't'] === txt) return false;
+  el.textContent = txt;
+  el[RKEY + 't'] = txt;
+  return true;
+}
+
+function setAttr(el, name, val){
+  if(!el) return false;
+  const cur = el.getAttribute(name);
+  const v = val == null ? null : String(val);
+  if(cur === v) return false;
+  if(v == null) el.removeAttribute(name); else el.setAttribute(name, v);
+  return true;
+}
+
+function setClass(el, name, on){
+  if(!el) return false;
+  if(el.classList.contains(name) === !!on) return false;
+  el.classList.toggle(name, !!on);
+  return true;
+}
+
+/* 입력 중인 칸의 값을 건드리지 않는다 (사용자가 치는 중일 수 있으므로) */
+function setValue(el, v){
+  if(!el) return false;
+  if(document.activeElement === el) return false;
+  v = v == null ? '' : String(v);
+  if(el.value === v) return false;
+  el.value = v;
+  return true;
+}
+
+function isField(e){
+  const t = (e.tagName || '').toLowerCase();
+  return t === 'input' || t === 'textarea' || t === 'select' || e.isContentEditable;
+}
+
+function restoreFocus(root, keep){
+  let target = null;
+  if(keep.id) target = root.querySelector('#' + CSS.escape(keep.id));
+  if(!target && keep.cls) target = root.querySelector('.' + keep.cls.trim().split(/\s+/).join('.'));
+  if(!target) return;
+  try{
+    if(target.value !== undefined && keep.v !== undefined) target.value = keep.v;
+    target.focus({ preventScroll:true });
+    if(keep.s != null && target.setSelectionRange) target.setSelectionRange(keep.s, keep.e);
+  }catch(e){}
+}
+
+/* 스크롤 위치를 지켜 주는 감싸개 — 목록을 다시 그릴 때 씀 */
+function keepScroll(el, fn){
+  if(!el) return fn();
+  const top = el.scrollTop, left = el.scrollLeft;
+  const r = fn();
+  if(el.scrollTop !== top) el.scrollTop = top;
+  if(el.scrollLeft !== left) el.scrollLeft = left;
+  return r;
+}
+
+/* hidden 도 값이 같으면 건드리지 않는다 (속성 변경도 렌더 비용이다) */
+function setHidden(el, on){
+  if(!el) return false;
+  on = !!on;
+  if(el.hidden === on) return false;
+  el.hidden = on;
+  return true;
+}
+
 
 /* ══════ js/qr.js ══════ */
 
@@ -1044,6 +1153,129 @@ function fortune(birth,btime,dateObj){
 }
 
 
+/* ══════ js/layout.js ══════ */
+
+/* ═══════════ 배치 상태 (Source of Truth) ═══════════
+
+   타일 위치는 오직 여기 한 곳에서만 관리합니다.
+
+     C.layout = { weather: { x:1, y:0, w:1 }, ... }
+
+     x — 열 번호 (0부터)
+     y — 같은 열 안에서의 순서
+     w — 가로로 차지하는 열 수 (지금은 항상 1)
+
+   높이와 너비는 내용에 따라 정해지므로 저장하지 않습니다.
+   높이를 고정하면 내용이 잘리는데 이 앱에서는 절대 자르지 않기로 했고,
+   너비를 여러 열로 늘리면 열마다 높이가 다른 이 구조에서 카드가 겹칩니다.
+
+   화면 크기가 달라져 열 수가 줄면 x 와 w 를 그 범위로 접습니다.
+   그래서 폰(1열)과 태블릿(3열)에서 같은 저장값을 그대로 씁니다. */
+
+const Layout = {
+  /* 지금 화면의 열 수 */
+  cols(){
+    if(document.body.classList.contains('phone')) return 1;
+    const ratio = innerWidth / Math.max(1, innerHeight);
+    return ratio < 1.15 ? 2 : 3;
+  },
+
+  isManual(){ return C.layoutMode === 'manual'; },
+
+  /* 저장된 배치를 지금 열 수에 맞게 정리해서 돌려준다 */
+  get(){
+    const n = this.cols();
+    const ids = Cards.enabled().map(c => c.id);
+    const src = C.layout || {};
+    const out = {};
+    ids.forEach(id => {
+      const it = src[id];
+      const w = 1;
+      let x = (it && +it.x) || 0;
+      x = Math.max(0, Math.min(n - w, x));
+      out[id] = { x, y: (it && +it.y) || 0, w };
+    });
+    /* 저장에 없던 카드(새로 켠 카드)는 가장 비어 있는 열의 맨 아래로 —
+       한 열에 몰리지 않도록 넣을 때마다 열별 개수를 다시 센다 */
+    const known = ids.filter(id => src[id]);
+    const counts = Array.from({length:n}, (_, i) =>
+      known.filter(id => out[id].x === i).length);
+    ids.filter(id => !src[id]).forEach(id => {
+      let t = 0;
+      for(let i = 1; i < n; i++) if(counts[i] < counts[t]) t = i;
+      out[id] = { x:t, y: 900 + counts[t], w:1 };
+      counts[t]++;
+    });
+    return this.normalize(out, ids, n);
+  },
+
+  /* 열마다 y 를 0,1,2… 로 다시 매긴다 (빈틈·중복 제거) */
+  normalize(map, ids, n){
+    for(let c = 0; c < n; c++){
+      ids.filter(id => map[id].x === c)
+         .sort((a, b) => map[a].y - map[b].y)
+         .forEach((id, i) => { map[id].y = i; });
+    }
+    return map;
+  },
+
+  set(map){
+    C.layout = {};
+    Object.keys(map).forEach(id => {
+      C.layout[id] = { x: map[id].x, y: map[id].y, w: map[id].w };
+    });
+    C.layoutMode = 'manual';
+    save();
+  },
+
+  /* 지금 화면에 그려진 모습을 그대로 배치값으로 만든다
+     (자동 → 수동으로 넘어갈 때 화면이 튀지 않게) */
+  snapshotFromScreen(){
+    const map = {};
+    const colEls = [...document.querySelectorAll('main > .col')];
+    if(colEls.length){
+      colEls.forEach((col, x) => {
+        [...col.children].forEach((el, y) => {
+          if(el.dataset && el.dataset.id) map[el.dataset.id] = { x, y, w:1 };
+        });
+      });
+    } else {
+      Cards.enabled().forEach((c, i) => { map[c.id] = { x:0, y:i, w:1 }; });
+    }
+    return map;
+  },
+
+  /* 카드 하나를 (x, y) 자리에 끼워 넣은 결과를 계산한다.
+     드래그 중 미리보기에 쓰이며, 실제 상태는 건드리지 않는다. */
+  place(map, id, x, y){
+    const n = this.cols();
+    const next = {};
+    Object.keys(map).forEach(k => { next[k] = { ...map[k] }; });
+    const w = Math.max(1, Math.min(n, next[id].w));
+    x = Math.max(0, Math.min(n - w, x));
+
+    /* 같은 열에 있던 카드들을 순서대로 세우고, 그 사이에 끼워 넣는다 */
+    next[id].x = x;
+    const same = Object.keys(next)
+      .filter(k => k !== id && next[k].x === x)
+      .sort((a, b) => next[a].y - next[b].y);
+    const at = Math.max(0, Math.min(same.length, y));
+    same.splice(at, 0, id);
+    same.forEach((k, i) => { next[k].y = i; });
+
+    /* 나머지 열도 번호를 정리 */
+    const ids = Object.keys(next);
+    for(let c = 0; c < n; c++){
+      if(c === x) continue;
+      ids.filter(k => next[k].x === c)
+         .sort((a, b) => next[a].y - next[b].y)
+         .forEach((k, i) => { next[k].y = i; });
+    }
+    return next;
+  }
+};
+
+
 /* ══════ js/core.js ══════ */
 
 /* ═══════════ 코어 ═══════════ */
@@ -1071,8 +1303,9 @@ const DEFAULTS = {
   name:'', birth:'', birthTime:'',
   place:'서울', lat:37.5665, lon:126.9780,
   wake:'07:00', out:'08:00', bed:'23:00',
-  useWake:true, useOut:true, useBed:true, nextDay:'auto',
+  useWake:true, useOut:true, useBed:true, nextDay:'auto', showSec:true,
   cardOrder:[], cardOff:[], cardCol:{}, layoutMode:'auto',
+  layout:{},                 // 수동 배치의 단일 기준 { id:{x,y,w} }
   events:[],   // {id,title,date,time,memo,type:'event'|'todo'|'exam'|'dday',repeat,done,anyday}
   todoMigrated:false,
   todos:[], todosNext:[],
@@ -1091,7 +1324,7 @@ let save = function(){ Store.save(C); };
 
 /* ── 유틸 ── */
 const $ = id => document.getElementById(id);
-const el = (tag, cls, html) => { const e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; };
+const el = (tag, cls, html) => { const e = document.createElement(tag); if(cls) e.className = cls; if(html != null) setHTML(e, html); return e; };
 const pad = n => String(n).padStart(2,'0');
 const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1202,39 +1435,81 @@ const Cards = {
 const WEIGHT = { S:1, M:2, L:3 };
 function build(){
   const grid = $('grid');
-  grid.innerHTML = '';
+  grid.replaceChildren();
+  grid[RKEY] = undefined;
   const cards = Cards.enabled();
   const phone = document.body.classList.contains('phone');
-  /* 폴드처럼 정사각형에 가까운 화면은 2열이 더 자연스럽다 */
-  const ratio = innerWidth / Math.max(1, innerHeight);
-  const nCol = phone ? 1 : (ratio < 1.15 ? 2 : 3);
-  grid.style.gridTemplateColumns = `repeat(${nCol},1fr)`;
+  const nCol = Layout.cols();
 
-  const cols = Array.from({length:nCol}, () => ({ w:0, node: el('div','col') }));
-  const manual = C.layoutMode === 'manual';
+  if(Layout.isManual()){ buildManual(grid, cards, nCol); }
+  else { buildAuto(grid, cards, nCol); }
+
   cards.forEach((c, idx) => {
-    let t = 0;
-    if(nCol > 1){
-      if(manual && C.cardCol && C.cardCol[c.id] != null){
-        t = Math.max(0, Math.min(nCol-1, +C.cardCol[c.id]));
-      } else {
-        t = idx < nCol ? idx : cols.reduce((m, x, i) => cols[m].w <= x.w ? m : i, 0);
-      }
-    }
-    const art = el('article','card' + (c.tone ? ' ' + c.tone : ''));
-    art.dataset.id = c.id;
-    art.style.animationDelay = (idx * 0.04) + 's';
-    if(c.grow) art.classList.add('grow');
-    cols[t].node.appendChild(art);
-    cols[t].w += WEIGHT[c.size] || 2;
-    c._el = art;
+    const art = c._el;
+    if(!art) return;
     if(c.init) c.init(art);
     setTimeout(() => art.classList.add('settled'), 700 + idx*40);
   });
-  cols.forEach(c => grid.appendChild(c.node));
-  if(!phone) requestAnimationFrame(fitStage);
+  if(!phone && !Layout.isManual()) requestAnimationFrame(() => fitStage(true));
   if(typeof Drag !== 'undefined') Drag.init();
   if(typeof OpenLink !== 'undefined') OpenLink.attach();
+}
+
+/* 카드 껍데기 하나 */
+function makeCard(c, idx){
+  const art = el('article','card' + (c.tone ? ' ' + c.tone : ''));
+  art.dataset.id = c.id;
+  art.style.animationDelay = (idx * 0.04) + 's';
+  if(c.grow) art.classList.add('grow');
+  c._el = art;
+  return art;
+}
+
+/* ── 자동 배치 : 열마다 높이를 맞춰 채운다 (예전 방식 유지) ── */
+function buildAuto(grid, cards, nCol){
+  grid.classList.remove('manual');
+  grid.style.gridTemplateColumns = `repeat(${nCol},1fr)`;
+  const cols = Array.from({length:nCol}, () => ({ w:0, node: el('div','col') }));
+  cards.forEach((c, idx) => {
+    let t = 0;
+    if(nCol > 1) t = idx < nCol ? idx : cols.reduce((m, x, i) => cols[m].w <= x.w ? m : i, 0);
+    cols[t].node.appendChild(makeCard(c, idx));
+    cols[t].w += WEIGHT[c.size] || 2;
+  });
+  cols.forEach(c => grid.appendChild(c.node));
+}
+
+/* ── 수동 배치 : 저장된 x·y·w 그대로 ──
+   열마다 세로로 쌓되, 가로로 넓은 카드는 그 열부터 w칸을 차지한다. */
+function buildManual(grid, cards, nCol){
+  grid.classList.add('manual');
+  grid.style.gridTemplateColumns = `repeat(${nCol},1fr)`;
+  const map = Layout.get();
+  applyManual(grid, cards, map, nCol);
+}
+
+/* 배치값을 화면에 반영한다. 카드를 다시 만들지 않고 자리만 옮긴다. */
+function applyManual(grid, cards, map, nCol){
+  nCol = nCol || Layout.cols();
+  /* 열 컨테이너 준비 (없으면 만든다) */
+  let cols = [...grid.querySelectorAll(':scope > .col')];
+  if(cols.length !== nCol){
+    grid.replaceChildren();
+    cols = Array.from({length:nCol}, () => el('div','col'));
+    cols.forEach(n => grid.appendChild(n));
+  }
+  cards.forEach((c, idx) => {
+    const art = c._el || makeCard(c, idx);
+    const it = map[c.id] || { x:0, y:idx, w:1 };
+    art.dataset.x = it.x; art.dataset.y = it.y;
+  });
+  /* 열마다 y 순서대로 넣는다 */
+  for(let x = 0; x < nCol; x++){
+    const list = cards
+      .filter(c => (map[c.id] || {}).x === x)
+      .sort((a, b) => (map[a.id].y - map[b.id].y));
+    list.forEach(c => cols[x].appendChild(c._el));
+  }
 }
 
 /* 지금 사용자가 입력 중인가? (입력 중에는 화면을 다시 그리지 않는다) */
@@ -1250,29 +1525,57 @@ function focusedCard(){
   return (a && a.closest) ? a.closest('.card') : null;
 }
 let lastFit = 0;
-function paint(quiet){
+/* ═══════════ 화면 갱신 ═══════════
+   paintTick()  — 1초마다. 시계와 헤더만 만진다.
+   paint()      — 데이터나 설정이 바뀌었을 때. 카드를 다시 계산한다.
+                  단, 실제 DOM 변경은 setHTML/setText 가 '값이 달라진 곳'에서만 일으킨다.
+   paintCard(id)— 그 카드 하나만. (카드 안에서 저장한 직후 등) */
+
+let painting = false;
+
+function paintCard(id){
+  const c = Cards.get(id);
+  if(!c || !c._el || !c.render) return;
+  if(!c._el.isConnected) return;          // 화면에서 떨어진 옛 요소는 건드리지 않는다
+  try{ c.render(c._el); }catch(e){ console.warn(id, e); }
+}
+
+/* 시계처럼 매초 바뀌는 것만 */
+function paintTick(){
   applyTheme();
-  const skip = focusedCard();
-  Cards.enabled().forEach(c => {
-    if(!c._el || !c.render) return;
-    if(skip && c._el === skip) return;      // 입력 중인 카드는 건드리지 않는다
-    try{ c.render(c._el); }catch(e){ console.warn(c.id, e); }
-  });
   paintHeader();
-  if(typeof OpenLink !== 'undefined') OpenLink.attach();
-  /* 주기적 갱신에서는 배치를 다시 계산하지 않는다 (화면이 들썩이지 않도록) */
-  if(!document.body.classList.contains('phone') && !quiet) requestAnimationFrame(fitStage);
+  paintCard('clock');
+  paintCard('countdown');
+}
+
+function paint(quiet){
+  if(painting) return;                 // 렌더 중에 다시 렌더되는 것을 막는다
+  painting = true;
+  try{
+    applyTheme();
+    const focus = focusedCard();
+    Cards.enabled().forEach(c => {
+      if(!c._el || !c.render || !c._el.isConnected) return;
+      /* 입력 중인 카드는 아예 건드리지 않는다 */
+      if(focus && c._el === focus) return;
+      try{ c.render(c._el); }catch(e){ console.warn(c.id, e); }
+    });
+    paintHeader();
+    if(typeof OpenLink !== 'undefined') OpenLink.attach();
+    if(!document.body.classList.contains('phone') && !quiet)
+      requestAnimationFrame(() => fitStage(false));
+  } finally { painting = false; }
 }
 
 function paintHeader(){
   const night = isNight(), h = now.getHours();
-  $('brandLabel').textContent = night ? T('night') : T('morning');
+  setText($('brandLabel'), night ? T('night') : T('morning'));
   const nm = C.name ? ', ' + C.name : '';
-  $('greeting').textContent = (night
+  setText($('greeting'), (night
       ? (h >= 22 || h < 5 ? T('greetDawn') : T('greetEve'))
-      : (h < 9 ? T('greetAm') : h < 12 ? T('greetNoon') : T('greetPm'))) + nm;
-  $('modeBtn').textContent = night ? T('dayScreen') : T('nightScreen');
-  $('setBtn').textContent = T('settings');
+      : (h < 9 ? T('greetAm') : h < 12 ? T('greetNoon') : T('greetPm'))) + nm);
+  setText($('modeBtn'), night ? T('dayScreen') : T('nightScreen'));
+  setText($('setBtn'), T('settings'));
 
   const nowM = h*60 + now.getMinutes();
   let toBed = mins(C.bed) - nowM; if(toBed < 0) toBed += 1440;
@@ -1284,8 +1587,8 @@ function paintHeader(){
     txt = (h < 5 ? T('bedPast',{t:C.bed}) : toBed <= 240 ? T('bedIn',{t:C.bed,d:fmt(toBed)}) : T('bedGoal',{t:C.bed}));
   else if(!night && useOut)
     txt = (toOut > 0 ? T('outIn',{t:C.out,d:fmt(toOut)}) : T('outPast',{t:C.out}));
-  $('countdown').textContent = txt;
-  $('countdown').hidden = !txt;
+  setText($('countdown'), txt);
+  setHidden($('countdown'), !txt);
 }
 
 /* ── 화면 맞춤 ── */
@@ -1297,10 +1600,10 @@ function fit(){
   /* 어떤 기기에서도 내용이 넘치면 스크롤할 수 있게 둔다 */
   document.documentElement.classList.add('scrollable');
   document.documentElement.classList.remove('fixed');
-  $('allBtn').hidden = !phone;
+  setHidden($('allBtn'), !phone);
   if(phone){
     document.body.classList.toggle('showall', !!C.phoneAll);
-    $('allBtn').textContent = C.phoneAll ? '간단히 보기' : '전체 보기';
+    setText($('allBtn'), C.phoneAll ? '간단히 보기' : '전체 보기');
     $('stage').style.transform = 'none';
     $('stage').style.height = '';
     $('stage').style.width = '';
@@ -1312,10 +1615,24 @@ function fit(){
   if(was !== phone) build();
 }
 /* 카드가 많아 한 화면을 넘치면 무대를 키우고 그만큼 축소해 전부 보이게 한다 */
-function fitStage(){
+/* 배치를 다시 계산해야 하는 상황인지 판별한다.
+   카드 목록·열 수·창 폭이 그대로면 데이터가 바뀌어도 자리를 옮기지 않는다. */
+let layoutKey = '';
+function needRelayout(){
+  const k = Cards.enabled().map(c => c.id).join(',')
+    + '|' + document.querySelectorAll('main > .col').length
+    + '|' + Math.round(innerWidth / 40)
+    + '|' + (C.layoutMode || 'auto');
+  if(k === layoutKey) return false;
+  layoutKey = k;
+  return true;
+}
+function fitStage(force){
   const st = $('stage');
   if(!st || document.body.classList.contains('phone')) return;
   if(typing()) return;
+  if(Layout.isManual()){ document.body.dataset.density =
+    Cards.enabled().length >= 12 ? 'tight' : Cards.enabled().length >= 9 ? 'compact' : ''; return; }
 
   /* 카드 수에 따라 여백만 조금 줄인다 (내용은 자르지 않는다) */
   const n = Cards.enabled().length;
@@ -1326,17 +1643,19 @@ function fitStage(){
   st.style.width = '100%';
   st.style.height = '';
 
-  /* 열을 고르게 나눈다 — 카드 높이가 자리 잡은 뒤 한 번 더 맞춘다 */
+  /* 구성이 바뀐 경우에만 열을 다시 나눈다 (평소에는 자리를 그대로 둔다) */
+  if(!force && !needRelayout()) return;
   requestAnimationFrame(() => {
     rebalance();
     clearTimeout(fitStage._t);
-    fitStage._t = setTimeout(() => { if(!typing()) rebalance(); }, 400);
+    fitStage._t = setTimeout(() => { if(!typing()) rebalance(); }, 450);
   });
 }
 
 /* 실제 높이를 재서 열을 고르게 다시 나눈다 (사용자가 열을 지정한 카드는 그대로 둔다) */
 function rebalance(){
   if(typing()) return;
+  if(Layout.isManual()) return;      // 수동 배치는 사용자가 정한 자리를 지킨다
   const cols = [...document.querySelectorAll('main > .col')];
   if(cols.length < 2) return;
   const manual = C.layoutMode === 'manual';
@@ -1772,57 +2091,77 @@ async function neisTimetable(force){
     x.setDate(x.getDate() - ((w + 6) % 7)); return ymd(x); };
   const thisWeek = monday(now);
   const cache = C.ttCache;
-  if(!force && cache && cache.week === thisWeek && cache.key === s.code + s.grade + s.cls)
-    return { table: cache.table, cached: true, weekOf: cache.weekOf };
+  const key = s.code + s.grade + s.cls;
+  if(!force && cache && cache.key === key){
+    const freshWeek = cache.weekOf === thisWeek;          // 이번 주 자료를 받은 적이 있나
+    const age = Date.now() - (cache.at || 0);
+    /* 이번 주 자료면 그 주 동안 유지, 옛 주 자료면 3시간마다 다시 시도
+       (개학 직후처럼 새 시간표가 올라오는 시기를 놓치지 않도록) */
+    if(freshWeek && cache.week === thisWeek)
+      return { table: cache.table, cached: true, weekOf: cache.weekOf, days: cache.days };
+    if(!freshWeek && age < 3*3600000)
+      return { table: cache.table, cached: true, weekOf: cache.weekOf, days: cache.days, old: true };
+  }
 
   const svc = neisSvcOf(s.kind);
-  /* 방학·주말이면 이번 주 자료가 없다. 최근 8주를 거슬러 찾는다. */
+  const table = {};      // 요일 → 과목 배열
+  const src = {};        // 요일 → 그 자료가 나온 날짜 (언제 것인지 표시용)
+  let newest = '';
+  let lastErr = '';
+
+  /* 최근 8주를 거슬러 보며 요일을 채운다.
+     개학 직후처럼 이번 주에 하루치만 있어도, 지난주 것으로 나머지 요일을 채운다. */
   for(let back = 0; back < 8; back++){
+    if([1,2,3,4,5].every(d => table[d])) break;      // 월~금이 다 찼으면 그만
     const start = new Date(thisWeek + 'T00:00:00');
     start.setDate(start.getDate() - back*7);
     const from = ymd(start);
     const endD = new Date(start); endD.setDate(endD.getDate() + 6);
     const to = ymd(endD);
-    /* 학기가 걸쳐 있을 수 있으니 두 학기를 모두 시도 */
+
     for(const sem of [semOf(start), semOf(start) === 1 ? 2 : 1]){
-      const yy = ayOf(start);
       const q = `${svc}?Type=json&pIndex=1&pSize=300`
         + (neisKey() ? '&KEY=' + encodeURIComponent(neisKey()) : '')
         + `&ATPT_OFCDC_SC_CODE=${encodeURIComponent(s.office)}`
         + `&SD_SCHUL_CODE=${encodeURIComponent(s.code)}`
-        + `&AY=${yy}&SEM=${sem}`
+        + `&AY=${ayOf(start)}&SEM=${sem}`
         + `&TI_FROM_YMD=${from.replace(/-/g,'')}&TI_TO_YMD=${to.replace(/-/g,'')}`
         + `&GRADE=${encodeURIComponent(s.grade)}&CLASS_NM=${encodeURIComponent(s.cls)}`;
       const r = await neisFetch(q);
       if(r.err){
-        /* 인증키 문제는 더 시도해도 소용없다 */
         if(/인증키|한도/.test(r.err)) return { err: r.err };
-        continue;
+        lastErr = r.err; continue;
       }
       const rows = neisRows(r.data, svc);
       if(!rows.length) continue;
 
-      const table = {};
       rows.forEach(x => {
         const d = String(x.ALL_TI_YMD || '');
         if(d.length < 8) return;
-        const dow = new Date(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}T00:00:00`).getDay();
+        const ds = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+        const dow = new Date(ds + 'T00:00:00').getDay();
         const no = parseInt(x.PERIO, 10);
         const subj = (x.ITRT_CNTNT || '').trim();
         if(!no || !subj) return;
-        table[dow] = table[dow] || [];
+        /* 이미 더 최근 자료로 채운 요일은 덮어쓰지 않는다 */
+        if(src[dow] && src[dow] > ds) return;
+        if(src[dow] !== ds){ table[dow] = []; src[dow] = ds; }
         table[dow][no - 1] = subj;
       });
-      for(const k in table) table[k] = table[k].map(v => v || '');
-      if(!Object.keys(table).length) continue;
-
-      C.ttCache = { week: thisWeek, weekOf: from, key: s.code + s.grade + s.cls, table, at: Date.now() };
-      C.timetable = table;
-      save();
-      return { table, weekOf: from, old: back > 0 };
+      if(!newest) newest = from;
+      break;                                        // 이 주는 처리 완료
     }
   }
-  return { err:'최근 8주 안에 등록된 시간표가 없습니다 (방학 기간일 수 있어요)' };
+
+  const got = Object.keys(table);
+  if(!got.length) return { err: lastErr || '최근 8주 안에 등록된 시간표가 없습니다 (방학 기간일 수 있어요)' };
+  got.forEach(k => { table[k] = table[k].map(v => v || ''); });
+
+  C.ttCache = { week: thisWeek, weekOf: newest || thisWeek, key, table, days: src, at: Date.now() };
+  C.timetable = table;
+  save();
+  return { table, weekOf: newest || thisWeek, days: src, count: got.length,
+           old: (newest || thisWeek) !== thisWeek };
 }
 /* 학년도·학기 계산 — 3~8월 1학기, 9~2월 2학기 */
 function ayOf(d){ return (d.getMonth() + 1) >= 3 ? d.getFullYear() : d.getFullYear() - 1; }
@@ -1831,133 +2170,220 @@ function semOf(d){ const m = d.getMonth() + 1; return (m >= 3 && m <= 8) ? 1 : 2
 
 /* ══════ js/drag.js ══════ */
 
-/* ═══════════ 카드 끌어서 옮기기 ═══════════
-   카드 제목 부분을 길게 누른 뒤 끌면 원하는 자리로 옮길 수 있습니다.
-   마우스와 터치를 함께 지원하며, 놓일 자리를 실선으로 보여 줍니다. */
+/* ═══════════ 타일 편집 ═══════════
+
+   iOS 홈 화면 위젯 편집과 같은 흐름입니다.
+     평소 화면 → 카드 길게 누르기 → 편집 모드(흔들림)
+       → 손가락으로 끌기 → 놓일 자리 미리보기 → 손 떼면 확정 → 완료
+
+   설계 원칙
+   ─ 평소에는 드래그가 없다. 클릭·스크롤·입력을 방해하지 않는다.
+   ─ 편집 모드에서만 끌 수 있다.
+   ─ 끄는 동안 저장 상태(Layout)를 건드리지 않는다.
+     미리보기만 바꾸고, 손을 뗄 때 한 번만 저장한다.
+   ─ 포인터 이벤트 하나로 마우스·터치·펜을 처리하고,
+     setPointerCapture 로 손가락이 카드 밖으로 나가도 끊기지 않는다. */
+
 const Drag = {
-  on:false, el:null, ghost:null, mark:null, startX:0, startY:0, timer:null, moved:false,
+  on:false, dragging:false, el:null, id:null, pid:null, timer:null,
+  startX:0, startY:0, base:null, preview:null, ghost:null, mark:null,
+  selected:null, _lastSpot:null,
+  LONG: 450, MOVE: 10,
 
   init(){
-    const st = document.getElementById('stage');
-    if(!st || st.dataset.dragBound) return;
-    st.dataset.dragBound = '1';
-    st.addEventListener('pointerdown', e => this.down(e), { passive:true });
-    addEventListener('pointermove', e => this.move(e), { passive:false });
-    addEventListener('pointerup',   e => this.up(e));
-    addEventListener('pointercancel', () => this.cancel());
+    const stage = document.getElementById('stage');
+    if(!stage || stage.dataset.dragBound) return;
+    stage.dataset.dragBound = '1';
+    stage.addEventListener('pointerdown', e => this.down(e));
+    stage.addEventListener('pointermove', e => this.move(e), { passive:false });
+    stage.addEventListener('pointerup', e => this.up(e));
+    stage.addEventListener('pointercancel', () => this.cancel());
+    stage.addEventListener('contextmenu', e => { if(this.on) e.preventDefault(); });
   },
 
   down(e){
-    if(e.button != null && e.button !== 0) return;
+    if(e.button != null && e.button > 0) return;
     const card = e.target.closest && e.target.closest('.card');
     if(!card) return;
-    /* 버튼·입력 위에서 시작하면 옮기지 않는다 */
-    if(e.target.closest('button, input, textarea, select, a, .cal-c, .td, .hb')) return;
-    this.el = card; this.startX = e.clientX; this.startY = e.clientY; this.moved = false;
+    if(this.on){
+      if(e.target.closest('.tile-ui')) return;
+      this.begin(card, e);
+      return;
+    }
+    if(e.target.closest('button, input, textarea, select, a, .cal-c, .td, .hb, .nz, .pick')) return;
+    this.startX = e.clientX; this.startY = e.clientY;
+    this._cand = card; this._pe = e;
     clearTimeout(this.timer);
-    /* 편집 모드에서는 바로, 평소에는 길게 눌러야 시작 */
-    const wait = document.body.classList.contains('edit-cards') ? 60 : 320;
-    this.timer = setTimeout(() => this.begin(e), wait);
+    this.timer = setTimeout(() => {
+      this.edit(true);
+      const fresh = Cards.get(card.dataset.id);
+      this.begin((fresh && fresh._el) || card, this._pe);
+      if(navigator.vibrate) try{ navigator.vibrate(14); }catch(err){}
+    }, this.LONG);
   },
 
-  begin(){
-    if(!this.el) return;
-    this.on = true;
+  begin(card, e){
+    clearTimeout(this.timer);
+    this.el = card;
+    this.id = card.dataset.id;
+    this.pid = e.pointerId;
+    this.startX = e.clientX; this.startY = e.clientY;
+    this.base = Layout.isManual() ? Layout.get() : Layout.snapshotFromScreen();
+    this.preview = null;
+    this.dragging = false;
+    try{ card.setPointerCapture(e.pointerId); }catch(err){}
+    this.select(card);
+  },
+
+  lift(){
+    if(this.dragging || !this.el) return;
+    this.dragging = true;
     document.body.classList.add('dragging');
+    const r = this.el.getBoundingClientRect();
+
+    const g = this.el.cloneNode(true);
+    g.classList.add('drag-ghost');
+    g.style.width = r.width + 'px';
+    g.style.height = r.height + 'px';
+    g.style.left = r.left + 'px';
+    g.style.top = r.top + 'px';
+    document.body.appendChild(g);
+    this.ghost = g;
+
     this.el.classList.add('drag-src');
-    /* 놓일 자리 표시 */
-    this.mark = document.createElement('div');
-    this.mark.className = 'drop-mark';
-    this.el.parentNode.insertBefore(this.mark, this.el.nextSibling);
-    if(navigator.vibrate) try{ navigator.vibrate(12); }catch(err){}
+    const m = document.createElement('div');
+    m.className = 'drop-mark';
+    m.style.height = r.height + 'px';
+    this.mark = m;
+    this.el.parentNode.insertBefore(m, this.el);
+    this.preview = { ...this.base };
   },
 
   move(e){
     if(!this.el) return;
-    if(!this.on){
-      /* 아직 시작 전인데 많이 움직였으면 스크롤로 본다 */
-      if(Math.abs(e.clientX - this.startX) > 8 || Math.abs(e.clientY - this.startY) > 8){
-        clearTimeout(this.timer); this.el = null;
+    const dx = e.clientX - this.startX, dy = e.clientY - this.startY;
+    if(!this.dragging){
+      if(!this.on){
+        if(Math.abs(dx) > this.MOVE || Math.abs(dy) > this.MOVE){
+          clearTimeout(this.timer); this.el = null;
+        }
+        return;
       }
-      return;
+      if(Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      this.lift();
     }
     e.preventDefault();
-    this.moved = true;
-    const cols = [...document.querySelectorAll('main > .col')];
-    if(!cols.length) return;
+    this.ghost.style.transform = `translate(${dx}px, ${dy}px)`;
 
-    /* 가장 가까운 열 찾기 */
-    let col = cols[0], best = Infinity;
-    cols.forEach(c => {
+    const spot = this.spotAt(e.clientX, e.clientY);
+    if(!spot) return;
+    if(this._lastSpot && this._lastSpot.x === spot.x && this._lastSpot.y === spot.y) return;
+    this._lastSpot = spot;
+
+    this.preview = Layout.place(this.base, this.id, spot.x, spot.y);
+    applyManual(document.getElementById('grid'), Cards.enabled(), this.preview);
+    if(this.el.parentNode) this.el.parentNode.insertBefore(this.mark, this.el);
+  },
+
+  spotAt(px, py){
+    const cols = [...document.querySelectorAll('main > .col')];
+    if(!cols.length) return null;
+    let x = 0, best = Infinity;
+    cols.forEach((c, i) => {
       const r = c.getBoundingClientRect();
-      const d = Math.abs((r.left + r.right) / 2 - e.clientX);
-      if(d < best){ best = d; col = c; }
+      const d = px < r.left ? r.left - px : px > r.right ? px - r.right : 0;
+      if(d < best){ best = d; x = i; }
     });
-    /* 그 열에서 놓일 위치 찾기 */
-    const kids = [...col.children].filter(x => x !== this.el && x !== this.mark);
-    let before = null;
-    for(const k of kids){
-      const r = k.getBoundingClientRect();
-      if(e.clientY < r.top + r.height / 2){ before = k; break; }
+    const kids = [...cols[x].children].filter(k => k !== this.mark && k !== this.el);
+    let y = kids.length;
+    for(let i = 0; i < kids.length; i++){
+      const r = kids[i].getBoundingClientRect();
+      if(py < r.top + r.height / 2){ y = i; break; }
     }
-    if(before) col.insertBefore(this.mark, before);
-    else col.appendChild(this.mark);
+    return { x, y };
   },
 
   up(){
     clearTimeout(this.timer);
-    if(!this.on){ this.el = null; return; }
-    const el = this.el, mark = this.mark;
-    if(el && mark && mark.parentNode){
-      mark.parentNode.insertBefore(el, mark);
-      this.save();
-    }
-    this.cancel();
-    paint();
+    if(!this.dragging){ this.el = null; return; }
+    const map = this.preview || this.base;
+    const id = this.id;
+    this.cleanup();
+    Layout.set(map);
+    applyManual(document.getElementById('grid'), Cards.enabled(), Layout.get());
+    const again = Cards.get(id);
+    if(again && again._el) this.select(again._el);
+    paint(true);
   },
 
   cancel(){
     clearTimeout(this.timer);
-    if(this.el) this.el.classList.remove('drag-src');
-    if(this.mark && this.mark.parentNode) this.mark.remove();
-    document.body.classList.remove('dragging');
-    this.on = false; this.el = null; this.mark = null;
+    if(this.dragging){
+      const base = this.base;
+      this.cleanup();
+      applyManual(document.getElementById('grid'), Cards.enabled(), base);
+    }
+    this.el = null;
   },
 
-  /* 지금 화면 배치를 그대로 저장한다 */
-  save(){
-    const cols = [...document.querySelectorAll('main > .col')];
-    const order = [], colOf = {};
-    cols.forEach((c, i) => {
-      [...c.children].forEach(x => {
-        if(!x.dataset || !x.dataset.id) return;
-        order.push(x.dataset.id);
-        colOf[x.dataset.id] = i;
-      });
-    });
-    C.cardOrder = order;
-    C.cardCol = colOf;
-    C.layoutMode = 'manual';
-    save();
-  }
-};
+  cleanup(){
+    if(this.ghost){ this.ghost.remove(); this.ghost = null; }
+    if(this.mark){ this.mark.remove(); this.mark = null; }
+    if(this.el) this.el.classList.remove('drag-src');
+    document.body.classList.remove('dragging');
+    this.dragging = false;
+    this._lastSpot = null;
+    this.el = null; this.pid = null;
+  },
 
+  edit(on){
+    on = !!on;
+    if(this.on === on) return;
+    this.on = on;
+    document.body.classList.toggle('edit-cards', on);
+    if(on){
+      if(!Layout.isManual()){
+        Layout.set(Layout.snapshotFromScreen());
+        build();
+      }
+      this.bar(true);
+    } else {
+      this.select(null);
+      this.bar(false);
+      paint(true);
+    }
+  },
 
-/* ── 화면에서 직접 옮기는 편집 모드 ── */
-Drag.edit = function(on){
-  document.body.classList.toggle('edit-cards', !!on);
-  let bar = document.getElementById('editBar');
-  if(on){
+  select(card){
+    document.querySelectorAll('.card.picked').forEach(c => c.classList.remove('picked'));
+    this.selected = card || null;
+    if(card) card.classList.add('picked');
+    if(this.on) this.bar(true);
+  },
+
+  bar(show){
+    let bar = document.getElementById('editBar');
+    if(!show){ if(bar) bar.remove(); return; }
     if(!bar){
       bar = document.createElement('div');
       bar.id = 'editBar';
-      bar.innerHTML = `<span>${T('stArrangeOn')}</span><button class="btn primary" id="editDone">${T('stDone')}</button>`;
       document.body.appendChild(bar);
-      bar.querySelector('#editDone').onclick = () => Drag.edit(false);
     }
-    bar.hidden = false;
-  } else if(bar) bar.remove();
+    const sel = this.selected;
+    setHTML(bar,
+      `<span class="eb-name">${sel ? esc(cardName(Cards.get(sel.dataset.id))) : T('stArrangeOn')}</span>`
+      + `<button class="btn primary" data-done="1">${T('stDone')}</button>`);
+    bar.onclick = e => {
+      if(e.target.closest('[data-done]')) this.edit(false);
+    };
+  }
 };
+
+document.addEventListener('pointerdown', e => {
+  if(!Drag.on) return;
+  if(e.target.closest('.card') || e.target.closest('#editBar')) return;
+  Drag.select(null);
+}, true);
 
 
 /* ══════ js/links.js ══════ */
@@ -2024,21 +2450,22 @@ Cards.register({
   id:'clock', name:'시계 · 날짜', size:'S', fixed:true,
   desc:'현재 시각, 날짜, 다가오는 D-day',
   init(el){
-    el.innerHTML = `
-      <div class="ck-top"><span class="ck-hm big" id="ckHM">00:00</span><span class="ck-ap" id="ckAP">AM</span></div>
-      <div class="ck-bot"><span class="ck-date" id="ckDate"></span><div class="ck-chips" id="ckChips"></div></div>`;
+    setHTML(el, `
+      <div class="ck-top"><span class="ck-hm big" id="ckHM">00:00</span><span class="ck-sec" id="ckSec">00</span><span class="ck-ap" id="ckAP">AM</span></div>
+      <div class="ck-bot"><span class="ck-date" id="ckDate"></span><div class="ck-chips" id="ckChips"></div></div>`);
   },
   render(){
     const h = now.getHours();
-    $('ckHM').textContent = pad(h)+':'+pad(now.getMinutes());
-    $('ckAP').textContent = h < 12 ? T('ampmAM') : T('ampmPM');
-    $('ckDate').textContent = dateLabel(now);
+    setText($('ckHM'), pad(h)+':'+pad(now.getMinutes()));
+    setText($('ckSec'), C.showSec === false ? '' : pad(now.getSeconds()));
+    setText($('ckAP'), h < 12 ? T('ampmAM') : T('ampmPM'));
+    setText($('ckDate'), dateLabel(now));
     const dd = EV.all().filter(e => e.type === 'dday' && !e.repeat)
       .map(e => ({ n:e.title, l:dleft(e.date) }))
       .filter(x => x.l >= 0).sort((a,b) => a.l - b.l).slice(0,3);
-    $('ckChips').innerHTML = dd.map((d,i) =>
+    setHTML($('ckChips'), dd.map((d,i) =>
       `<span class="ck-chip${i===0?' hot':''}">${dtxt(d.l)} ${esc(d.n)}</span>`).join('')
-      || `<span class="tiny">${T('ddayHint')}</span>`;
+      || `<span class="tiny">${T('ddayHint')}</span>`);
   }
 });
 
@@ -2138,14 +2565,14 @@ async function loadWeather(force){
     WX_ERR = (e && e.message) ? e.message : '연결 실패';
     if(C.wx) C.wx.stale = true;
   }
-  paint();
+  paintCard('weather');
 }
 
 Cards.register({
   id:'weather', name:'날씨', size:'L', grow:true,
   desc:'현재 기온, 미세먼지, 시간대별 예보, 내일 요약',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab" id="wxLab">날씨</span><span class="cmeta" id="wxSrc">불러오는 중</span></div>
       <div class="wx-main">
         <span class="wx-icon" id="wxIcon">⛅</span>
@@ -2159,7 +2586,7 @@ Cards.register({
       <div class="wx-stats" id="wxStats"></div>
       <p class="wx-adv" id="wxAdv"></p>
       <div class="wx-tmrw" id="wxTmrw"></div>
-      <div class="wx-hourly" id="wxHourly"></div>`;
+      <div class="wx-hourly" id="wxHourly"></div>`);
     el.querySelector('#wxSrc').onclick = () => loadWeather(true);
   },
   render(el){
@@ -2174,47 +2601,43 @@ Cards.register({
     const md = sel.slice(5).replace(/^0/,'').replace('-','월 ').replace(/-0?/,'') + '일';
     const tmr = ymd(new Date(now.getTime() + 86400000));
     const when = isToday ? T('today') : (sel === tmr ? T('tomorrow') : md);
-    el.querySelector('#wxLab').textContent = (C.place || T('wxPlace')) + ' · ' + when;
+    setText(el.querySelector('#wxLab'), (C.place || T('wxPlace')) + ' · ' + when);
 
     if(!isToday && !dayData){
-      el.querySelector('.wx-main').hidden = true;
-      el.querySelector('#wxStats').hidden = true;
-      el.querySelector('#wxTmrw').hidden = true;
-      el.querySelector('#wxHourly').hidden = true;
-      el.querySelector('#wxSrc').textContent = '';
-      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${when} ${T('wxNoData')}<br>
-        <span class="tiny">예보는 오늘부터 7일까지만 제공돼요.</span></span>`;
+      setHidden(el.querySelector('.wx-main'), true);
+      setHidden(el.querySelector('#wxStats'), true);
+      setHidden(el.querySelector('#wxTmrw'), true);
+      setHidden(el.querySelector('#wxHourly'), true);
+      setText(el.querySelector('#wxSrc'), '');
+      setHTML(el.querySelector('#wxAdv'), `<span class="empty">${when} ${T('wxNoData')}<br>
+        <span class="tiny">예보는 오늘부터 7일까지만 제공돼요.</span></span>`);
       return;
     }
-    el.querySelector('.wx-main').hidden = !w;
-    el.querySelector('#wxStats').hidden = !w;
-    el.querySelector('#wxTmrw').hidden = !w;
-    el.querySelector('#wxHourly').hidden = !w;
+    setHidden(el.querySelector('.wx-main'), !w);
+    setHidden(el.querySelector('#wxStats'), !w);
+    setHidden(el.querySelector('#wxTmrw'), !w);
+    setHidden(el.querySelector('#wxHourly'), !w);
     if(!w){
-      el.querySelector('#wxSrc').textContent = T('wxRetry');
-      el.querySelector('#wxAdv').innerHTML = `<span class="empty">${T('wxFail')}</span>`;
+      setText(el.querySelector('#wxSrc'), T('wxRetry'));
+      setHTML(el.querySelector('#wxAdv'), `<span class="empty">${T('wxFail')}</span>`);
       return;
     }
-    el.querySelector('#wxSrc').textContent =
-      (C.wx.stale ? '—' : (C.wx.model && lang()==='ko' ? '기상청 · Open-Meteo' : 'Open-Meteo')) + ' · ' + T('wxRefresh');
+    setText(el.querySelector('#wxSrc'), (C.wx.stale ? '—' : (C.wx.model && lang()==='ko' ? '기상청 · Open-Meteo' : 'Open-Meteo')) + ' · ' + T('wxRefresh'));
     el.querySelector('.wx-main').classList.toggle('pair', !isToday);
-    el.querySelector('#wxIcon').textContent = WICON(w.code);
-    el.querySelector('#wxDesc').textContent = WDESC(w.code);
+    setText(el.querySelector('#wxIcon'), WICON(w.code));
+    setText(el.querySelector('#wxDesc'), WDESC(w.code));
     if(isToday){
-      el.querySelector('#wxTemp').innerHTML = `${w.temp}°`;
-      el.querySelector('#wxS1').textContent = `${T('wxFeels')} ${w.feels}°`;
-      el.querySelector('#wxS2').innerHTML =
-        `${T('wxHi')} <b class="hi2">${w.hi}°</b> / ${T('wxLo')} <b class="lo2">${w.lo}°</b>`;
+      setHTML(el.querySelector('#wxTemp'), `${w.temp}°`);
+      setText(el.querySelector('#wxS1'), `${T('wxFeels')} ${w.feels}°`);
+      setHTML(el.querySelector('#wxS2'), `${T('wxHi')} <b class="hi2">${w.hi}°</b> / ${T('wxLo')} <b class="lo2">${w.lo}°</b>`);
     } else {
-      el.querySelector('#wxTemp').innerHTML =
-        `<span class="lo2">${w.lo}°</span><span class="slash">/</span><span class="hi2">${w.hi}°</span>`;
-      el.querySelector('#wxS1').textContent = T('wxLoHi');
-      el.querySelector('#wxS2').innerHTML =
-        `${T('wxRain')} <b style="color:${w.rain>=60?'var(--acc)':'inherit'}">${w.rain != null ? w.rain : '—'}%</b>`;
+      setHTML(el.querySelector('#wxTemp'), `<span class="lo2">${w.lo}°</span><span class="slash">/</span><span class="hi2">${w.hi}°</span>`);
+      setText(el.querySelector('#wxS1'), T('wxLoHi'));
+      setHTML(el.querySelector('#wxS2'), `${T('wxRain')} <b style="color:${w.rain>=60?'var(--acc)':'inherit'}">${w.rain != null ? w.rain : '—'}%</b>`);
       el.querySelector('.wx-main').classList.add('pair');
     }
 
-    el.querySelector('#wxTmrw').hidden = !isToday;
+    setHidden(el.querySelector('#wxTmrw'), !isToday);
     const air = isToday ? ((C.wx && C.wx.air) || {}) : {};
     const st = [];
     const num = v => (v != null && isFinite(v)) ? Math.round(v) : null;
@@ -2234,27 +2657,27 @@ Cards.register({
       st.push([T('wxUv'), w.uv>=8?w.uv+' '+T('uvVeryHigh'):w.uv>=6?w.uv+' '+T('uvHigh'):w.uv+' '+T('uvMid'), 'var(--tx)']);
       st.push([T('wxSunrise'), w.sunrise||'—', 'var(--tx)']);
     }
-    el.querySelector('#wxStats').innerHTML = st.map(s =>
+    setHTML(el.querySelector('#wxStats'), st.map(s =>
       `<div class="wx-stat"><i>${s[0]}</i><b style="color:${s[2]}">${s[1]}</b>`
-      + (s[3] ? `<u>${esc(s[3])}</u>` : '') + `</div>`).join('');
+      + (s[3] ? `<u>${esc(s[3])}</u>` : '') + `</div>`).join(''));
 
     /* 조언 기준: 오늘은 현재 기온, 다른 날은 그날 최고 기온 */
     const t = (w.temp != null) ? w.temp : w.hi;
     const adv = t>=28 ? T('advHot') : t>=23 ? T('advWarm')
               : t>=17 ? T('advMild') : t>=10 ? T('advCool') : T('advCold');
     const rr = wetRanges(w.wetH);
-    el.querySelector('#wxAdv').textContent = adv
-      + (w.rain>=50 ? ' ' + (rr ? T('advRainAt',{r:rr}) : T('advRain')) : '');
+    setText(el.querySelector('#wxAdv'), adv
+      + (w.rain>=50 ? ' ' + (rr ? T('advRainAt',{r:rr}) : T('advRain')) : ''));
 
     const tw = C.wx.tomorrow;
-    el.querySelector('#wxTmrw').innerHTML = tw
+    setHTML(el.querySelector('#wxTmrw'), tw
       ? `<span class="lb">${T('wxTomorrow')}</span><span class="ic">${WICON(tw.code)}</span>`
         + `<span class="tp"><b class="lo2">${tw.lo}°</b> / <b class="hi2">${tw.hi}°</b></span>`
         + `<span class="rn">${WDESC(tw.code)}${tw.rain!=null?' · '+T('wxRain')+' <b>'+tw.rain+'%</b>':''}`
         + `${wetRanges(tw.wetH)?' · '+wetRanges(tw.wetH):''}</span>`
-      : '';
-    el.querySelector('#wxHourly').innerHTML = w.hourly.map(x =>
-      `<div class="wx-h"><span class="t">${x.t}</span><span class="i">${x.icon}</span><span class="v">${x.temp}°</span></div>`).join('');
+      : '');
+    setHTML(el.querySelector('#wxHourly'), w.hourly.map(x =>
+      `<div class="wx-h"><span class="t">${x.t}</span><span class="i">${x.icon}</span><span class="v">${x.temp}°</span></div>`).join(''));
   }
 });
 
@@ -2275,7 +2698,7 @@ Cards.register({
   desc:'월 달력, 일정·수행평가·D-day 표시, 날짜를 눌러 추가',
   init(el){
     calInit();
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead">
         <span class="clab">${T('calTitle')}</span>
         <div class="cal-nav">
@@ -2290,7 +2713,7 @@ Cards.register({
       <div class="cal-day">
         <div class="cal-dhead"><span id="calDayLab"></span><button class="cbtn acc" id="calAdd">${T('calAdd')}</button></div>
         <div class="cal-list" id="calList"></div>
-      </div>`;
+      </div>`);
     el.querySelector('.cal-nav').onclick = e => {
       const b = e.target.closest('[data-go]'); if(!b) return;
       const g = +b.dataset.go;
@@ -2316,9 +2739,9 @@ Cards.register({
   render(el){
     calInit();
     const { y, m } = calYM;
-    el.querySelector('#calYM').textContent = ymLabel(y, m);
-    el.querySelector('#calDow').innerHTML = dows().map((d,i) =>
-      `<span class="${i===0?'sun':i===6?'sat':''}">${d}</span>`).join('');
+    setText(el.querySelector('#calYM'), ymLabel(y, m));
+    setHTML(el.querySelector('#calDow'), dows().map((d,i) =>
+      `<span class="${i===0?'sun':i===6?'sat':''}">${d}</span>`).join(''));
 
     const first = new Date(y, m, 1), start = first.getDay();
     const last = new Date(y, m+1, 0).getDate();
@@ -2329,7 +2752,7 @@ Cards.register({
     while(cells.length % 7) cells.push({ d: cells.length-start-last+1, out:true, ym:[y, m+1] });
 
     const t = today();
-    el.querySelector('#calGrid').innerHTML = cells.map(c => {
+    setHTML(el.querySelector('#calGrid'), cells.map(c => {
       let yy = c.ym[0], mm = c.ym[1];
       if(mm < 0){ mm = 11; yy--; } if(mm > 11){ mm = 0; yy++; }
       const ds = `${yy}-${pad(mm+1)}-${pad(c.d)}`;
@@ -2340,21 +2763,20 @@ Cards.register({
       return `<button class="cal-c${c.out?' out':''}${ds===t?' today':''}${ds===calSel?' sel':''}" data-d="${ds}">
         <span class="n${dow===0?' sun':dow===6?' sat':''}">${c.d}</span>
         <span class="dots">${dots}</span></button>`;
-    }).join('');
+    }).join(''));
 
     const sd = new Date(calSel+'T00:00:00');
     const dl = dleft(calSel);
-    el.querySelector('#calDayLab').innerHTML =
-      `${dateLabel(sd)} <i class="tiny">${calSel===t?T('calToday'):dtxt(dl)}</i>`;
+    setHTML(el.querySelector('#calDayLab'), `${dateLabel(sd)} <i class="tiny">${calSel===t?T('calToday'):dtxt(dl)}</i>`);
     const list = EV.onDate(calSel);
-    el.querySelector('#calList').innerHTML = list.length ? list.map(e => `
+    setHTML(el.querySelector('#calList'), list.length ? list.map(e => `
       <div class="cal-ev" data-ev="${e.id}">
         <i class="bar" style="background:${evColor(e.type)}"></i>
         <span class="tm">${e.time || T('calAllDay')}</span>
         <span class="tt">${esc(e.title)}${e.repeat && e.repeat.type ? ' <i class="rp">반복</i>' : ''}
           ${e.type === 'todo' ? '<i class="rp">할 일</i>' : ''}</span>
         ${e.time && e.notify !== false ? '<i class="rp">🔔</i>' : ''}
-      </div>`).join('') : `<div class="empty">${T('calEmpty')}</div>`;
+      </div>`).join('') : `<div class="empty">${T('calEmpty')}</div>`);
   }
 });
 
@@ -2364,10 +2786,10 @@ function openEvent(id, dateStr){
   editingId = id;
   const e = id ? EV.all().find(x => x.id === id) : null;
   const d = e ? e.date : (dateStr || today());
-  $('evTitle').textContent = e ? '일정 편집' : '일정 추가';
-  $('evDelete').hidden = !e;
+  setText($('evTitle'), e ? '일정 편집' : '일정 추가');
+  setHidden($('evDelete'), !e);
   const rep = (e && e.repeat) || { type:'', days:[], until:'' };
-  $('evBody').innerHTML = `
+  setHTML($('evBody'), `
     <div class="fld"><label>제목</label><input id="evT" value="${esc(e ? e.title : '')}" placeholder="예: 국어 발표 대본"></div>
     <div class="row2">
       <div class="fld"><label>날짜</label><input id="evD" type="date" value="${d}"></div>
@@ -2396,13 +2818,13 @@ function openEvent(id, dateStr){
     </div>
     <div class="fld"><label>메모 (선택)</label><textarea id="evM">${esc(e ? e.memo : '')}</textarea></div>
     <label class="chk"><input type="checkbox" id="evN" ${(!e || e.notify !== false) ? 'checked' : ''}>
-      <span>알림 받기 <i class="hint">시각을 정하면 그 시각 전에, 시각이 없으면 아침에 알려 줍니다.</i></span></label>`;
+      <span>알림 받기 <i class="hint">시각을 정하면 그 시각 전에, 시각이 없으면 아침에 알려 줍니다.</i></span></label>`);
 
   $('evType').onclick = ev => {
     const b = ev.target.closest('[data-t]'); if(!b) return;
     [...$('evType').children].forEach(x => x.classList.toggle('on', x === b));
   };
-  $('evRep').onchange = ev => { $('evWeekWrap').hidden = ev.target.value !== 'weekly'; };
+  $('evRep').onchange = ev => { setHidden($('evWeekWrap'), ev.target.value !== 'weekly'); };
   $('evDow').onclick = ev => { const b = ev.target.closest('[data-d]'); if(b) b.classList.toggle('on'); };
   $('evEdit').classList.add('show');
   setTimeout(() => $('evT').focus(), 100);
@@ -2445,7 +2867,7 @@ Cards.register({
   id:'todo', name:'할 일', size:'M', grow:true,
   desc:'날짜·시각을 붙이면 달력에 뜨고 알림도 옵니다',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead">
         <div class="tabs" id="tdTabs">
           <button class="on" data-k="today">${T('tdToday')}</button>
@@ -2466,7 +2888,7 @@ Cards.register({
         <label class="td-lb">${T('tdTime')}</label><input type="time" id="tdTime">
         <button class="btn" id="tdClear">${T('tdClear')}</button>
       </div>
-      <div class="td-list" id="tdList"></div>`;
+      <div class="td-list" id="tdList"></div>`);
 
     const inp = el.querySelector('#tdIn');
     const opt = el.querySelector('#tdOpt');
@@ -2474,14 +2896,14 @@ Cards.register({
     const hint = el.querySelector('#tdHint');
     const syncHint = () => {
       const d = el.querySelector('#tdDate').value, tm = el.querySelector('#tdTime').value;
-      hint.textContent = d
+      setText(hint, d
         ? (T('tdSetOn', { d: d.slice(5).replace('-','/') }) + (tm ? ' ' + tm : '') + (tm ? ' · ' + T('tdWillNotify') : ''))
-        : T('tdHintDate');
-      ok.hidden = !inp.value.trim();
+        : T('tdHintDate'));
+      setHidden(ok, !inp.value.trim());
     };
     el._syncHint = syncHint;
     el.querySelector('#tdWhen').onclick = () => {
-      opt.hidden = !opt.hidden;
+      setHidden(opt, !opt.hidden);
       if(!opt.hidden && !el.querySelector('#tdDate').value) el.querySelector('#tdDate').value = today();
       syncHint();
     };
@@ -2490,7 +2912,7 @@ Cards.register({
     inp.addEventListener('input', syncHint);
     el.querySelector('#tdClear').onclick = () => {
       el.querySelector('#tdDate').value = ''; el.querySelector('#tdTime').value = '';
-      opt.hidden = true; inp.focus(); syncHint();
+      setHidden(opt, true); inp.focus(); syncHint();
     };
     const add = () => {
       const v = inp.value.trim(); if(!v) return;
@@ -2499,7 +2921,7 @@ Cards.register({
       EV.add({ title:v, type:'todo', date: d || today(), time: tm || '',
                anyday: !d, done:false });
       inp.value = ''; el.querySelector('#tdDate').value = ''; el.querySelector('#tdTime').value = '';
-      opt.hidden = true;
+      setHidden(opt, true);
       /* 입력 중이라 paint 가 이 카드를 건너뛰므로 직접 다시 그린다 */
       const me = Cards.get('todo');
       if(me && me._el) me.render(me._el);
@@ -2540,9 +2962,9 @@ Cards.register({
     list.sort((a,b) => (a.date+(a.time||'99:99')).localeCompare(b.date+(b.time||'99:99')));
 
     const left = EV.all().filter(e => e.type === 'todo' && !e.done && (e.anyday || e.date <= t)).length;
-    el.querySelector('#tdCount').textContent = left ? T('tdLeft', { n: left }) : '';
+    setText(el.querySelector('#tdCount'), left ? T('tdLeft', { n: left }) : '');
 
-    el.querySelector('#tdList').innerHTML = list.length ? list.map(e => {
+    setHTML(el.querySelector('#tdList'), list.length ? list.map(e => {
       const dl = e.anyday ? null : dleft(e.date);
       const late = dl != null && dl < 0 && !e.done;
       const when = e.anyday ? '' :
@@ -2559,7 +2981,7 @@ Cards.register({
       </div>`;
     }).join('') : `<div class="empty">${
       todoFilter === 'done' ? T('tdEmptyDone') :
-      todoFilter === 'all' ? T('tdEmptyAll') : T('tdEmptyToday')}</div>`;
+      todoFilter === 'all' ? T('tdEmptyAll') : T('tdEmptyToday')}</div>`);
   }
 });
 
@@ -2571,10 +2993,10 @@ Cards.register({
   id:'exam', name:'수행평가 알리미', size:'S', def:false, tag:'tagStudent', tone:'violet',
   desc:'달력에 수행평가로 넣은 일정만 모아 D-day로 표시',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab">${T('examLab')}</span>
         <button class="cbtn" id="exAdd">+ 추가</button></div>
-      <div class="ex-list" id="exList"></div>`;
+      <div class="ex-list" id="exList"></div>`);
     el.querySelector('#exAdd').onclick = () => openEvent(null, today());
     el.querySelector('#exList').onclick = e => {
       const r = e.target.closest('[data-ev]'); if(r) openEvent(r.dataset.ev);
@@ -2582,13 +3004,13 @@ Cards.register({
   },
   render(el){
     const list = EV.upcoming('exam', 4).filter(x => !x.done);
-    el.querySelector('#exList').innerHTML = list.length ? list.map(e => {
+    setHTML(el.querySelector('#exList'), list.length ? list.map(e => {
       const dl = dleft(e.date);
       return `<div class="ex" data-ev="${e.id}">
         <span class="d ${dl<=2?'hot':''}">${dtxt(dl)}</span>
         <span class="m"><b>${esc(e.title)}</b><i>${e.date.slice(5).replace('-','/')}${e.memo?' · '+esc(e.memo):''}</i></span>
       </div>`;
-    }).join('') : `<div class="empty">등록된 수행평가가 없습니다. 달력에서 종류를 '수행평가'로 넣으면 여기에 모입니다.</div>`;
+    }).join('') : `<div class="empty">등록된 수행평가가 없습니다. 달력에서 종류를 '수행평가'로 넣으면 여기에 모입니다.</div>`);
   }
 });
 
@@ -2686,27 +3108,27 @@ async function loadGames(force){
       return seen[k] ? false : (seen[k] = 1); });
     C.gamesAt = Date.now(); C.gamesErr = null;
   } else C.gamesErr = err || '경기 정보를 찾지 못했습니다';
-  save(); paint();
+  save(); paintCard('baseball');
 }
 
 Cards.register({
   id:'baseball', name:'야구 경기', size:'S', def:false, tag:'tagSport',
   desc:'응원 팀의 오늘 경기와 최근 결과 (KBO)',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab" id="bbLab">야구</span>
         <span class="cmeta" id="bbSrc"></span></div>
       <div id="bbBody"></div>
-      <div class="bb-recent" id="bbRecent"></div>`;
-    el.querySelector('#bbSrc').onclick = () => { el.querySelector('#bbSrc').textContent = '불러오는 중…'; loadGames(true); };
+      <div class="bb-recent" id="bbRecent"></div>`);
+    el.querySelector('#bbSrc').onclick = () => { setText(el.querySelector('#bbSrc'), '불러오는 중…'); loadGames(true); };
   },
   render(el){
     const team = KBO_TEAMS.find(t => t.id === C.teamId);
-    el.querySelector('#bbLab').textContent = (team ? team.kr : '야구') + (dayOff() ? ' · 내일' : '');
+    setText(el.querySelector('#bbLab'), (team ? team.kr : '야구') + (dayOff() ? ' · 내일' : ''));
     if(!C.teamId){
-      el.querySelector('#bbSrc').textContent = '';
-      el.querySelector('#bbBody').innerHTML = `<div class="empty">설정 → 카드 구성에서 응원 팀을 골라 주세요.</div>`;
-      el.querySelector('#bbRecent').innerHTML = ''; return;
+      setText(el.querySelector('#bbSrc'), '');
+      setHTML(el.querySelector('#bbBody'), `<div class="empty">설정 → 카드 구성에서 응원 팀을 골라 주세요.</div>`);
+      setHTML(el.querySelector('#bbRecent'), ''); return;
     }
     /* 응원 팀 색을 카드 배경에 은은하게 */
     if(team && team.c){
@@ -2718,11 +3140,11 @@ Cards.register({
 
     const games = C.games || [];
     if(!games.length){
-      el.querySelector('#bbSrc').textContent = '눌러서 다시';
-      el.querySelector('#bbBody').innerHTML = `<div class="empty">${esc(C.gamesErr || '불러오는 중…')}</div>`;
-      el.querySelector('#bbRecent').innerHTML = ''; return;
+      setText(el.querySelector('#bbSrc'), '눌러서 다시');
+      setHTML(el.querySelector('#bbBody'), `<div class="empty">${esc(C.gamesErr || '불러오는 중…')}</div>`);
+      setHTML(el.querySelector('#bbRecent'), ''); return;
     }
-    el.querySelector('#bbSrc').textContent = 'TheSportsDB';
+    setText(el.querySelector('#bbSrc'), 'TheSportsDB');
     const t = ymd(baseDate());
     const g = games.find(x => x.date === t);
     const next = games.filter(x => x.date > t).sort((a,b2) => a.date.localeCompare(b2.date))[0]
@@ -2730,27 +3152,28 @@ Cards.register({
                       .sort((a,b2) => a.date.localeCompare(b2.date))[0];
     const full = o => { const t = KBO_TEAMS.find(x => x.s === o); return t ? t.kr : o; };
     if(g){
-      el.querySelector('#bbBody').innerHTML =
-        `<div class="bb-vs"><i>vs</i><b>${esc(full(g.opp))}</b></div>
+      setHTML(el.querySelector('#bbBody'), `<div class="bb-vs"><i>vs</i><b>${esc(full(g.opp))}</b></div>
          <div class="bb-chips">
            <span class="lc acc">${g.home ? '홈' : '원정'}${g.venue ? ' · '+esc(g.venue) : ''}</span>
            ${g.time ? `<span class="lc">${g.time}</span>` : ''}
            ${g.my != null && g.op != null && (g.my+g.op) > 0 ? `<span class="lc">${g.my} : ${g.op}</span>` : ''}
-         </div>`;
+         </div>`);
     } else if(next){
       /* 그날 경기가 없으면 다음 경기를 크게 보여준다 */
       const dl = dleft(next.date);
-      el.querySelector('#bbBody').innerHTML =
-        `<div class="bb-vs"><i>vs</i><b>${esc(full(next.opp))}</b></div>`
+      setHTML(el.querySelector('#bbBody'), `<div class="bb-vs"><i>vs</i><b>${esc(full(next.opp))}</b></div>`
         + `<div class="bb-chips">`
         + `<span class="lc acc">${dl === 1 ? T('tdTomorrow') : dl === 0 ? T('today') : dtxt(dl)}</span>`
         + `<span class="lc">${next.date.slice(5).replace('-','/')}${next.time ? ' · ' + next.time : ''}</span>`
-        + `<span class="lc">${next.home ? '홈' : '원정'}</span></div>`;
+        + `<span class="lc">${next.home ? '홈' : '원정'}</span></div>`);
     } else {
-      el.querySelector('#bbBody').innerHTML =
-        `<div class="bb-head sm">${dayOff() ? '내일은' : '오늘은'} 경기가 없습니다</div>`;
+      setHTML(el.querySelector('#bbBody'), `<div class="bb-head sm">${dayOff() ? '내일은' : '오늘은'} 경기가 없습니다</div>`);
     }
-    const past = games.filter(x => x.date < today() && x.my != null && x.op != null && (x.my + x.op) > 0).slice(-3);
+    /* 끝난 경기: 점수가 있는 것만, 날짜순으로 정렬해 최근 3개 */
+    const past = games
+      .filter(x => x.date < today() && x.my != null && x.op != null && (x.my + x.op) > 0)
+      .sort((a, b2) => a.date.localeCompare(b2.date))
+      .slice(-3);
     if(past.length){
       let w=0,l=0,d=0;
       const cells = past.map(x => {
@@ -2758,8 +3181,8 @@ Cards.register({
         r === '승' ? w++ : r === '패' ? l++ : d++;
         return `<span class="g">${x.date.slice(5).replace('-','/')} ${esc(x.opp)} <b class="${r==='승'?'w':r==='패'?'l':''}">${x.my}:${x.op} ${r}</b></span>`;
       }).join('');
-      el.querySelector('#bbRecent').innerHTML = `<span class="hd">최근 ${past.length}경기</span>${cells}<span class="hd rt">${w}승${d?d+'무':''}${l}패</span>`;
-    } else el.querySelector('#bbRecent').innerHTML = '';
+      setHTML(el.querySelector('#bbRecent'), `<span class="hd">최근 ${past.length}경기</span>${cells}<span class="hd rt">${w}승${d?d+'무':''}${l}패</span>`);
+    } else setHTML(el.querySelector('#bbRecent'), '');
   }
 });
 
@@ -2849,28 +3272,28 @@ async function loadNews(force){
     if(!g) g = await rssFirst(`${base}/search?q=${encodeURIComponent(t.q)}&hl=${hl}`);
     return g ? Object.assign({ tag:t.name }, g) : { tag:t.name, text:T('newsFail'), src:'', url:'' };
   }));
-  C.news = out; C.newsAt = Date.now(); save(); paint();
+  C.news = out; C.newsAt = Date.now(); save(); paintCard('news');
 }
 Cards.register({
   id:'news', name:'뉴스 브리핑', size:'M', def:false,
   desc:'분야별 헤드라인 한 줄씩. 누르면 기사로 이동',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab">${T('newsLab')}</span>
         <span class="cmeta" id="nwSrc">눌러서 새로고침</span></div>
-      <div class="nw-list" id="nwList"></div>`;
-    el.querySelector('#nwSrc').onclick = () => { el.querySelector('#nwSrc').textContent = '불러오는 중…'; loadNews(true); };
+      <div class="nw-list" id="nwList"></div>`);
+    el.querySelector('#nwSrc').onclick = () => { setText(el.querySelector('#nwSrc'), '불러오는 중…'); loadNews(true); };
   },
   render(el){
     const list = C.news || [];
-    el.querySelector('#nwSrc').textContent = list.length && list.some(x => x.url)
-      ? 'Google News' : (NEWS_ERR ? NEWS_ERR + ' · ' + T('wxRetry') : T('newsTap'));
-    el.querySelector('#nwList').innerHTML = list.length ? list.map(n => `
+    setText(el.querySelector('#nwSrc'), list.length && list.some(x => x.url)
+      ? 'Google News' : (NEWS_ERR ? NEWS_ERR + ' · ' + T('wxRetry') : T('newsTap')));
+    setHTML(el.querySelector('#nwList'), list.length ? list.map(n => `
       <a class="nw" ${n.url?`href="${esc(n.url)}" target="_blank" rel="noopener"`:''}>
         <span class="tg">${n.tag}</span>
         <span class="tt">${esc(n.text)}</span>
         ${n.src?`<span class="sc">${esc(n.src)}</span>`:''}
-      </a>`).join('') : `<div class="empty">헤드라인을 불러오려면 오른쪽 위를 눌러 주세요.</div>`;
+      </a>`).join('') : `<div class="empty">헤드라인을 불러오려면 오른쪽 위를 눌러 주세요.</div>`);
   }
 });
 
@@ -2903,7 +3326,7 @@ Cards.register({
   id:'fortune', name:'오늘의 운세', size:'L', grow:true,
   desc:'생년월일로 절기·일진·십신을 계산한 사주 운세 (재미로 보는 참고용)',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab" id="foLab">${T('foLabToday')}</span><span class="cmeta" id="foWho"></span></div>
       <div class="fo-score"><b class="big" id="foScore">--</b><i id="foGrade"></i></div>
       <div class="fo-badges" id="foBadges"></div>
@@ -2911,46 +3334,46 @@ Cards.register({
       <div class="fo-bars" id="foBars"></div>
       <div class="fo-act" id="foAct"></div>
       <div class="fo-lucky" id="foLucky"></div>
-      <span class="tiny fo-disc">${T('foDisc')}</span>`;
+      <span class="tiny fo-disc">${T('foDisc')}</span>`);
   },
   render(el){
     if(!C.birth){
-      el.querySelector('#foHead').innerHTML = `<span class="empty">${T('foNeedBirth')}</span>`;
+      setHTML(el.querySelector('#foHead'), `<span class="empty">${T('foNeedBirth')}</span>`);
       return;
     }
     let f = null;
     const bd = baseDate();
     try{ f = fortune(C.birth, C.birthTime, new Date(bd.getFullYear(), bd.getMonth(), bd.getDate())); }catch(e){ return; }
     const lab = el.querySelector('#foLab');
-    if(lab) lab.textContent = dayOff() ? T('foLabTomorrow') : T('foLabToday');
+    if(lab) setText(lab, dayOff() ? T('foLabTomorrow') : T('foLabToday'));
     const g = f.score>=90?T('fgBest'):f.score>=75?T('fgGood'):f.score>=62?T('fgSmall'):f.score>=52?T('fgFlat'):T('fgCare');
     const col = v => v>=78?'var(--acc)':v>=60?'var(--amber)':'var(--rose)';
     const b = now.getFullYear() - new Date(C.birth+'T00:00:00').getFullYear();
     const sc = el.querySelector('#foScore');
-    sc.textContent = f.score;
+    setText(sc, f.score);
     /* 점수 구간별 색 — 낮으면 빨강, 보통은 주황, 좋으면 초록 */
     sc.style.color = f.score >= 75 ? 'var(--acc)'
                    : f.score >= 60 ? '#7fd48b'
                    : f.score >= 45 ? 'var(--amber)'
                    : f.score >= 30 ? '#f28f5a' : 'var(--rose)';
-    el.querySelector('#foGrade').textContent = g;
-    el.querySelector('#foWho').textContent = `${T('foDayGan')} ${GANH[f.tp.dg]}${JIH[f.tp.db]}`;
-    el.querySelector('#foBadges').innerHTML = [
+    setText(el.querySelector('#foGrade'), g);
+    setText(el.querySelector('#foWho'), `${T('foDayGan')} ${GANH[f.tp.dg]}${JIH[f.tp.db]}`);
+    setHTML(el.querySelector('#foBadges'), [
       [ssName(f.ss),'good'],
       (lang()==='ko' && f.rel[0] !== '평') ? [f.rel[0], ['육합','삼합'].includes(f.rel[0])?'good':'warn'] : null,
       (lang()==='ko' && f.mun) ? ['문창귀인','good'] : null,
       (lang()==='ko' && f.che) ? ['천을귀인','good'] : null,
       [T('foMeGan')+' '+GANH[f.me.dg]+(lang()==='ko'?f.A.me:'')+' · '+(f.A.strong?T('foStrong'):T('foWeak')),'']
-    ].filter(Boolean).map(x => `<span class="${x[1]}">${x[0]}</span>`).join('');
-    el.querySelector('#foHead').textContent = (dayOff() ? T('foTomorrowPre') : '') + ssText(f.ss) + (f.rel[2] ? ' ' + f.rel[2] + '.' : '')
+    ].filter(Boolean).map(x => `<span class="${x[1]}">${x[0]}</span>`).join(''));
+    setText(el.querySelector('#foHead'), (dayOff() ? T('foTomorrowPre') : '') + ssText(f.ss) + (f.rel[2] ? ' ' + f.rel[2] + '.' : '')
       + (f.mun ? ' 문창귀인이 들어 암기와 글쓰기가 잘 붙습니다.' : '')
-      + (f.che ? ' 천을귀인이 들어 도와주는 사람이 붙습니다.' : '');
-    el.querySelector('#foBars').innerHTML = [[T('foStudy'),f.study],[T('foPeople'),f.rela],[T('foBody'),f.body],[T('foLuck'),f.score]]
-      .map(x => `<div class="fo-bar"><span>${x[0]}</span><div class="tr"><i style="width:${x[1]}%;background:${col(x[1])}"></i></div><b>${x[1]}</b></div>`).join('');
-    el.querySelector('#foAct').innerHTML = [[T('foAct'),ssAct(f.ss)],[T('foGood'), hourTxt((f.goodTime||'').split(',')[0])],[T('foBad'), hourTxt(f.badTime||'')]]
-      .map(x => `<div><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');
-    el.querySelector('#foLucky').innerHTML = [[T('foColor'), (lang()==='ko'?f.color:(T(OH_COLOR_KEY[f.A.yong]||'colGreen')))],[T('foNum'),f.num.join('·')],[T('foDir'), (lang()==='ko'?f.dir:T({'동쪽':'dirE','서쪽':'dirW','남쪽':'dirS','북쪽':'dirN','중앙':'dirC'}[f.dir]||'dirC'))]]
-      .map(x => `<div><i>${x[0]}</i><b>${x[1]}</b></div>`).join('');
+      + (f.che ? ' 천을귀인이 들어 도와주는 사람이 붙습니다.' : ''));
+    setHTML(el.querySelector('#foBars'), [[T('foStudy'),f.study],[T('foPeople'),f.rela],[T('foBody'),f.body],[T('foLuck'),f.score]]
+      .map(x => `<div class="fo-bar"><span>${x[0]}</span><div class="tr"><i style="width:${x[1]}%;background:${col(x[1])}"></i></div><b>${x[1]}</b></div>`).join(''));
+    setHTML(el.querySelector('#foAct'), [[T('foAct'),ssAct(f.ss)],[T('foGood'), hourTxt((f.goodTime||'').split(',')[0])],[T('foBad'), hourTxt(f.badTime||'')]]
+      .map(x => `<div><i>${x[0]}</i><b>${x[1]}</b></div>`).join(''));
+    setHTML(el.querySelector('#foLucky'), [[T('foColor'), (lang()==='ko'?f.color:(T(OH_COLOR_KEY[f.A.yong]||'colGreen')))],[T('foNum'),f.num.join('·')],[T('foDir'), (lang()==='ko'?f.dir:T({'동쪽':'dirE','서쪽':'dirW','남쪽':'dirS','북쪽':'dirN','중앙':'dirC'}[f.dir]||'dirC'))]]
+      .map(x => `<div><i>${x[0]}</i><b>${x[1]}</b></div>`).join(''));
   }
 });
 
@@ -2962,7 +3385,7 @@ Cards.register({
   id:'sleep', name:'수면 점수', size:'S', def:false,
   desc:'스마트워치 수면 점수를 옮겨 적고 7일 흐름 보기',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab">${T('sleepLab')}</span><span class="cmeta" id="slMeta"></span></div>
       <div id="slFull" hidden>
         <div class="sl-num"><b class="big" id="slScore">--</b><i id="slWord"></i></div>
@@ -2976,7 +3399,7 @@ Cards.register({
           <button class="btn" id="slSave">기록</button>
         </div>
       </div>
-      <span class="tiny" id="slTip"></span>`;
+      <span class="tiny" id="slTip"></span>`);
     const put = v => {
       if(isNaN(v) || v < 0 || v > 100) return;
       C.sleep = v; C.sleepHist = C.sleepHist || {}; C.sleepHist[today()] = v; save(); paint();
@@ -2987,32 +3410,32 @@ Cards.register({
   },
   render(el){
     const has = C.sleep != null;
-    el.querySelector('#slFull').hidden = !has;
-    el.querySelector('#slEmpty').hidden = has;
+    setHidden(el.querySelector('#slFull'), !has);
+    setHidden(el.querySelector('#slEmpty'), has);
     const days = []; for(let i=6;i>=0;i--){ const d = new Date(); d.setDate(d.getDate()-i); days.push(ymd(d)); }
     const vals = days.map((d,i) => i === 6 ? C.sleep : ((C.sleepHist||{})[d] ?? null));
     const rec = vals.filter(v => v != null);
     const avg = rec.length ? Math.round(rec.reduce((a,b)=>a+b,0)/rec.length) : null;
-    el.querySelector('#slMeta').textContent = avg != null ? `7일 평균 ${avg}` : '';
+    setText(el.querySelector('#slMeta'), avg != null ? `7일 평균 ${avg}` : '');
     if(has){
-      el.querySelector('#slScore').textContent = C.sleep;
-      el.querySelector('#slWord').textContent = C.sleep>=85?'아주 좋음':C.sleep>=70?'양호':C.sleep>=55?'보통':'부족';
-      el.querySelector('#slRange').value = C.sleep;
-      el.querySelector('#slBars').innerHTML = vals.map((v,i) =>
-        `<div class="${i===6?'now':''}" style="height:${v==null?3:Math.max(5,Math.round(v*.32))}px;opacity:${v==null?0.35:1}"></div>`).join('');
+      setText(el.querySelector('#slScore'), C.sleep);
+      setText(el.querySelector('#slWord'), C.sleep>=85?'아주 좋음':C.sleep>=70?'양호':C.sleep>=55?'보통':'부족');
+      setValue(el.querySelector('#slRange'), C.sleep);
+      setHTML(el.querySelector('#slBars'), vals.map((v,i) =>
+        `<div class="${i===6?'now':''}" style="height:${v==null?3:Math.max(5,Math.round(v*.32))}px;opacity:${v==null?0.35:1}"></div>`).join(''));
     } else {
-      el.querySelector('#slAsk').textContent = isNight()
+      setText(el.querySelector('#slAsk'), isNight()
         ? '오늘 밤 기록은 내일 아침에 워치에서 확인하세요.'
-        : '어젯밤 점수가 아직 없습니다. 워치 기록을 보고 숫자만 옮겨 적으세요.';
+        : '어젯밤 점수가 아직 없습니다. 워치 기록을 보고 숫자만 옮겨 적으세요.');
     }
     let rb = mins(C.wake||'07:00') - 480; if(rb < 0) rb += 1440;
     const diff = has && avg != null ? C.sleep - avg : 0;
-    el.querySelector('#slTip').textContent = !has
+    setText(el.querySelector('#slTip'), !has
       ? `8시간을 자려면 ${pad(Math.floor(rb/60))}:${pad(rb%60)}에는 누워야 해요.`
       : rec.length < 2 ? '며칠 쌓이면 평균과 비교해 드릴게요.'
       : diff >= 3 ? `평균보다 ${diff}점 높아요. 컨디션 좋은 날입니다.`
       : diff <= -3 ? `평균보다 ${Math.abs(diff)}점 낮아요. 오늘은 일찍 자 보세요.`
-      : '최근 흐름과 비슷합니다.';
+      : '최근 흐름과 비슷합니다.');
   }
 });
 
@@ -3089,12 +3512,12 @@ Cards.register({
   id:'whitenoise', name:'수면 유도음', size:'S', def:false,
   desc:'백색소음·빗소리·파도. 타이머를 걸면 알아서 꺼집니다',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab">수면 유도음</span><span class="cmeta" id="nzMeta"></span></div>
       <div class="nz-kinds" id="nzKinds"></div>
       <div class="nz-timer" id="nzTimer"></div>
       <div class="nz-vol"><span class="tiny">음량</span>
-        <input type="range" min="5" max="100" id="nzVol"></div>`;
+        <input type="range" min="5" max="100" id="nzVol"></div>`);
     el.querySelector('#nzKinds').onclick = e => {
       const b = e.target.closest('[data-k]'); if(!b) return;
       if(NZ.playing === b.dataset.k) nzStop();
@@ -3113,16 +3536,16 @@ Cards.register({
   },
   render(el){
     const mins = C.nzMin || 30;
-    el.querySelector('#nzKinds').innerHTML = NZ_KINDS.map(k =>
+    setHTML(el.querySelector('#nzKinds'), NZ_KINDS.map(k =>
       `<button class="nz ${NZ.playing===k.id?'on':''}" data-k="${k.id}">
-        <b>${k.name}</b><i>${k.desc}</i></button>`).join('');
-    el.querySelector('#nzTimer').innerHTML = [15,30,60,120].map(m =>
-      `<button class="${mins===m?'on':''}" data-m="${m}">${m>=60?(m/60)+'시간':m+'분'}</button>`).join('');
-    el.querySelector('#nzVol').value = C.nzVol != null ? C.nzVol : 45;
+        <b>${k.name}</b><i>${k.desc}</i></button>`).join(''));
+    setHTML(el.querySelector('#nzTimer'), [15,30,60,120].map(m =>
+      `<button class="${mins===m?'on':''}" data-m="${m}">${m>=60?(m/60)+'시간':m+'분'}</button>`).join(''));
+    setValue(el.querySelector('#nzVol'), C.nzVol != null ? C.nzVol : 45);
     const left = NZ.endAt ? Math.max(0, NZ.endAt - Date.now()) : 0;
-    el.querySelector('#nzMeta').textContent = NZ.playing
+    setText(el.querySelector('#nzMeta'), NZ.playing
       ? (left ? `${Math.ceil(left/60000)}분 남음` : '재생 중')
-      : '';
+      : '');
   }
 });
 
@@ -3265,9 +3688,9 @@ Cards.register({
   id:'quote', name:'오늘의 한마디', size:'S',
   desc:'아침·밤에 맞춘 문장 하나',
   init(el){
-    el.innerHTML = `<div class="chead"><span class="clab">${T('quoteLab')}</span>`
+    setHTML(el, `<div class="chead"><span class="clab">${T('quoteLab')}</span>`
       + `<span class="cmeta">${T('wxRefresh').split('·')[0].trim() || ''}</span></div>`
-      + `<p class="qt" id="qtText"></p><span class="qtsrc" id="qtSrc"></span>`;
+      + `<p class="qt" id="qtText"></p><span class="qtsrc" id="qtSrc"></span>`);
     el.style.cursor = 'pointer';
     el.onclick = () => { quoteSeed++; const c = Cards.get('quote'); c.render(c._el); };
   },
@@ -3276,8 +3699,8 @@ Cards.register({
     const list = quoteList(isNight());
     const seed = jdn(now.getFullYear(), now.getMonth()+1, now.getDate()) + quoteSeed;
     const q = list[Math.abs(seed) % list.length];
-    $('qtText').textContent = '“' + q[0] + '”';
-    $('qtSrc').textContent = q[1] ? '— ' + q[1] : '';
+    setText($('qtText'), '“' + q[0] + '”');
+    setText($('qtSrc'), q[1] ? '— ' + q[1] : '');
   }
 });
 
@@ -3290,10 +3713,10 @@ Cards.register({
   id:'habit', name:'매일 루틴', size:'S', def:false,
   desc:'매일 반복하는 습관을 체크. 연속 달성 일수도 함께',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab">${T('habitLab')}</span><span class="cmeta" id="hbMeta"></span></div>
       <div class="hb-list" id="hbList"></div>
-      <div class="hb-add"><input id="hbIn" maxlength="20" placeholder="+ 루틴 추가"></div>`;
+      <div class="hb-add"><input id="hbIn" maxlength="20" placeholder="+ 루틴 추가"></div>`);
     el.querySelector('#hbIn').addEventListener('keydown', e => {
       if(e.key !== 'Enter') return;
       const v = e.target.value.trim(); if(!v) return;
@@ -3315,7 +3738,7 @@ Cards.register({
   render(el){
     const habits = (C.habits && C.habits.length) ? C.habits : DEFAULT_HABITS;
     const done = (C.habitLog||{})[today()] || [];
-    el.querySelector('#hbMeta').textContent = `${done.length} / ${habits.length}`;
+    setText(el.querySelector('#hbMeta'), `${done.length} / ${habits.length}`);
     const streak = name => {
       let n = 0; const d = new Date();
       for(;;){ const k = ymd(d); const l = (C.habitLog||{})[k] || [];
@@ -3323,13 +3746,13 @@ Cards.register({
         d.setDate(d.getDate()-1); if(n > 400) break; }
       return n;
     };
-    el.querySelector('#hbList').innerHTML = habits.map(h => {
+    setHTML(el.querySelector('#hbList'), habits.map(h => {
       const on = done.includes(h), s = streak(h);
       return `<button class="hb ${on?'on':''}" data-h="${esc(h)}">
         <i class="bx"></i><span class="nm">${esc(h)}</span>
         ${s>1?`<span class="st">${s}일째</span>`:''}
         <i class="rm" data-rm="1">×</i></button>`;
-    }).join('') || `<div class="empty">아래에 루틴을 적어 보세요.</div>`;
+    }).join('') || `<div class="empty">아래에 루틴을 적어 보세요.</div>`);
   }
 });
 
@@ -3341,14 +3764,14 @@ Cards.register({
   id:'water', name:'물 마시기', size:'S', def:false,
   desc:'하루 목표 잔 수를 채워 가며 기록',
   init(el){
-    el.innerHTML = `
+    setHTML(el, `
       <div class="chead"><span class="clab">${T('waterLab')}</span><span class="cmeta" id="wtMeta"></span></div>
       <div class="wt-cups" id="wtCups"></div>
       <div class="wt-row">
         <button class="btn" id="wtMinus">−</button>
         <span class="wt-num big" id="wtNum">0</span>
         <button class="btn primary" id="wtPlus">+ 한 잔</button>
-      </div>`;
+      </div>`);
     const set = n => {
       C.waterLog = C.waterLog || {};
       C.waterLog[today()] = Math.max(0, Math.min(20, n));
@@ -3363,10 +3786,10 @@ Cards.register({
   render(el){
     const goal = +(C.waterGoal || 8);
     const n = (C.waterLog||{})[today()] || 0;
-    el.querySelector('#wtMeta').textContent = `목표 ${goal}잔`;
-    el.querySelector('#wtNum').textContent = n;
-    el.querySelector('#wtCups').innerHTML = Array.from({length:goal}, (_,i) =>
-      `<i class="cup ${i < n ? 'on':''}" data-i="${i}"></i>`).join('');
+    setText(el.querySelector('#wtMeta'), `목표 ${goal}잔`);
+    setText(el.querySelector('#wtNum'), n);
+    setHTML(el.querySelector('#wtCups'), Array.from({length:goal}, (_,i) =>
+      `<i class="cup ${i < n ? 'on':''}" data-i="${i}"></i>`).join(''));
   }
 });
 
@@ -3378,32 +3801,49 @@ Cards.register({
   id:'timetable', name:'오늘 시간표', size:'S', def:false, tag:'tagStudent',
   desc:'학교를 연결하면 자동으로, 직접 일주일치를 넣을 수도 있어요',
   init(el){
-    el.innerHTML = `
-      <div class="chead"><span class="clab">${T('ttLab')}</span>
+    setHTML(el, `
+      <div class="chead"><span class="clab" id="ttLab">${T('ttLab')}</span>
         <span class="cmeta" id="ttMeta"></span></div>
-      <div class="tt-list" id="ttList"></div>`;
+      <div class="tt-list" id="ttList"></div>`);
     el.querySelector('#ttMeta').onclick = () => {
       if(C.school && C.school.code) ttRefresh(true);
       else openSettings('cards');
     };
+    el.style.cursor = 'default';
   },
   render(el){
-    const dow = now.getDay();
-    const list = (C.timetable || {})[dow] || [];
+    const base = baseDate();
+    let dow = base.getDay();
+    const tt = C.timetable || {};
+    let list = tt[dow] || [];
+    let shifted = 0;
+
+    /* 오늘(또는 내일) 시간표가 없으면 다음 등교일 것을 보여 준다 */
+    if(!list.length){
+      for(let i = 1; i <= 7; i++){
+        const d = (dow + i) % 7;
+        if(tt[d] && tt[d].length){ dow = d; list = tt[d]; shifted = i; break; }
+      }
+    }
+
     const auto = !!(C.school && C.school.code);
-    const wk = C.ttCache && C.ttCache.weekOf;
-    const oldWeek = wk && wk !== (function(){ const x=new Date(now); x.setDate(x.getDate()-((x.getDay()+6)%7)); return ymd(x); })();
-    el.querySelector('#ttMeta').textContent = auto
-      ? (C.school.name + ' ' + C.school.grade + '-' + C.school.cls + (oldWeek ? ' · ' + wk.slice(5).replace('-','/') + ' 주' : ''))
-      : (list.length ? '' : '설정에서 넣기');
-    el.querySelector('#ttList').innerHTML = list.length
+    const when = shifted === 0 ? (dayOff() ? T('tdTomorrow') : T('today'))
+               : shifted === 1 && !dayOff() ? T('tdTomorrow')
+               : dows()[dow] + (lang() === 'ko' ? '요일' : '');
+    const on = (C.ttCache && C.ttCache.days && C.ttCache.days[dow]) || '';
+    const stale = on && on < ymd(base);
+
+    setText(el.querySelector('#ttLab'), T('ttLab') + (list.length ? ' · ' + when : ''));
+    setText(el.querySelector('#ttMeta'), auto
+      ? (C.school.name + ' ' + C.school.grade + '-' + C.school.cls
+         + (stale ? ' · ' + on.slice(5).replace('-','/') + ' · ' + T('wxRetry') : ''))
+      : (list.length ? '' : T('ttSetHint')));
+
+    setHTML(el.querySelector('#ttList'), list.length
       ? list.map((s,i) => s
           ? `<div class="tt"><span class="no">${i+1}</span><span class="sj">${esc(s)}</span></div>`
           : `<div class="tt empty-p"><span class="no">${i+1}</span><span class="sj">—</span></div>`).join('')
-      : `<div class="empty">${
-          dow === 0 || dow === 6 ? (lang()==='ko' ? '주말이에요. 시간표가 없습니다.' : '—')
-          : auto ? '오늘 시간표가 없습니다. 방학이면 마지막 학기 것이 표시됩니다.'
-          : '설정 → 카드 구성에서 학교를 연결하거나 직접 넣어 보세요.'}</div>`;
+      : `<div class="empty">${auto ? T('ttNone') : T('ttSetHint2')}</div>`);
   }
 });
 
@@ -3411,9 +3851,9 @@ Cards.register({
 async function ttRefresh(force){
   const c = Cards.get('timetable');
   const meta = c && c._el && c._el.querySelector('#ttMeta');
-  if(meta) meta.textContent = '불러오는 중…';
+  if(meta) setText(meta, '불러오는 중…');
   const r = await neisTimetable(force);
-  if(r.err && meta) meta.textContent = r.err;
+  if(r.err && meta) setText(meta, r.err);
   paint();
   return r;
 }
@@ -3425,16 +3865,16 @@ async function ttRefresh(force){
 Cards.register({
   id:'countdown', name:'큰 D-day', size:'S', def:false,
   desc:'가장 가까운 D-day 하나를 크게 표시',
-  init(el){ el.innerHTML = `<div class="cd" id="cdBody"></div>`; },
+  init(el){ setHTML(el, `<div class="cd" id="cdBody"></div>`); },
   render(el){
     const dd = EV.all().filter(e => e.type === 'dday' && !e.repeat)
       .map(e => ({ n:e.title, l:dleft(e.date), d:e.date }))
       .filter(x => x.l >= 0).sort((a,b) => a.l - b.l)[0];
-    el.querySelector('#cdBody').innerHTML = dd
+    setHTML(el.querySelector('#cdBody'), dd
       ? `<span class="lb">${esc(dd.n)}</span>
          <span class="num big">${dd.l === 0 ? 'D-DAY' : 'D-'+dd.l}</span>
          <span class="dt">${dd.d.replace(/-/g,'.')}</span>`
-      : `<div class="empty">달력에서 종류를 'D-day'로 넣으면 여기에 크게 표시됩니다.</div>`;
+      : `<div class="empty">달력에서 종류를 'D-day'로 넣으면 여기에 크게 표시됩니다.</div>`);
   }
 });
 
@@ -3471,25 +3911,25 @@ const OB = {
   applyLang(){
     document.querySelectorAll('#briefApp [data-i18n]').forEach(el => {
       const k = el.dataset.i18n, v = T(k);
-      if(v && v !== k) el.textContent = v;
+      if(v && v !== k) setText(el, v);
     });
-    const set = (sel, v) => { const e = document.querySelector(sel); if(e) e.textContent = v; };
+    const set = (sel, v) => { const e = document.querySelector(sel); if(e) setText(e, v); };
     const ph  = (sel, v) => { const e = document.querySelector(sel); if(e) e.placeholder = v; };
     ph('#ob-name', T('obNamePh'));
     ph('#obGeoQ', T('obSearchPh'));
-    const gb = document.getElementById('obGeoBtn'); if(gb) gb.textContent = T('obLocate');
+    const gb = document.getElementById('obGeoBtn'); if(gb) setText(gb, T('obLocate'));
     /* 3단계 생일 — 라벨과 안내 */
     const s3box = document.querySelector('#briefApp .slide[data-slide="3"]');
     if(s3box){
       const lb = s3box.querySelectorAll('.field > label');
-      if(lb[0]) lb[0].textContent = T('obBirthLabel');
-      if(lb[1]) lb[1].textContent = T('obTimeLabel');
+      if(lb[0]) setText(lb[0], T('obBirthLabel'));
+      if(lb[1]) setText(lb[1], T('obTimeLabel'));
       const hint = s3box.querySelector('.hint');
       if(hint){
         const sp = hint.querySelector('span') || hint.lastElementChild;
-        if(sp && sp.tagName !== 'SVG') sp.textContent = T('obSub3');
+        if(sp && sp.tagName !== 'SVG') setText(sp, T('obSub3'));
         else {
-          [...hint.childNodes].forEach(n => { if(n.nodeType === 3 && n.textContent.trim()) n.textContent = ' ' + T('obSub3'); });
+          [...hint.childNodes].forEach(n => { if(n.nodeType === 3 && n.textContent.trim()) setText(n, ' ' + T('obSub3')); });
         }
       }
     }
@@ -3500,24 +3940,24 @@ const OB = {
       const s = document.querySelector(`#briefApp .slide[data-slide="${n}"]`);
       if(!s) continue;
       const t = s.querySelector('.slide-title'), p = s.querySelector('.slide-sub');
-      if(t) t.textContent = T(TT[n][0]);
-      if(p) p.textContent = T(TT[n][1]);
+      if(t) setText(t, T(TT[n][0]));
+      if(p) setText(p, T(TT[n][1]));
     }
     /* 5단계 선택 개수 문구는 count() 가 채운다 */
     const lc = document.querySelector('#briefApp .lk-copy');
-    if(lc) lc.textContent = T('obCopy');
+    if(lc) setText(lc, T('obCopy'));
     /* 단계 표시 */
     const kick = [T('obWelcome'),T('obName'),T('obBirth'),T('obPlace'),T('obCards'),T('obLink')];
     document.querySelectorAll('#briefApp .slide-kicker').forEach((el,i) => {
-      el.textContent = String(i).padStart(2,'0') + ' · ' + (kick[i] || '');
+      setText(el, String(i).padStart(2,'0') + ' · ' + (kick[i] || ''));
     });
     /* 1단계 기능 목록 — 카드 이름·설명을 그대로 쓴다 */
     const featIds = ['weather','calendar','todo','fortune'];
     document.querySelectorAll('#briefApp .feat').forEach((el, i) => {
       const c = Cards.get(featIds[i]); if(!c) return;
       const b = el.querySelector('.tx b'), s = el.querySelector('.tx > span');
-      if(b) b.textContent = cardName(c);
-      if(s) s.textContent = cardDesc(c);
+      if(b) setText(b, cardName(c));
+      if(s) setText(s, cardDesc(c));
     });
     /* 미리보기 카드 안의 예시 문구 */
     /* 미리보기 두 장 */
@@ -3525,24 +3965,24 @@ const OB = {
     const night = document.querySelector('#briefApp .phone.night');
     if(day){
       const tag = day.querySelector('.p-tag'), hi = day.querySelector('.p-hi'), big = day.querySelector('.p-big');
-      if(tag) tag.textContent = '☀ ' + T('greetAm') + (C.name ? ', ' + C.name : '');
-      if(hi) hi.innerHTML = T('wClear') + '<br>' + T('advHot');
-      if(big) big.innerHTML = '<span class="lo2">18°</span> / <span class="hi2">26°</span>';
+      if(tag) setText(tag, '☀ ' + T('greetAm') + (C.name ? ', ' + C.name : ''));
+      if(hi) setHTML(hi, T('wClear') + '<br>' + T('advHot'));
+      if(big) setHTML(big, '<span class="lo2">18°</span> / <span class="hi2">26°</span>');
     }
     if(night){
       const tag = night.querySelector('.p-tag'), hi = night.querySelector('.p-hi'), big = night.querySelector('.p-big');
-      if(tag) tag.textContent = '☾ ' + T('greetEve');
-      if(hi) hi.innerHTML = T('tdTomorrow') + '<br>' + T('tdLeft', { n: 3 });
-      if(big) big.textContent = T('bedIn', { t:'23:00', d:'42' + T('minute') });
+      if(tag) setText(tag, '☾ ' + T('greetEve'));
+      if(hi) setHTML(hi, T('tdTomorrow') + '<br>' + T('tdLeft', { n: 3 }));
+      if(big) setText(big, T('bedIn', { t:'23:00', d:'42' + T('minute') }));
     }
     const nb = document.querySelector('[data-action="next"] .next-label');
     const pb = document.querySelector('[data-action="prev"]');
-    if(nb) nb.textContent = this.step >= this.MAX ? T('obStart') : T('obNext');
+    if(nb) setText(nb, this.step >= this.MAX ? T('obStart') : T('obNext'));
     if(pb){
       /* 아이콘은 그대로 두고 글자만 바꾼다 */
       const tn = [...pb.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
-      if(tn) tn.textContent = ' ' + T('obPrev');
-      else if(!pb.querySelector('svg')) pb.textContent = T('obPrev');
+      if(tn) setText(tn, ' ' + T('obPrev'));
+      else if(!pb.querySelector('svg')) setText(pb, T('obPrev'));
     }
   },
 
@@ -3574,7 +4014,8 @@ const OB = {
       timetable:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M9 10v11M15 10v11"/>',
       countdown:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'
     };
-    grid.innerHTML = '';
+    grid.replaceChildren();
+    grid[RKEY] = undefined;
     Cards.list.filter(c => !c.fixed).forEach(c => {
       const on = Cards.isOn(c.id);
       const el = document.createElement('div');
@@ -3582,10 +4023,9 @@ const OB = {
       el.setAttribute('role','button');
       el.setAttribute('aria-pressed', on ? 'true' : 'false');
       el.dataset.card = c.id;
-      el.innerHTML =
-        `<span class="p-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[c.id]||ICON.clock}</svg></span>`
+      setHTML(el, `<span class="p-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[c.id]||ICON.clock}</svg></span>`
         + `<span class="p-tx"><b>${cardName(c)}</b><span>${cardDesc(c)}</span></span>`
-        + `<span class="p-sw"></span>`;
+        + `<span class="p-sw"></span>`);
       el.addEventListener('click', () => {
         Cards.toggle(c.id);
         el.setAttribute('aria-pressed', Cards.isOn(c.id) ? 'true' : 'false');
@@ -3598,9 +4038,9 @@ const OB = {
   count(){
     const n = Cards.list.filter(c => !c.fixed && Cards.isOn(c.id)).length;
     const el = document.getElementById('obCnt');
-    if(el) el.textContent = n;
+    if(el) setText(el, n);
     const pk = document.querySelector('#briefApp .pick-count');
-    if(pk) pk.textContent = T('obPicked', { n });
+    if(pk) setText(pk, T('obPicked', { n }));
   },
 
   /* ── 지역 검색 (앱과 같은 방식, 가까운 순) ── */
@@ -3625,14 +4065,14 @@ const OB = {
     const fmt = k => k<1 ? '바로 여기' : k<100 ? Math.round(k)+'km' : Math.round(k/10)*10+'km';
 
     const draw = list => {
-      res.innerHTML = list.map((r,i) => `
+      setHTML(res, list.map((r,i) => `
         <div class="result" data-lat="${r.latitude}" data-lon="${r.longitude}" data-nm="${esc(r.name)}"
              aria-selected="${i===0?'true':'false'}">
           <span class="r-main">${esc(r.name)}</span>
           <span class="r-sub">${esc([r.admin2, r.admin1].filter(Boolean).join(' ') || r.country || '')} · ${fmt(r._d)}</span>
           <svg class="r-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>
-        </div>`).join('') || '<div class="result"><span class="r-main">결과가 없습니다</span></div>';
+        </div>`).join('') || '<div class="result"><span class="r-main">결과가 없습니다</span></div>');
     };
 
     const search = async v => {
@@ -3658,8 +4098,8 @@ const OB = {
     q.addEventListener('input', () => {
       clearTimeout(this.geoT);
       const v = q.value.trim();
-      if(v.length < 2){ res.innerHTML = ''; return; }
-      res.innerHTML = '<div class="result"><span class="r-main">찾는 중…</span></div>';
+      if(v.length < 2){ setHTML(res, ''); return; }
+      setHTML(res, '<div class="result"><span class="r-main">찾는 중…</span></div>');
       this.geoT = setTimeout(() => search(v), 350);
     });
     res.addEventListener('click', e => {
@@ -3677,10 +4117,10 @@ const OB = {
         C.lat = +p.coords.latitude.toFixed(4); C.lon = +p.coords.longitude.toFixed(4);
         C.wx = null; save();
         btn.classList.remove('busy');
-        res.innerHTML = `<div class="result" aria-selected="true"><span class="r-main">현재 위치</span>
+        setHTML(res, `<div class="result" aria-selected="true"><span class="r-main">현재 위치</span>
           <span class="r-sub">${C.lat}, ${C.lon}</span>
           <svg class="r-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></div>`;
+               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></div>`);
       };
       navigator.geolocation.getCurrentPosition(ok,
         () => navigator.geolocation.getCurrentPosition(ok,
@@ -3710,14 +4150,14 @@ const OB = {
     const me = this.myName(), other = this.otherName();
     const T2 = document.getElementById('lkTitle');
     const S = document.getElementById('lkSub');
-    if(T2) T2.textContent = window.T('obTitle6', { o: other });
-    if(S) S.textContent = window.T('obSub6', { m: me, o: other });
+    if(T2) setText(T2, window.T('obTitle6', { o: other }));
+    if(S) setText(S, window.T('obSub6', { m: me, o: other }));
     const ht = document.getElementById('lkHostT'), hs = document.getElementById('lkHostS');
     const gt = document.getElementById('lkGuestT'), gs = document.getElementById('lkGuestS');
-    if(ht) ht.textContent = window.T('obHostT', { m: me });
-    if(hs) hs.textContent = window.T('obHostS', { o: other });
-    if(gt) gt.textContent = window.T('obGuestT', { o: other });
-    if(gs) gs.textContent = window.T('obGuestS', { o: other });
+    if(ht) setText(ht, window.T('obHostT', { m: me }));
+    if(hs) setText(hs, window.T('obHostS', { o: other }));
+    if(gt) setText(gt, window.T('obGuestT', { o: other }));
+    if(gs) setText(gs, window.T('obGuestS', { o: other }));
 
     const host = document.getElementById('lkHost');
     const guest = document.getElementById('lkGuest');
@@ -3726,19 +4166,19 @@ const OB = {
       const b = e.target.closest('[data-mode]'); if(!b) return;
       [...pick.children].forEach(x => x.setAttribute('aria-selected', x === b ? 'true' : 'false'));
       const isHost = b.dataset.mode === 'host';
-      host.hidden = !isHost; guest.hidden = isHost;
+      setHidden(host, !isHost); setHidden(guest, isHost);
       if(isHost) this.makeCode(); else setTimeout(() => guest.querySelector('input').focus(), 120);
     });
 
     /* 안내 문구 */
     const steps = document.getElementById('lkSteps');
-    if(steps) steps.innerHTML = [
+    if(steps) setHTML(steps, [
       window.T('obStep1', { o: other }), window.T('obStep2'), window.T('obStep3')
-    ].map(s => `<li>${s}</li>`).join('');
+    ].map(s => `<li>${s}</li>`).join(''));
     const steps2 = document.getElementById('lkSteps2');
-    if(steps2) steps2.innerHTML = [
+    if(steps2) setHTML(steps2, [
       window.T('obG1', { o: other, m: other }), window.T('obG2')
-    ].map(s => `<li>${s}</li>`).join('');
+    ].map(s => `<li>${s}</li>`).join(''));
 
     /* 코드 입력 */
     const inputs = [...guest.querySelectorAll('input')];
@@ -3746,15 +4186,15 @@ const OB = {
     const tryJoin = async () => {
       const v = inputs.map(i => i.value).join('').toUpperCase();
       if(v.length < 6) return;
-      msg.textContent = '연결하는 중…'; msg.className = 'lk-msg';
+      setText(msg, '연결하는 중…'); msg.className = 'lk-msg';
       try{
         await syncJoin(v);
         this.joined = true;
-        msg.textContent = T('obJoined', { o: this.otherName() });
+        setText(msg, T('obJoined', { o: this.otherName() }));
         msg.className = 'lk-msg ok';
         build(); paint();
       }catch(e){
-        msg.textContent = e.message || T('obJoinFail');
+        setText(msg, e.message || T('obJoinFail'));
         msg.className = 'lk-msg err';
         document.getElementById('obCode').classList.add('err');
         setTimeout(() => document.getElementById('obCode').classList.remove('err'), 900);
@@ -3788,18 +4228,18 @@ const OB = {
     try{
       const c = (C.sync && C.sync.on && C.sync.code) ? C.sync.code : await syncCreate();
       const url = joinLink(c);
-      qr.innerHTML = QR.svg(url, 150);
+      setHTML(qr, QR.svg(url, 150));
       if(note) note.remove();
-      if(big) big.textContent = c;
+      if(big) setText(big, c);
       const cp = document.getElementById('lkCopy');
       if(cp) cp.onclick = async () => {
-        try{ await navigator.clipboard.writeText(url); cp.textContent = T('obCopied'); }
-        catch(e){ cp.textContent = c; }
+        try{ await navigator.clipboard.writeText(url); setText(cp, T('obCopied')); }
+        catch(e){ setText(cp, c); }
       };
     }catch(e){
       qr.dataset.made = '';
-      if(note) note.textContent = '연결 준비 실패';
-      if(big) big.textContent = '나중에 설정에서';
+      if(note) setText(note, '연결 준비 실패');
+      if(big) setText(big, '나중에 설정에서');
     }
   },
 
@@ -3829,7 +4269,7 @@ const OB = {
       const last = this.step >= this.MAX;
       const lb = next.querySelector('.next-label');
       const ic = next.querySelector('.next-ic');
-      if(lb) lb.textContent = last ? T('obStart') : T('obNext');
+      if(lb) setText(lb, last ? T('obStart') : T('obNext'));
       if(ic) ic.style.display = last ? 'none' : '';
     }
     const pb = this.root.querySelector('.progress');
@@ -3886,7 +4326,7 @@ const OB = {
     this.app.classList.add('is-done');
     if(silent !== true){
       const w0 = document.getElementById('welcome');
-      if(w0){ w0.hidden = false; requestAnimationFrame(() => w0.classList.add('show')); }
+      if(w0){ setHidden(w0, false); requestAnimationFrame(() => w0.classList.add('show')); }
     }
     const enter = () => {
       document.getElementById('stage').classList.add('entering');
@@ -3902,17 +4342,16 @@ const OB = {
     const night = (now.getHours() >= 18 || now.getHours() < 5);
     /* 환영 화면을 먼저 띄운 뒤에 소개 화면을 걷어낸다 (홈 화면이 잠깐 비치는 것 방지) */
     if(wc){
-      wc.hidden = false;
+      setHidden(wc, false);
       wc.classList.add('show');
     }
     setTimeout(() => {
       this.app.remove();
       if(!wc){ enter(); return; }
-      document.getElementById('wcName').textContent = C.name || T('wcHello');
-      document.getElementById('wcHi').textContent = night ? T('wcNight') : T('wcReady');
+      setText(document.getElementById('wcName'), C.name || T('wcHello'));
+      setText(document.getElementById('wcHi'), night ? T('wcNight') : T('wcReady'));
       const on = Cards.enabled().length;
-      document.getElementById('wcSub').textContent =
-        T('wcCards', { n: on }) + (this.joined ? T('wcLinked') : '');
+      setText(document.getElementById('wcSub'), T('wcCards', { n: on }) + (this.joined ? T('wcLinked') : ''));
       setTimeout(() => {
         wc.classList.add('out');
         wc.style.pointerEvents = 'none';
@@ -3938,15 +4377,16 @@ function joinLink(code){
 /* ═══════════ 설정 ═══════════ */
 let setTab = 'general';
 function openSettings(tab){
+  setSnapshot = settingsSnapshot();
   setTab = tab || 'general';
-  const TABN = { general:'stGeneral', cards:'stCards', schedule:'stTime', notify:'stNotify',
-                 link:'stLink', data:'stData', help:'stHelp' };
+  const TABN = { general:'stGeneral', cards:'stCards', detail:'stDetail', schedule:'stTime',
+                 notify:'stNotify', link:'stLink', data:'stData', help:'stHelp' };
   [...document.querySelectorAll('.setnav [data-tab]')].forEach(b => {
     b.classList.toggle('on', b.dataset.tab === setTab);
-    if(TABN[b.dataset.tab]) b.textContent = T(TABN[b.dataset.tab]);
+    if(TABN[b.dataset.tab]) setText(b, T(TABN[b.dataset.tab]));
   });
-  const sh = document.querySelector('.sethead'); if(sh) sh.textContent = T('stTitle');
-  $('buildTag').textContent = BUILD;
+  const sh = document.querySelector('.sethead'); if(sh) setText(sh, T('stTitle'));
+  setText($('buildTag'), BUILD);
   renderSettings();
   $('settings').classList.add('show');
 }
@@ -3954,9 +4394,21 @@ function closeModal(el, after){
   el.classList.add('closing');
   setTimeout(() => { el.classList.remove('show','closing'); if(after) after(); }, 200);
 }
+/* 설정을 닫을 때 화면을 통째로 다시 만들지 않는다.
+   카드 구성이 실제로 바뀐 경우에만 build() 하고, 그 외에는 값만 갱신한다. */
+let setSnapshot = '';
+function settingsSnapshot(){
+  return JSON.stringify([Cards.enabled().map(c => c.id), C.layoutMode, C.cardCol, C.lang]);
+}
 function closeSettings(){
   saveSettingsInputs();
-  closeModal($('settings'), () => { build(); paint(); loadWeather(true); loadGames(false); loadNews(false); });
+  const changed = settingsSnapshot() !== setSnapshot;
+  closeModal($('settings'), () => {
+    if(changed) build();          // 카드 구성·언어가 바뀐 경우에만 다시 만든다
+    paint();
+    /* 지역이나 팀이 바뀌었을 수 있으니 데이터만 조용히 새로 받는다 */
+    loadWeather(false); loadGames(false); loadNews(false);
+  });
 }
 /* 설정 입력은 바꾸는 즉시 저장한다 (탭을 옮기지 않아도 반영되도록) */
 function bindLiveSave(){
@@ -3965,7 +4417,9 @@ function bindLiveSave(){
     inp.dataset.live = '1';
     inp.addEventListener('change', () => {
       saveSettingsInputs();
-      paintHeader(); paint(true);
+      paintHeader();
+      /* 설정 화면 자체는 다시 만들지 않는다 (입력 포커스·스크롤 보존) */
+      paint(true);
     });
   });
 }
@@ -3979,9 +4433,11 @@ function saveSettingsInputs(){
 }
 function renderSettings(){
   const B = $('setBody');
-  setTimeout(bindLiveSave, 0);
+  /* 설정을 다시 그릴 때 스크롤 위치를 지킨다 */
+  const keepTop = B ? B.scrollTop : 0;
+  setTimeout(() => { bindLiveSave(); if(B) B.scrollTop = keepTop; }, 0);
   if(setTab === 'general'){
-    B.innerHTML = `
+    setHTML(B, `
       <h3 class="sectitle">${T('stLang')}</h3>
       <div class="fld"><select data-k="lang" id="langSel">
         ${LANGS.map(l => `<option value="${l.id}"${lang()===l.id?' selected':''}>${l.name}</option>`).join('')}
@@ -4004,14 +4460,14 @@ function renderSettings(){
       </div>
       <div class="fld"><input id="geoQ" placeholder="${T('stSearchPh')}">
         <div class="searchres" id="geoRes"></div></div>
-      <button class="btn" id="geoBtn">${T('stLocate')}</button>`;
+      <button class="btn" id="geoBtn">${T('stLocate')}</button>`);
     bindGeo(B);
     const ls = B.querySelector('#langSel');
     if(ls) ls.onchange = () => { C.lang = ls.value; save(); build(); paint(); renderSettings(); };
   }
   else if(setTab === 'cards'){
     const manual = C.layoutMode === 'manual';
-    B.innerHTML = `
+    setHTML(B, `
       <h3 class="sectitle">${T('stCardsTitle')}</h3>
       <p class="sechelp">${T('stCardsHint')}</p>
       <p class="sechelp" style="color:var(--acc)">${T('stDragHint')}</p>
@@ -4026,7 +4482,35 @@ function renderSettings(){
             ${c.fixed ? `<span class="tiny">${T('stAlways')}</span>`
                       : `<button class="sw ${Cards.isOn(c.id)?'on':''}" data-sw="1"></button>`}
           </div>`).join('')}
-      </div>
+      </div>`);
+    const lm = B.querySelector('#layMode');
+    if(lm) lm.onclick = e => {
+      const btn = e.target.closest('[data-lay]'); if(!btn) return;
+      if(btn.dataset.lay === 'auto'){
+        /* 자동으로 되돌리기 — 수동 배치값은 지운다 */
+        C.layoutMode = 'auto'; C.layout = {}; C.cardCol = {}; C.cardOrder = []; save();
+        build(); paint(); renderSettings();
+      } else {
+        closeSettings();
+        setTimeout(() => Drag.edit(true), 420);   // 편집 모드가 알아서 수동으로 전환한다
+      }
+    };
+    $('cardList').onclick = e => {
+      const row = e.target.closest('[data-id]'); if(!row) return;
+      const id = row.dataset.id;
+      if(e.target.dataset.sw){
+        Cards.toggle(id);
+        setClass(e.target, 'on', Cards.isOn(id));
+        setClass(row, 'off', !Cards.isOn(id));
+        build(); paint();
+      }
+    };
+  }
+  else if(setTab === 'detail'){
+    /* 카드별 세부 설정 — 꺼진 카드도 볼 수는 있고, 만지려 하면 안내가 뜬다 */
+    setHTML(B, `
+      <h3 class="sectitle">${T('stDetail')}</h3>
+      <p class="sechelp">${T('stDetailHint')}</p>
       <div id="nwSetting" ${Cards.isOn('news')?'':'hidden'}>
         <h3 class="sectitle" style="margin-top:26px">${T('stNewsTitle')}</h3>
         <p class="sechelp">${T('stNewsHint')}</p>
@@ -4078,7 +4562,29 @@ function renderSettings(){
           <input data-k="sdbKey" value="${esc(C.sdbKey)}" placeholder="${T('stBbKeyPh')}">
           <span class="hint">${T('stBbKeyHint')}</span></div>
         <p class="sechelp">${T('stBbSource')}</p>
-      </div>`;
+      </div>`);
+    /* 꺼진 카드 구역은 흐리게 두고, 누르면 안내 */
+    [['nwSetting','news'],['ttSetting','timetable'],['wtSetting','water'],['bbSetting','baseball']]
+      .forEach(([boxId, cardId]) => {
+        const box = B.querySelector('#' + boxId);
+        if(!box) return;
+        box.hidden = false;                       // 항상 보이게 (확인은 가능)
+        const on = Cards.isOn(cardId);
+        box.classList.toggle('locked', !on);
+        if(on) return;
+        /* 안내 띠를 얹는다 */
+        const note = document.createElement('button');
+        note.className = 'lock-note';
+        note.type = 'button';
+        note.textContent = T('stLocked', { c: cardName(Cards.get(cardId)) });
+        note.onclick = () => { setTab = 'cards'; renderSettings(); };
+        box.insertBefore(note, box.firstChild);
+        box.addEventListener('click', e => {
+          if(e.target === note) return;
+          e.preventDefault(); e.stopPropagation();
+          note.classList.remove('shake'); void note.offsetWidth; note.classList.add('shake');
+        }, true);
+      });
     $('setBody').querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('change', () => {
       saveSettingsInputs(); C.games = []; C.gamesAt = 0; loadGames(true);
     }));
@@ -4088,16 +4594,16 @@ function renderSettings(){
       const btn = e.target.closest('[data-tt]'); if(!btn) return;
       [...ttMode.children].forEach(x => x.classList.toggle('on', x === btn));
       const auto = btn.dataset.tt === 'auto';
-      B.querySelector('#ttAuto').hidden = !auto;
-      B.querySelector('#ttManual').hidden = auto;
+      setHidden(B.querySelector('#ttAuto'), !auto);
+      setHidden(B.querySelector('#ttManual'), auto);
       if(!auto){ C.school = null; save(); drawWeek(); }
     };
     const drawWeek = () => {
       const box = B.querySelector('#ttWeek'); if(!box) return;
       const t = C.timetable || {};
-      box.innerHTML = [1,2,3,4,5].map(d =>
+      setHTML(box, [1,2,3,4,5].map(d =>
         `<div class="fld"><label>${DAYS_KR[d]}요일</label>
-          <input data-dow="${d}" value="${esc((t[d]||[]).join(', '))}" placeholder="국어, 수학, 영어"></div>`).join('');
+          <input data-dow="${d}" value="${esc((t[d]||[]).join(', '))}" placeholder="국어, 수학, 영어"></div>`).join(''));
     };
     drawWeek();
     const ttSave = B.querySelector('#ttSave');
@@ -4108,7 +4614,7 @@ function renderSettings(){
         if(list.length) t[+inp.dataset.dow] = list;
       });
       C.timetable = t; C.ttCache = null; save(); paint();
-      B.querySelector('#ttMsg2').textContent = T('stTtSaved');
+      setText(B.querySelector('#ttMsg2'), T('stTtSaved'));
       B.querySelector('#ttMsg2').className = 'lk-msg ok';
     };
     const ttQ = B.querySelector('#ttQ');
@@ -4118,18 +4624,19 @@ function renderSettings(){
         clearTimeout(tq);
         const v = ttQ.value.trim();
         const res = B.querySelector('#ttRes');
-        if(v.length < 2){ res.innerHTML = ''; return; }
-        res.innerHTML = '<span class="hint">찾는 중…</span>';
+        if(v.length < 2){ setHTML(res, ''); return; }
+        setHTML(res, '<span class="hint">찾는 중…</span>');
         tq = setTimeout(async () => {
           const r = await neisSchools(v);
-          if(r.err){ res.innerHTML = `<span class="hint">${esc(r.err)}</span>`; return; }
-          res.innerHTML = r.list.length ? r.list.map(s =>
+          if(r.err){ setHTML(res, `<span class="hint">${esc(r.err)}</span>`); return; }
+          setHTML(res, r.list.length ? r.list.map(s =>
             `<button data-code="${esc(s.code)}" data-office="${esc(s.office)}" data-nm="${esc(s.name)}" data-kind="${esc(s.kind)}">
               <b>${esc(s.name)}</b><span class="tiny">${esc(s.addr)} · ${esc(s.kind)}</span></button>`).join('')
-            : '<span class="hint">검색 결과가 없습니다.</span>';
+            : '<span class="hint">검색 결과가 없습니다.</span>');
         }, 400);
       });
-      B.querySelector('#ttRes').onclick = e => {
+      const _ttRes = B.querySelector('#ttRes');
+      if(_ttRes) _ttRes.onclick = e => {
         const btn = e.target.closest('[data-code]'); if(!btn) return;
         C.school = Object.assign({}, C.school, {
           code: btn.dataset.code, office: btn.dataset.office,
@@ -4137,7 +4644,7 @@ function renderSettings(){
         });
         save();
         ttQ.value = btn.dataset.nm;
-        B.querySelector('#ttRes').innerHTML = `<span class="hint">선택: <b>${esc(btn.dataset.nm)}</b></span>`;
+        setHTML(B.querySelector('#ttRes'), `<span class="hint">선택: <b>${esc(btn.dataset.nm)}</b></span>`);
       };
     }
     const ttFetch = B.querySelector('#ttFetch');
@@ -4146,35 +4653,22 @@ function renderSettings(){
       const g = B.querySelector('#ttGrade').value.trim();
       const cl = B.querySelector('#ttCls').value.trim();
       C.neisKey = B.querySelector('#ttKey').value.trim();
-      if(!C.school || !C.school.code){ msg.textContent = '학교를 먼저 골라 주세요.'; msg.className='lk-msg err'; return; }
-      if(!g || !cl){ msg.textContent = '학년과 반을 넣어 주세요.'; msg.className='lk-msg err'; return; }
+      if(!C.school || !C.school.code){ setText(msg, '학교를 먼저 골라 주세요.'); msg.className='lk-msg err'; return; }
+      if(!g || !cl){ setText(msg, '학년과 반을 넣어 주세요.'); msg.className='lk-msg err'; return; }
       C.school = Object.assign({}, C.school, { grade:g, cls:cl });
       save();
-      msg.textContent = '가져오는 중…'; msg.className = 'lk-msg';
+      setText(msg, '가져오는 중…'); msg.className = 'lk-msg';
       const r = await neisTimetable(true);
-      if(r.err){ msg.textContent = r.err; msg.className = 'lk-msg err'; }
+      if(r.err){ setText(msg, r.err); msg.className = 'lk-msg err'; }
       else {
         const days = Object.keys(r.table).length;
-        msg.textContent = T('stTtGot',{d:days})
-          + (r.old ? ` (${r.weekOf.slice(5).replace('-','/')} 주 · 방학이라 최근 자료를 가져왔습니다)` : '');
+        setText(msg, T('ttGotDays',{n:days})
+          + (r.old ? ` (${r.weekOf.slice(5).replace('-','/')} 주)` : ''));
         msg.className = 'lk-msg ok';
         paint();
       }
     };
 
-    const lm = B.querySelector('#layMode');
-    if(lm) lm.onclick = e => {
-      const btn = e.target.closest('[data-lay]'); if(!btn) return;
-      if(btn.dataset.lay === 'auto'){
-        C.layoutMode = 'auto'; C.cardCol = {}; C.cardOrder = []; save();
-        build(); paint(); renderSettings();
-      } else {
-        /* 화면에서 직접 옮기도록 설정을 닫고 편집 모드로 */
-        C.layoutMode = 'manual'; save();
-        closeSettings();
-        setTimeout(() => Drag.edit(true), 420);
-      }
-    };
     const nwPick = $('setBody').querySelector('[data-nw]');
     if(nwPick) nwPick.parentNode.onclick = e => {
       const btn = e.target.closest('[data-nw]'); if(!btn) return;
@@ -4185,15 +4679,9 @@ function renderSettings(){
       btn.classList.toggle('on', C.newsTopics.includes(id));
       save(); C.news = null; C.newsAt = 0; loadNews(true);
     };
-    $('cardList').onclick = e => {
-      const row = e.target.closest('[data-id]'); if(!row) return;
-      const id = row.dataset.id;
-      if(e.target.dataset.sw){ Cards.toggle(id); renderSettings(); }
-
-    };
   }
   else if(setTab === 'schedule'){
-    B.innerHTML = `
+    setHTML(B, `
       <h3 class="sectitle">${T('stDayTitle')}</h3>
       <p class="sechelp">${T('stDayHint')}</p>
       <div class="row3">
@@ -4221,19 +4709,25 @@ function renderSettings(){
           <option value="off"${C.nextDay==='off'?' selected':''}>${T('stNextDayOff')}</option>
         </select></div>
       <h3 class="sectitle" style="margin-top:26px">${T('stScreen')}</h3>
-      <p class="sechelp">${T('stScreenHint')}</p>`;
+      <p class="sechelp">${T('stScreenHint')}</p>`);
     ['offWake','offOut','offBed'].forEach(id => {
       const el = B.querySelector('#'+id); if(!el) return;
       el.onclick = () => {
         const key = { offWake:'useWake', offOut:'useOut', offBed:'useBed' }[id];
-        C[key] = !(C[key] !== false);          // 켜짐 ↔ 꺼짐
-        save(); renderSettings(); paintHeader(); paint();
+        C[key] = !(C[key] !== false);
+        save();
+        /* 그 스위치와 짝인 입력칸만 손본다 (화면 전체를 다시 만들지 않는다) */
+        setClass(el, 'on', C[key] !== false);
+        const fld = el.closest('.fld');
+        const inp = fld && fld.querySelector('input[type=time]');
+        if(inp) inp.disabled = (C[key] === false);
+        paintHeader(); paint(true);
       };
     });
   }
   else if(setTab === 'notify'){
     const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
-    B.innerHTML = `
+    setHTML(B, `
       <h3 class="sectitle">${T('stNotifyTitle')}</h3>
       <p class="sechelp">${T('stNotifyHint')}</p>
       <div class="cardrow" style="margin-bottom:16px">
@@ -4254,8 +4748,9 @@ function renderSettings(){
           ${[0,5,10,15,30,60].map(m => `<option value="${m}"${+C.notifyLead===m?' selected':''}>${m?T('stLeadMin',{m}):T('stLeadNow')}</option>`).join('')}
         </select></div>
       <button class="btn" id="ntTest">${T('stTest')}</button>
-      <p class="sechelp" style="margin-top:18px">${T('stNotifyFoot')}</p>`;
-    B.querySelector('#ntSw').onclick = async () => {
+      <p class="sechelp" style="margin-top:18px">${T('stNotifyFoot')}</p>`);
+    const _ntSw = B.querySelector('#ntSw');
+    if(_ntSw) _ntSw.onclick = async () => {
       if(!C.notifyOn){
         const r = await Notify.ask();
         C.notifyOn = (r === 'granted');
@@ -4263,21 +4758,22 @@ function renderSettings(){
       } else C.notifyOn = false;
       save(); renderSettings();
     };
-    B.querySelector('#ntTest').onclick = async () => {
+    const _ntTest = B.querySelector('#ntTest');
+    if(_ntTest) _ntTest.onclick = async () => {
       const r = await Notify.ask();
       if(r !== 'granted') return alert('알림 권한이 필요해요.');
       Notify.show(T('stTest'), T('stTestBody'), 'test');
     };
   }
   else if(setTab === 'link'){
-    B.innerHTML = `
+    setHTML(B, `
       <h3 class="sectitle">${T('stLinkTitle')}</h3>
       <p class="sechelp">${T('stLinkHint')}</p>
-      <div class="linkbox"></div>`;
+      <div class="linkbox"></div>`);
     renderLinkBox(B.querySelector('.linkbox'));
   }
   else if(setTab === 'help'){
-    B.innerHTML = `
+    setHTML(B, `
       <h3 class="sectitle">${T('stHelpTitle')}</h3>
       <p class="sechelp">${T('stHelpHint')}</p>
 
@@ -4304,10 +4800,11 @@ function renderSettings(){
       <h3 class="sectitle" style="margin-top:30px">${T('stSource')}</h3>
       <p class="sechelp"><a href="privacy.html" target="_blank" rel="noopener" style="color:var(--acc)">${T('stPrivacy')}</a><br><br>
         ${T('stVersion')} ${BUILD}<br>
-        Open-Meteo.com · TheSportsDB.com · Google News</p>`;
+        Open-Meteo.com · TheSportsDB.com · Google News</p>`);
 
     let fbKind = 'bug';
-    B.querySelector('#fbKind').onclick = e => {
+    const _fbKind = B.querySelector('#fbKind');
+    if(_fbKind) _fbKind.onclick = e => {
       const btn = e.target.closest('[data-k]'); if(!btn) return;
       fbKind = btn.dataset.k;
       [...btn.parentNode.children].forEach(x => x.classList.toggle('on', x === btn));
@@ -4316,11 +4813,12 @@ function renderSettings(){
       build: BUILD, screen: innerWidth + 'x' + innerHeight, lang: lang(),
       cards: Cards.enabled().map(c => c.id).join(','), ua: navigator.userAgent
     });
-    B.querySelector('#fbSend').onclick = async () => {
+    const _fbSend = B.querySelector('#fbSend');
+    if(_fbSend) _fbSend.onclick = async () => {
       const text = B.querySelector('#fbBody').value.trim();
       const msg = B.querySelector('#fbMsg');
-      if(!text){ msg.textContent = T('stNeedText'); return; }
-      msg.textContent = T('stSending');
+      if(!text){ setText(msg, T('stNeedText')); return; }
+      setText(msg, T('stSending'));
       const body = {
         kind: fbKind, text,
         from: B.querySelector('#fbFrom').value.trim(),
@@ -4329,19 +4827,19 @@ function renderSettings(){
       };
       const ok = await sendReport(body);
       if(ok){
-        msg.textContent = T('stSent');
+        setText(msg, T('stSent'));
         msg.className = 'lk-msg ok';
         B.querySelector('#fbBody').value = '';
       } else {
-        msg.innerHTML = T('stSendFail') + ' '
-          + `<a href="mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('[Briefing] report')}&body=${encodeURIComponent(text)}">${T('stMailOpen')}</a>`;
+        setHTML(msg, T('stSendFail') + ' '
+          + `<a href="mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('[Briefing] report')}&body=${encodeURIComponent(text)}">${T('stMailOpen')}</a>`);
         msg.className = 'lk-msg err';
       }
     };
   }
   else if(setTab === 'data'){
     const n = EV.all().length, td = (C.todos||[]).length + (C.todosNext||[]).length;
-    B.innerHTML = `
+    setHTML(B, `
       <h3 class="sectitle">${T('stDataTitle')}</h3>
       <p class="sechelp">${T('stDataHint')}</p>
       <div class="fld"><span class="hint">${T('stStat',{e:n,t:td,s:Object.keys(C.sleepHist||{}).length})}</span></div>
@@ -4352,7 +4850,7 @@ function renderSettings(){
       </div>
       <input type="file" id="impFile" accept="application/json" hidden>
       <h3 class="sectitle" style="margin-top:26px">${T('stSource')}</h3>
-      <p class="sechelp">${T('stSourceHint')}</p>`;
+      <p class="sechelp">${T('stSourceHint')}</p>`);
     $('expBtn').onclick = () => {
       const blob = new Blob([JSON.stringify(C,null,1)], {type:'application/json'});
       const a = document.createElement('a');
@@ -4425,17 +4923,17 @@ function bindGeo(root){
   q.addEventListener('input', () => {
     clearTimeout(t);
     const v = q.value.trim();
-    if(v.length < 2){ res.innerHTML = ''; return; }
-    res.innerHTML = '<span class="hint">찾는 중…</span>';
+    if(v.length < 2){ setHTML(res, ''); return; }
+    setHTML(res, '<span class="hint">찾는 중…</span>');
     t = setTimeout(async () => {
       const list = await search(v);
-      res.innerHTML = list.length ? list.map(r => {
+      setHTML(res, list.length ? list.map(r => {
         const where = [r.admin2, r.admin1].filter(Boolean).join(' ') || r.country || '';
         return `<button data-lat="${r.latitude}" data-lon="${r.longitude}" data-nm="${esc(r.name)}">
           <b>${esc(r.name)}</b>
           <span class="tiny">${esc(where)}</span>
           <i class="km">${fmtKm(r._d)}</i></button>`;
-      }).join('') : '<span class="hint">결과가 없습니다. 가까운 동네나 구 이름으로 검색해 보세요.</span>';
+      }).join('') : '<span class="hint">결과가 없습니다. 가까운 동네나 구 이름으로 검색해 보세요.</span>');
     }, 350);
   });
 
@@ -4443,27 +4941,27 @@ function bindGeo(root){
     const btn = e.target.closest('[data-lat]'); if(!btn) return;
     C.place = btn.dataset.nm; C.lat = +btn.dataset.lat; C.lon = +btn.dataset.lon;
     C.wx = null; save();
-    const p = R.querySelector('#obPlace'); if(p) p.textContent = C.place;
+    const p = R.querySelector('#obPlace'); if(p) setText(p, C.place);
     if($('setBody') && $('setBody').contains(res)) renderSettings();
-    else { res.innerHTML = `<span class="hint">선택: <b>${esc(C.place)}</b></span>`; }
+    else { setHTML(res, `<span class="hint">선택: <b>${esc(C.place)}</b></span>`); }
     loadWeather(true);
   };
 
   const gb = R.querySelector('#geoBtn');
   if(gb) gb.onclick = () => {
     if(!navigator.geolocation) return alert('이 기기에서는 위치를 쓸 수 없어요.');
-    gb.textContent = '찾는 중…';
+    setText(gb, '찾는 중…');
     const ok = p => {
       myPos = [p.coords.latitude, p.coords.longitude];
       C.lat = +p.coords.latitude.toFixed(4); C.lon = +p.coords.longitude.toFixed(4);
       C.wx = null; save();
-      gb.textContent = '현재 위치로 맞췄어요';
-      const pl = R.querySelector('#obPlace'); if(pl) pl.textContent = C.place || '현재 위치';
+      setText(gb, '현재 위치로 맞췄어요');
+      const pl = R.querySelector('#obPlace'); if(pl) setText(pl, C.place || '현재 위치');
       loadWeather(true);
     };
     navigator.geolocation.getCurrentPosition(ok,
       () => navigator.geolocation.getCurrentPosition(ok,
-        () => { gb.textContent = '위치를 찾지 못했어요 · 다시 시도'; },
+        () => { setText(gb, '위치를 찾지 못했어요 · 다시 시도'); },
         { enableHighAccuracy:true, timeout:30000, maximumAge:3600000 }),
       { enableHighAccuracy:false, timeout:15000, maximumAge:3600000 });
   };
@@ -4478,7 +4976,7 @@ function renderLinkBox(box){
 
   if(linked){
     const url = joinLink(C.sync.code || '');
-    box.innerHTML = `
+    setHTML(box, `
       <div class="lk-done">
         <div class="lk-share">
           ${C.sync.code ? `<div class="lk-qr">${QR.svg(url, 150)}</div>` : ''}
@@ -4493,11 +4991,11 @@ function renderLinkBox(box){
           <button class="btn danger lk-off">${T('lkOff')}</button>
         </div>
         <div class="lk-msg"></div>
-      </div>`;
+      </div>`);
     q('.lk-sync').onclick = async () => {
-      q('.lk-msg').textContent = T('lkSyncing');
+      setText(q('.lk-msg'), T('lkSyncing'));
       await syncPull(true); await syncPush(true);
-      q('.lk-msg').textContent = T('lkSynced');
+      setText(q('.lk-msg'), T('lkSynced'));
       paint();
     };
     q('.lk-off').onclick = () => {
@@ -4506,7 +5004,7 @@ function renderLinkBox(box){
     return;
   }
 
-  box.innerHTML = `
+  setHTML(box, `
     <div class="lk-two">
       <button class="lk-card lk-new">
         <b>${T('lkHost')}</b><i>${T('lkHostS')}</i>
@@ -4515,15 +5013,15 @@ function renderLinkBox(box){
         <b>${T('lkGuest')}</b><i>${T('lkGuestS')}</i>
       </button>
     </div>
-    <div class="lk-panel"></div>`;
+    <div class="lk-panel"></div>`);
 
   q('.lk-new').onclick = async () => {
     const P = q('.lk-panel');
-    P.innerHTML = `<div class="lk-load">코드를 만드는 중…</div>`;
+    setHTML(P, `<div class="lk-load">코드를 만드는 중…</div>`);
     try{
       const code = await syncCreate();
       const url = joinLink(code);
-      P.innerHTML = `
+      setHTML(P, `
         <div class="lk-done">
           <div class="lk-share">
             <div class="lk-qr">${QR.svg(url, 160)}</div>
@@ -4534,29 +5032,29 @@ function renderLinkBox(box){
               <button class="btn lk-copy">${T('obCopy')}</button>
             </div>
           </div>
-        </div>`;
+        </div>`);
       P.querySelector('.lk-copy').onclick = async ev => {
-        try{ await navigator.clipboard.writeText(url); ev.target.textContent = '복사했어요'; }
-        catch(e){ ev.target.textContent = url; }
+        try{ await navigator.clipboard.writeText(url); setText(ev.target, '복사했어요'); }
+        catch(e){ setText(ev.target, url); }
       };
     }catch(e){
-      P.innerHTML = `<div class="lk-err">${esc(e.message || T('obJoinFail'))}</div>`;
+      setHTML(P, `<div class="lk-err">${esc(e.message || T('obJoinFail'))}</div>`);
     }
   };
 
   q('.lk-join').onclick = () => {
     const P = q('.lk-panel');
-    P.innerHTML = `
+    setHTML(P, `
       <div class="fld"><label>${T('lkCode6')}</label>
         <input class="lk-input lk-in" maxlength="6" placeholder="ABC123" autocapitalize="characters"></div>
       <button class="btn primary lk-go">${T('lkGo')}</button>
-      <div class="lk-msg"></div>`;
+      <div class="lk-msg"></div>`);
     const go = async () => {
       const v = P.querySelector('.lk-in').value.trim();
-      if(v.length < 6){ P.querySelector('.lk-msg').textContent = T('lkNeed6'); return; }
-      P.querySelector('.lk-msg').textContent = T('obJoining');
+      if(v.length < 6){ setText(P.querySelector('.lk-msg'), T('lkNeed6')); return; }
+      setText(P.querySelector('.lk-msg'), T('obJoining'));
       try{ await syncJoin(v); renderLinkBox(box); build(); paint(); }
-      catch(e){ P.querySelector('.lk-msg').textContent = e.message || T('obJoinFail'); }
+      catch(e){ setText(P.querySelector('.lk-msg'), e.message || T('obJoinFail')); }
     };
     P.querySelector('.lk-go').onclick = go;
     P.querySelector('.lk-in').addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
@@ -4573,23 +5071,23 @@ async function handleJoinLink(){
   history.replaceState(null, '', location.pathname);
   $('onboard').classList.remove('show');
   const box = $('joinAuto');
-  box.innerHTML = `<div class="mbox ob"><div class="ob-hero">
+  setHTML(box, `<div class="mbox ob"><div class="ob-hero">
       <div class="ob-mark"><i></i></div>
       <h2>기기 연결 중</h2>
       <p class="lead">코드 <b>${code}</b> 로 연결하고 있어요…</p>
       <div class="lk-msg" id="jaMsg"></div>
-    </div></div>`;
+    </div></div>`);
   box.classList.add('show');
   try{
     await syncJoin(code);
     C.onboarded = true; save();
-    box.querySelector('h2').textContent = '연결됐어요';
-    box.querySelector('.lead').innerHTML = '이제 두 기기가 같은 일정과 할 일을 봅니다.';
+    setText(box.querySelector('h2'), '연결됐어요');
+    setHTML(box.querySelector('.lead'), '이제 두 기기가 같은 일정과 할 일을 봅니다.');
     setTimeout(() => { box.classList.remove('show'); build(); paint(); }, 1400);
   }catch(e){
-    box.querySelector('h2').textContent = '연결하지 못했어요';
-    box.querySelector('.lead').textContent = e.message || '코드를 다시 확인해 주세요.';
-    box.querySelector('#jaMsg').innerHTML = `<button class="btn primary" onclick="document.getElementById('joinAuto').classList.remove('show')">닫기</button>`;
+    setText(box.querySelector('h2'), '연결하지 못했어요');
+    setText(box.querySelector('.lead'), e.message || '코드를 다시 확인해 주세요.');
+    setHTML(box.querySelector('#jaMsg'), `<button class="btn primary" onclick="document.getElementById('joinAuto').classList.remove('show')">닫기</button>`);
   }
   return true;
 }
@@ -4616,7 +5114,7 @@ async function boot(){
       if(!force && !widthChanged) return;          // 키보드 때문에 생긴 변화는 무시
       if(typing()) return;                          // 입력 중이면 건드리지 않는다
       lastW = w; lastPhone = phone;
-      fit(); paint();
+      fit(); paint(); fitStage(true);
     }, 200);
   };
   addEventListener('resize', () => refit(false));
@@ -4646,15 +5144,24 @@ async function boot(){
       const natural = (now.getHours() >= 18 || now.getHours() < 5) ? 'night' : 'day';
       if(overrideBase && natural !== overrideBase){ modeOverride = null; overrideBase = null; }
     }
-    paintHeader();
-    if(now.getSeconds() === 0){ if(!typing()) paint(true); Notify.tick(); }
-    if(now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 2){ rollover(); paint(); }
+    /* 매초 하는 일은 시계와 헤더뿐. 카드 전체는 건드리지 않는다. */
+    if(!typing()) paintTick();
+    if(now.getSeconds() === 0) Notify.tick();
+    /* 날짜가 바뀌는 순간에만 전체를 다시 계산한다 */
+    if(now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 2 && C.day !== today()){
+      rollover(); paint(true);
+    }
   }, 1000);
   setInterval(() => { if(!typing()) loadWeather(false); }, 15*60*1000);
   if(C.notifyOn) Notify.ask().then(() => Notify.tick());
   setInterval(() => { if(!typing()) loadGames(false); }, 60*60*1000);
   setInterval(() => { if(!typing()) loadNews(false); }, 60*60*1000);
   if(Cards.isOn('timetable') && C.school && C.school.code) ttRefresh(false);
+  /* 개학 직후처럼 시간표가 새로 올라오는 시기를 놓치지 않도록 주기적으로 확인 */
+  setInterval(() => {
+    if(typing()) return;
+    if(Cards.isOn('timetable') && C.school && C.school.code) ttRefresh(false);
+  }, 3*3600000);
   setInterval(() => { if(syncReady() && !typing()) syncPull(); }, 45000);
 
   try{ if('wakeLock' in navigator) await navigator.wakeLock.request('screen'); }catch(e){}
@@ -4688,7 +5195,7 @@ $('modeBtn').onclick = () => {
 $('allBtn').onclick = () => {
   const on = document.body.classList.toggle('showall');
   C.phoneAll = on; save();
-  $('allBtn').textContent = on ? '간단히 보기' : '전체 보기';
+  setText($('allBtn'), on ? '간단히 보기' : '전체 보기');
   build(); paint(); scrollTo({top:0, behavior:'smooth'});
 };
 $('evSave').onclick = saveEvent;
