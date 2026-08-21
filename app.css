@@ -1000,7 +1000,7 @@ body.edit-cards .card-open{display:none}
 /* 끌고 있는 동안 */
 body.dragging{cursor:grabbing;overscroll-behavior:contain}
 body.dragging .card{animation:none}
-.card.drag-src{visibility:hidden}
+.card.drag-src{display:none}
 .drag-ghost{position:fixed;z-index:400;margin:0;pointer-events:none;
   transform-origin:center;box-shadow:0 26px 60px -20px rgba(0,0,0,.6);
   animation:none!important;opacity:.96;scale:1.03}

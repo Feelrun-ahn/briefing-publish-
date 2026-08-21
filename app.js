@@ -743,6 +743,14 @@ const I18N3 = {"ko": {"tagStudent": "학생", "tagSport": "스포츠", "colGreen
 
 (function(){ const D={"ko": {"sz1": "작게", "sz2": "중간", "sz3": "크게", "stArrangeOn": "카드를 끌어 옮기세요"}, "en": {"sz1": "Small", "sz2": "Medium", "sz3": "Large", "stArrangeOn": "Drag the cards to rearrange"}, "ja": {"sz1": "小", "sz2": "中", "sz3": "大", "stArrangeOn": "カードをドラッグして並べ替え"}, "zh": {"sz1": "小", "sz2": "中", "sz3": "大", "stArrangeOn": "拖动卡片进行排列"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
 
+(function(){ const D={"ko": {"wxLastAt": "{t} 기준", "ttNoFresh": "최신 시간표를 확인하지 못했습니다"}, "en": {"wxLastAt": "as of {t}", "ttNoFresh": "Could not check for a newer timetable"}, "ja": {"wxLastAt": "{t} 時点", "ttNoFresh": "最新の時間割を確認できませんでした"}, "zh": {"wxLastAt": "{t} 数据", "ttNoFresh": "未能确认最新课表"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
+(function(){ const D={"ko": {"stTtNoServer": "시간표 서버가 아직 준비되지 않았습니다. 지금은 직접 넣기를 써 주세요."}, "en": {"stTtNoServer": "The timetable server is not set up yet. Please type it in for now."}, "ja": {"stTtNoServer": "時間割サーバーが未設定です。今は手入力をご利用ください。"}, "zh": {"stTtNoServer": "课表服务器尚未就绪，请先手动填写。"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
+(function(){ const D={"ko": {"ttErrNoSchool": "학교·학년·반을 먼저 설정해 주세요", "ttErrNoServer": "시간표를 불러올 수 없습니다", "ttErrNone": "시간표를 찾지 못했습니다", "ttErrFail": "오류가 발생했습니다", "schNone": "검색되지 않습니다", "schFail": "오류가 발생했습니다"}, "en": {"ttErrNoSchool": "Set your school, grade and class first", "ttErrNoServer": "Could not load the timetable", "ttErrNone": "No timetable found", "ttErrFail": "Something went wrong", "schNone": "No results", "schFail": "Something went wrong"}, "ja": {"ttErrNoSchool": "学校・学年・組を先に設定してください", "ttErrNoServer": "時間割を読み込めません", "ttErrNone": "時間割が見つかりません", "ttErrFail": "エラーが発生しました", "schNone": "見つかりません", "schFail": "エラーが発生しました"}, "zh": {"ttErrNoSchool": "请先设置学校、年级和班级", "ttErrNoServer": "无法加载课表", "ttErrNone": "未找到课表", "ttErrFail": "发生错误", "schNone": "未找到结果", "schFail": "发生错误"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
+(function(){ const D={"ko": {"locHere": "현재 위치", "locFinding": "위치를 찾는 중…", "locDone": "현재 위치로 맞췄어요", "locDenied": "위치 권한이 필요합니다. 브라우저 설정에서 허용해 주세요.", "locFail": "위치를 찾지 못했습니다", "locKeep": "이전 위치를 그대로 씁니다"}, "en": {"locHere": "Current location", "locFinding": "Finding your location…", "locDone": "Set to your location", "locDenied": "Location permission is needed. Please allow it in your browser settings.", "locFail": "Could not find your location", "locKeep": "Keeping the previous location"}, "ja": {"locHere": "現在地", "locFinding": "現在地を取得中…", "locDone": "現在地に合わせました", "locDenied": "位置情報の許可が必要です。ブラウザの設定で許可してください。", "locFail": "現在地を取得できませんでした", "locKeep": "以前の位置をそのまま使います"}, "zh": {"locHere": "当前位置", "locFinding": "正在获取位置…", "locDone": "已设为当前位置", "locDenied": "需要位置权限，请在浏览器设置中允许。", "locFail": "未能获取位置", "locKeep": "继续使用之前的位置"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
 
 /* ══════ js/render.js ══════ */
 
@@ -1276,6 +1284,106 @@ const Layout = {
 };
 
 
+/* ══════ js/net.js ══════ */
+
+/* ═══════════ 바깥에서 데이터 받아오기 ═══════════
+
+   외부 요청은 전부 여기를 거칩니다. 카드는 Net.get() 만 부르면 됩니다.
+
+   여기서 책임지는 것
+     ① 시간 제한   — 응답이 없으면 정해진 시간에 끊는다 (앱이 멈추지 않게)
+     ② 중복 방지   — 같은 요청이 이미 가고 있으면 그 결과를 함께 쓴다
+     ③ 저장        — 받아 둔 값을 보관하고, 아직 쓸 만하면 그대로 쓴다
+     ④ 되돌아가기  — 실패하면 마지막에 성공한 값을 돌려준다
+
+   특히 ②가 중요합니다. 새로고침을 네 번 눌러도 바깥 요청은 한 번만 나갑니다. */
+
+const Net = {
+  _live: new Map(),     // 지금 진행 중인 요청 (key → Promise)
+  _mem:  new Map(),     // 이번 실행 동안의 저장
+
+  /* 저장은 앱 설정과 함께 남는다 (앱을 껐다 켜도 남아 있게) */
+  store(){ C.apiCache = C.apiCache || {}; return C.apiCache; },
+
+  read(key){
+    const m = this._mem.get(key);
+    if(m) return m;
+    const s = this.store()[key];
+    if(s) this._mem.set(key, s);
+    return s || null;
+  },
+
+  write(key, data){
+    const rec = { data, at: Date.now() };
+    this._mem.set(key, rec);
+    this.store()[key] = rec;
+    save();
+    return rec;
+  },
+
+  /* 저장된 값 (오래됐든 아니든) */
+  cached(key){ const r = this.read(key); return r ? r.data : null; },
+  cachedAt(key){ const r = this.read(key); return r ? r.at : 0; },
+
+  /*  key    저장·중복 판단의 기준 (같으면 같은 요청)
+      fn     실제로 값을 받아오는 함수 (신호 하나를 받는다)
+      opt    { ttl:유효 시간(ms), timeout:제한 시간(ms), force:새로 받기 } */
+  async get(key, fn, opt){
+    opt = opt || {};
+    const ttl = opt.ttl != null ? opt.ttl : 10*60*1000;
+    const timeout = opt.timeout || 9000;
+
+    /* ③ 아직 쓸 만하면 그대로 */
+    const rec = this.read(key);
+    if(!opt.force && rec && (Date.now() - rec.at) < ttl)
+      return { data: rec.data, fresh:false, at: rec.at };
+
+    /* ② 같은 요청이 이미 가고 있으면 그 결과를 함께 쓴다 */
+    if(this._live.has(key)) return this._live.get(key);
+
+    const run = (async () => {
+      const ac = new AbortController();
+      const t = setTimeout(() => ac.abort(), timeout);      // ① 시간 제한
+      try{
+        const data = await fn(ac.signal);
+        clearTimeout(t);
+        if(data == null) throw new Error('빈 응답');
+        this.write(key, data);
+        return { data, fresh:true, at: Date.now() };
+      }catch(err){
+        clearTimeout(t);
+        /* ④ 마지막에 성공한 값으로 돌아간다 */
+        const old = this.read(key);
+        if(old) return { data: old.data, fresh:false, at: old.at, err };
+        return { data:null, fresh:false, at:0, err };
+      }finally{
+        this._live.delete(key);
+      }
+    })();
+
+    this._live.set(key, run);
+    return run;
+  },
+
+  /* 짧은 시간 안의 연타를 막는다 (새로고침 버튼용) */
+  _last: new Map(),
+  tooSoon(key, ms){
+    const t = this._last.get(key) || 0;
+    if(Date.now() - t < (ms || 3000)) return true;
+    this._last.set(key, Date.now());
+    return false;
+  },
+
+  /* 오래된 저장값 정리 (일주일) */
+  sweep(){
+    const s = this.store(), cut = Date.now() - 7*86400000;
+    let n = 0;
+    Object.keys(s).forEach(k => { if(!s[k] || s[k].at < cut){ delete s[k]; n++; } });
+    if(n) save();
+  }
+};
+
+
 /* ══════ js/core.js ══════ */
 
 /* ═══════════ 코어 ═══════════ */
@@ -1302,6 +1410,7 @@ const DEFAULTS = {
   onboarded:false, lang:'',
   name:'', birth:'', birthTime:'',
   place:'서울', lat:37.5665, lon:126.9780,
+  loc:null,                  // 위치 단일 상태 (Geo 가 관리)
   wake:'07:00', out:'08:00', bed:'23:00',
   useWake:true, useOut:true, useBed:true, nextDay:'auto', showSec:true,
   cardOrder:[], cardOff:[], cardCol:{}, layoutMode:'auto',
@@ -1317,7 +1426,9 @@ const DEFAULTS = {
   school:null, neisKey:'', ttCache:null,
   notifyOn:false, notifyDaily:'08:00', notifyPre:'21:00', notifyLead:10,
   sync:{ on:false, uid:'', code:'', at:0 },
-  wx:null, phoneAll:true, day:''
+  wx:null, phoneAll:true, day:'',
+  apiCache:{},               // 바깥에서 받아 둔 값 (Net 이 관리)
+  schemaVersion:0            // 저장 구조 판번호 (0 = 아직 확인 전)
 };
 let C = JSON.parse(JSON.stringify(DEFAULTS));
 let save = function(){ Store.save(C); };
@@ -1776,6 +1887,129 @@ function rollover(){
 }
 
 
+/* ══════ js/geo.js ══════ */
+
+/* ═══════════ 위치 ═══════════
+
+   위치는 오직 이 한 곳에서만 관리합니다.
+
+     C.loc = {
+       lat, lon,                    // 날씨를 받아올 좌표
+       sido, sigungu, dong,         // 행정구역
+       name,                        // 화면에 보일 이름
+       src,                         // 'gps' | 'search' | 'default'
+       at                           // 마지막으로 정한 시각
+     }
+
+   예전에는 좌표(C.lat/C.lon)와 이름(C.place)이 따로 놀아서
+   부산 좌표에 '서울'이라는 이름이 붙는 일이 있었습니다.
+   지금은 좌표를 바꾸면 이름도 반드시 함께 바뀝니다.
+
+   날씨 좌표 · 카드의 장소명 · 자세히 보기 링크가 모두 이 값을 씁니다. */
+
+const Geo = {
+  /* 지금 위치 (없으면 기본값을 만들어 돌려준다) */
+  get(){
+    if(!C.loc || C.loc.lat == null){
+      /* 예전 방식으로 저장돼 있던 값을 옮긴다 */
+      C.loc = {
+        lat: C.lat != null ? C.lat : 37.5665,
+        lon: C.lon != null ? C.lon : 126.9780,
+        sido:'', sigungu:'', dong:'',
+        name: C.place || '서울',
+        src:'default', at: 0
+      };
+    }
+    return C.loc;
+  },
+
+  /* 위치를 새로 정한다. 좌표와 이름이 항상 함께 바뀐다. */
+  set(loc){
+    const cur = this.get();
+    C.loc = Object.assign({}, cur, loc, { at: Date.now() });
+    /* 예전 이름으로 읽는 곳이 남아 있어 함께 맞춰 둔다 */
+    C.lat = C.loc.lat; C.lon = C.loc.lon; C.place = C.loc.name;
+    C.wx = null;                       // 좌표가 바뀌었으니 날씨를 새로 받는다
+    save();
+    return C.loc;
+  },
+
+  /* 행정구역 조각을 보기 좋은 한 줄로
+     '부산광역시 해운대구 우동' → '부산 해운대구 우동' */
+  label(sido, sigungu, dong){
+    const short = (sido || '')
+      .replace('특별자치시','').replace('특별자치도','')
+      .replace('광역시','').replace('특별시','')
+      .replace('북도','북').replace('남도','남').replace('도$','');
+    return [short, sigungu, dong].filter(Boolean).join(' ') || '';
+  },
+
+  /* ── 좌표 → 행정구역 이름 ──
+     키가 필요 없고 CORS 를 허용하는 곳을 씁니다.
+     실패해도 날씨는 좌표로 계속 받아옵니다. (역지오코딩 실패 ≠ 날씨 실패) */
+  async name(lat, lon){
+    const key = `geo:${lat.toFixed(3)}:${lon.toFixed(3)}`;
+    const r = await Net.get(key, async signal => {
+      const u = 'https://api-bdc.net/data/reverse-geocode-client'
+        + `?latitude=${lat}&longitude=${lon}&localityLanguage=ko`;
+      const j = await (await fetch(u, { signal })).json();
+      if(!j) throw new Error('빈 응답');
+      return j;
+    }, { ttl: 7*86400000, timeout: 6000 });          // 한 주 저장
+
+    const j = r.data;
+    if(!j) return null;
+
+    /* 행정 단계별로 골라낸다
+       4 = 시·도, 6 = 시·군·구, 7~8 = 읍·면·동 */
+    const adm = (j.localityInfo && j.localityInfo.administrative) || [];
+    const pick = lv => {
+      const hit = adm.filter(a => a.adminLevel === lv).sort((a,b) => (b.order||0)-(a.order||0))[0];
+      return hit ? String(hit.name || '').trim() : '';
+    };
+    const sido = pick(4) || j.principalSubdivision || '';
+    const sigungu = pick(6) || j.city || j.locality || '';
+    let dong = pick(8) || pick(7) || '';
+    /* 시·군·구와 같은 이름이 겹쳐 오는 경우 정리 */
+    if(dong && dong === sigungu) dong = '';
+
+    const name = this.label(sido, sigungu, dong)
+      || j.locality || j.city || j.principalSubdivision || '';
+    if(!name) return null;
+    return { sido, sigungu, dong, name };
+  },
+
+  /* ── 현재 위치로 맞추기 ──
+     onState(단계, 값) 로 진행 상황을 알려 준다.
+       'ing'    찾는 중
+       'ok'     끝남 (loc)
+       'denied' 권한 거부
+       'fail'   실패 */
+  locate(onState){
+    if(!navigator.geolocation){ onState && onState('fail'); return; }
+    onState && onState('ing');
+
+    navigator.geolocation.getCurrentPosition(async p => {
+      const lat = +p.coords.latitude.toFixed(5);
+      const lon = +p.coords.longitude.toFixed(5);
+
+      /* ① 좌표를 먼저 반영한다 — 이름을 못 찾아도 날씨는 정확해진다 */
+      const loc = Geo.set({ lat, lon, src:'gps',
+                            sido:'', sigungu:'', dong:'', name: T('locHere') });
+      onState && onState('ok', loc);
+
+      /* ② 이름은 뒤이어 채운다 */
+      try{
+        const nm = await Geo.name(lat, lon);
+        if(nm) onState && onState('ok', Geo.set(nm));
+      }catch(e){ /* 이름을 못 찾아도 그냥 둔다 */ }
+    }, err => {
+      onState && onState(err && err.code === 1 ? 'denied' : 'fail');
+    }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
+  }
+};
+
+
 /* ══════ js/notify.js ══════ */
 
 /* ═══════════ 알림 ═══════════
@@ -1974,7 +2208,10 @@ async function syncPull(force){
       if(at > (C.sync.at||0) || force){
         const d = JSON.parse(j.fields.data.stringValue);
         SYNC_KEYS.forEach(k => { if(d[k] !== undefined) C[k] = d[k]; });
-        C.sync.at = at; save(); build(); paint();
+        C.sync.at = at; save();
+        /* 카드 구성이 바뀐 게 아니면 다시 만들지 않는다 */
+        if(typeof needRelayout === 'function' && needRelayout()) build();
+        paint();
       }
     }
   }catch(e){}
@@ -2008,85 +2245,62 @@ async function sendReport(body){
 }
 
 
+/* 서버에 올려 둔 자료를 지운다 (설정 → 데이터 → 전체 초기화에서 부름) */
+async function syncWipe(){
+  if(!C.sync || !C.sync.uid) return;
+  const t = await syncToken();
+  if(!t) throw new Error('로그인 정보 없음');
+  const del = async path => {
+    const r = await fetch(`${FS}/${path}`, { method:'DELETE', headers:{ Authorization:'Bearer ' + t } });
+    if(!r.ok && r.status !== 404) throw new Error('삭제 실패');
+  };
+  await del(`spaces/${C.sync.uid}`);
+  if(C.sync.code) { try{ await del(`links/${C.sync.code}`); }catch(e){} }
+  C.sync = { on:false, uid:'', code:'', at:0 };
+  save();
+}
+
+
 /* ══════ js/neis.js ══════ */
 
-/* ═══════════ 나이스(NEIS) 교육정보 개방 포털 ═══════════
-   학교 검색: schoolInfo · 중학교 시간표: misTimetable
-   (초등 elsTimetable · 고등 hisTimetable 도 같은 방식)
-   인증키는 open.neis.go.kr 에서 무료로 발급받아 설정에 넣습니다. */
-const NEIS_BASE = 'https://open.neis.go.kr/hub/';
-const NEIS_PROXIES = [
-  u => u,
-  u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
-  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
-  u => 'https://corsproxy.io/?' + encodeURIComponent(u)
-];
-/* 학교급에 따라 서비스 이름이 다르다 */
-const NEIS_SVC = { els:'elsTimetable', mis:'misTimetable', his:'hisTimetable' };
+/* ═══════════ 시간표 (나이스) ═══════════
 
-async function neisFetch(path){
-  const url = NEIS_BASE + path;
-  let lastErr = '';
-  for(const p of NEIS_PROXIES){
-    const ac = new AbortController();
-    const to = setTimeout(() => ac.abort(), 11000);
-    try{
-      const r = await fetch(p(url), { signal: ac.signal });
-      clearTimeout(to);
-      if(!r.ok){ lastErr = 'HTTP ' + r.status; continue; }
-      const txt = await r.text();
-      let j = null;
-      try{ j = JSON.parse(txt); }
-      catch(e){
-        const s = txt.indexOf('{'), e2 = txt.lastIndexOf('}');
-        if(s >= 0 && e2 > s){ try{ j = JSON.parse(txt.slice(s, e2+1)); }catch(e3){} }
-      }
-      if(!j){ lastErr = '응답을 읽지 못했습니다'; continue; }
-      /* 나이스는 결과가 없을 때도 200으로 코드만 담아 보낸다 */
-      if(j.RESULT && j.RESULT.CODE && j.RESULT.CODE !== 'INFO-000'){
-        return { err: neisMsg(j.RESULT.CODE, j.RESULT.MESSAGE) };
-      }
-      return { data: j };
-    }catch(e){ clearTimeout(to); lastErr = '연결 실패'; }
-  }
-  return { err: lastErr || '연결 실패' };
-}
-function neisMsg(code, msg){
-  if(code === 'INFO-200') return '해당 조건의 자료가 없습니다';
-  if(code === 'ERROR-290' || code === 'ERROR-300') return '인증키가 올바르지 않습니다';
-  if(code === 'ERROR-337') return '오늘 요청 한도를 넘었습니다';
-  return msg || code;
-}
-function neisKey(){ return (C.neisKey || '').trim(); }
-function neisRows(j, svc){
-  const arr = j && j[svc];
-  if(!arr || !arr[1] || !arr[1].row) return [];
-  return arr[1].row;
+   앱은 나이스를 직접 부르지 않습니다. 중계 서버를 거칩니다.
+
+     앱 → Briefing 서버 → 나이스
+
+   인증키는 서버에만 있고 앱에는 없습니다.
+   같은 학교·학년·반·주간 요청은 서버에서 하나로 묶여 나이스 호출을 아낍니다.
+   서버 코드는 server/worker.js 에 있습니다.
+
+   서버를 아직 배포하지 않았다면 아래 주소가 비어 있고,
+   그때는 시간표를 직접 넣는 방식만 쓸 수 있습니다. */
+
+let API_BASE = 'https://briefing-api.feelrun.workers.dev';
+
+function apiReady(){ return !!API_BASE; }
+
+/* 서버에 물어보기 — 시간 제한과 중복 방지는 Net 이 맡는다 */
+async function neisApi(path, params, opt){
+  if(!apiReady()) return { err: T('ttErrNoServer') };
+  const q = new URLSearchParams(params).toString();
+  const key = 'neis:' + path + '?' + q;
+  const r = await Net.get(key, async signal => {
+    const res = await fetch(`${API_BASE}${path}?${q}`, { signal });
+    const j = await res.json();
+    if(res.status === 429) { const e = new Error(j.error || '한도'); e.limit = true; throw e; }
+    if(!res.ok) throw new Error(j.error || '오류');
+    return j;
+  }, opt || { ttl: 30*60*1000, timeout: 11000 });
+  if(!r.data) return { err: (r.err && r.err.limit) ? T('ttNoFresh') : T('ttErrFail'),
+                       limit: !!(r.err && r.err.limit) };
+  return { rows: r.data.rows || [], stale: !r.fresh, at: r.at };
 }
 
-/* 학교 검색 — 이름 일부로 찾는다 */
-async function neisSchools(name){
-  const q = `schoolInfo?Type=json&pIndex=1&pSize=20`
-    + (neisKey() ? '&KEY=' + encodeURIComponent(neisKey()) : '')
-    + '&SCHUL_NM=' + encodeURIComponent(name);
-  const r = await neisFetch(q);
-  if(r.err) return { err: r.err };
-  return { list: neisRows(r.data, 'schoolInfo').map(s => ({
-    office: s.ATPT_OFCDC_SC_CODE, officeName: s.ATPT_OFCDC_SC_NM,
-    code: s.SD_SCHUL_CODE, name: s.SCHUL_NM,
-    kind: s.SCHUL_KND_SC_NM || '', addr: (s.ORG_RDNMA || '').split(' ').slice(0,2).join(' ')
-  })) };
-}
-/* 학교 종류 → 서비스 이름 */
-function neisSvcOf(kind){
-  if(/초등/.test(kind)) return NEIS_SVC.els;
-  if(/고등/.test(kind)) return NEIS_SVC.his;
-  return NEIS_SVC.mis;
-}
-/* 이번 주 시간표를 통째로 받아 요일별로 정리 */
 async function neisTimetable(force){
   const s = C.school;
-  if(!s || !s.code || !s.grade || !s.cls) return { err:'학교·학년·반을 먼저 설정해 주세요' };
+  if(!s || !s.code || !s.grade || !s.cls) return { err: T('ttErrNoSchool') };
+  if(!apiReady()) return { err: T('ttErrNoServer') };
   const monday = d => { const x = new Date(d); const w = x.getDay();
     x.setDate(x.getDate() - ((w + 6) % 7)); return ymd(x); };
   const thisWeek = monday(now);
@@ -2103,7 +2317,6 @@ async function neisTimetable(force){
       return { table: cache.table, cached: true, weekOf: cache.weekOf, days: cache.days, old: true };
   }
 
-  const svc = neisSvcOf(s.kind);
   const table = {};      // 요일 → 과목 배열
   const src = {};        // 요일 → 그 자료가 나온 날짜 (언제 것인지 표시용)
   let newest = '';
@@ -2120,19 +2333,16 @@ async function neisTimetable(force){
     const to = ymd(endD);
 
     for(const sem of [semOf(start), semOf(start) === 1 ? 2 : 1]){
-      const q = `${svc}?Type=json&pIndex=1&pSize=300`
-        + (neisKey() ? '&KEY=' + encodeURIComponent(neisKey()) : '')
-        + `&ATPT_OFCDC_SC_CODE=${encodeURIComponent(s.office)}`
-        + `&SD_SCHUL_CODE=${encodeURIComponent(s.code)}`
-        + `&AY=${ayOf(start)}&SEM=${sem}`
-        + `&TI_FROM_YMD=${from.replace(/-/g,'')}&TI_TO_YMD=${to.replace(/-/g,'')}`
-        + `&GRADE=${encodeURIComponent(s.grade)}&CLASS_NM=${encodeURIComponent(s.cls)}`;
-      const r = await neisFetch(q);
+      const r = await neisApi('/timetable', {
+        office: s.office, school: s.code, grade: s.grade, class: s.cls,
+        from: from.replace(/-/g,''), to: to.replace(/-/g,''),
+        kind: s.kind || '', ay: ayOf(start), sem
+      }, { ttl: back === 0 ? 25*60*1000 : 12*3600000, timeout: 11000, force: !!force && back === 0 });
       if(r.err){
-        if(/인증키|한도/.test(r.err)) return { err: r.err };
+        if(r.limit) return { err: r.err, limit:true, table: (cache && cache.table) || null };
         lastErr = r.err; continue;
       }
-      const rows = neisRows(r.data, svc);
+      const rows = r.rows;
       if(!rows.length) continue;
 
       rows.forEach(x => {
@@ -2154,7 +2364,7 @@ async function neisTimetable(force){
   }
 
   const got = Object.keys(table);
-  if(!got.length) return { err: lastErr || '최근 8주 안에 등록된 시간표가 없습니다 (방학 기간일 수 있어요)' };
+  if(!got.length) return { err: lastErr || T('ttErrNone') };
   got.forEach(k => { table[k] = table[k].map(v => v || ''); });
 
   C.ttCache = { week: thisWeek, weekOf: newest || thisWeek, key, table, days: src, at: Date.now() };
@@ -2166,6 +2376,17 @@ async function neisTimetable(force){
 /* 학년도·학기 계산 — 3~8월 1학기, 9~2월 2학기 */
 function ayOf(d){ return (d.getMonth() + 1) >= 3 ? d.getFullYear() : d.getFullYear() - 1; }
 function semOf(d){ const m = d.getMonth() + 1; return (m >= 3 && m <= 8) ? 1 : 2; }
+
+
+/* 학교 검색 */
+async function neisSchools(name){
+  if(!apiReady()) return { err: T('ttErrNoServer') };
+  const r = await neisApi('/school', { q: name }, { ttl: 24*3600000, timeout: 10000 });
+  if(r.err) return { err: T('schFail') };
+  return { list: (r.rows || []).map(x => ({
+    code: x.SD_SCHUL_CODE, office: x.ATPT_OFCDC_SC_CODE,
+    name: x.SCHUL_NM, kind: x.SCHUL_KND_SC_NM, addr: x.ORG_RDNMA || '' })) };
+}
 
 
 /* ══════ js/drag.js ══════ */
@@ -2185,7 +2406,7 @@ function semOf(d){ const m = d.getMonth() + 1; return (m >= 3 && m <= 8) ? 1 : 2
      setPointerCapture 로 손가락이 카드 밖으로 나가도 끊기지 않는다. */
 
 const Drag = {
-  on:false, dragging:false, el:null, id:null, pid:null, timer:null,
+  on:false, dragging:false, el:null, id:null, pid:null, timer:null, _raf:0, _pt:null,
   startX:0, startY:0, base:null, preview:null, ghost:null, mark:null,
   selected:null, _lastSpot:null,
   LONG: 450, MOVE: 10,
@@ -2259,6 +2480,11 @@ const Drag = {
     this.preview = { ...this.base };
   },
 
+  /* 움직임 — 화면에 하는 일은 두 가지뿐이다.
+     ① 복제본을 손가락 위치로 옮긴다
+     ② 놓일 자리 표시를 그 칸으로 옮긴다
+     실제 카드들의 DOM 순서는 손을 뗄 때까지 한 번도 바꾸지 않는다.
+     (표시가 자리를 차지하므로 아래 카드들은 자연히 밀려 보인다) */
   move(e){
     if(!this.el) return;
     const dx = e.clientX - this.startX, dy = e.clientY - this.startY;
@@ -2273,16 +2499,30 @@ const Drag = {
       this.lift();
     }
     e.preventDefault();
-    this.ghost.style.transform = `translate(${dx}px, ${dy}px)`;
+    this._pt = { x:e.clientX, y:e.clientY, dx, dy };
+    if(this._raf) return;                       // 한 프레임에 한 번만 그린다
+    this._raf = requestAnimationFrame(() => {
+      this._raf = 0;
+      const pt = this._pt;
+      if(!pt || !this.dragging) return;
+      this.ghost.style.transform = `translate(${pt.dx}px, ${pt.dy}px)`;
 
-    const spot = this.spotAt(e.clientX, e.clientY);
-    if(!spot) return;
-    if(this._lastSpot && this._lastSpot.x === spot.x && this._lastSpot.y === spot.y) return;
-    this._lastSpot = spot;
+      const spot = this.spotAt(pt.x, pt.y);
+      if(!spot) return;
+      if(this._lastSpot && this._lastSpot.x === spot.x && this._lastSpot.y === spot.y) return;
+      this._lastSpot = spot;
+      this.moveMark(spot);
+    });
+  },
 
-    this.preview = Layout.place(this.base, this.id, spot.x, spot.y);
-    applyManual(document.getElementById('grid'), Cards.enabled(), this.preview);
-    if(this.el.parentNode) this.el.parentNode.insertBefore(this.mark, this.el);
+  /* 표시만 그 칸으로 옮긴다 (카드 DOM 은 그대로) */
+  moveMark(spot){
+    const cols = [...document.querySelectorAll('main > .col')];
+    const col = cols[spot.x];
+    if(!col) return;
+    const kids = [...col.children].filter(k => k !== this.mark);
+    if(spot.y >= kids.length) col.appendChild(this.mark);
+    else col.insertBefore(this.mark, kids[spot.y]);
   },
 
   spotAt(px, py){
@@ -2305,9 +2545,12 @@ const Drag = {
 
   up(){
     clearTimeout(this.timer);
+    if(this._raf){ cancelAnimationFrame(this._raf); this._raf = 0; }
     if(!this.dragging){ this.el = null; return; }
-    const map = this.preview || this.base;
+    /* 표시가 있는 자리를 최종 좌표로 삼는다 */
+    const spot = this.markSpot() || this._lastSpot;
     const id = this.id;
+    const map = spot ? Layout.place(this.base, id, spot.x, spot.y) : this.base;
     this.cleanup();
     Layout.set(map);
     applyManual(document.getElementById('grid'), Cards.enabled(), Layout.get());
@@ -2316,12 +2559,23 @@ const Drag = {
     paint(true);
   },
 
+  /* 지금 표시가 놓인 칸 */
+  markSpot(){
+    if(!this.mark || !this.mark.parentNode) return null;
+    const cols = [...document.querySelectorAll('main > .col')];
+    const x = cols.indexOf(this.mark.parentNode);
+    if(x < 0) return null;
+    const kids = [...this.mark.parentNode.children].filter(k => k !== this.el);
+    return { x, y: kids.indexOf(this.mark) };
+  },
+
   cancel(){
     clearTimeout(this.timer);
+    if(this._raf){ cancelAnimationFrame(this._raf); this._raf = 0; }
     if(this.dragging){
       const base = this.base;
       this.cleanup();
-      applyManual(document.getElementById('grid'), Cards.enabled(), base);
+      applyManual(document.getElementById('grid'), Cards.enabled(), base);   // 원래대로
     }
     this.el = null;
   },
@@ -2396,8 +2650,12 @@ const OpenLink = {
     const enc = encodeURIComponent;
     switch(id){
       case 'weather': {
-        const p = C.place || '';
-        return p ? `https://search.naver.com/search.naver?query=${enc(p + ' 날씨')}`
+        /* 카드에 보이는 곳과 똑같은 위치로 연다 */
+        const L = (typeof Geo !== 'undefined') ? Geo.get() : { name: C.place };
+        const q = (L.sido && L.sigungu)
+          ? [L.sido, L.sigungu, L.dong].filter(Boolean).join(' ')
+          : (L.name || '');
+        return q ? `https://search.naver.com/search.naver?query=${enc(q + ' 날씨')}`
                  : 'https://weather.naver.com/';
       }
       case 'baseball': {
@@ -2428,7 +2686,8 @@ const OpenLink = {
       const u = this.url(c.id);
       const old = el.querySelector('.card-open');
       if(!u){ if(old) old.remove(); return; }
-      if(old) return;
+      /* 이미 있으면 주소만 최신으로 맞춘다 (위치가 바뀌면 링크도 따라가야 한다) */
+      if(old){ if(old.getAttribute('href') !== u) old.setAttribute('href', u); return; }
       const a = document.createElement('a');
       a.className = 'card-open';
       a.href = u; a.target = '_blank'; a.rel = 'noopener';
@@ -2499,22 +2758,34 @@ function wetRanges(hs){
 
 async function loadWeather(force){
   const c = C.wx;
-  if(c && !force && c.date === today() && Date.now() - c.at < 20*60*1000) return paint();
+  if(c && !force && c.date === today() && Date.now() - c.at < 20*60*1000) return paintCard('weather');
+  /* 새로고침 연타 막기 */
+  if(force && Net.tooSoon('wx', 4000)) return paintCard('weather');
   try{
     /* 한반도 안이면 기상청 모델을 쓴다 (Open-Meteo가 KMA 예보를 그대로 제공) */
-    const inKR = C.lat > 33 && C.lat < 39.5 && C.lon > 124 && C.lon < 132;
+    const L = Geo.get();
+    const inKR = L.lat > 33 && L.lat < 39.5 && L.lon > 124 && L.lon < 132;
     const model = inKR ? '&models=kma_seamless' : '';
-    const u1 = `https://api.open-meteo.com/v1/forecast?latitude=${C.lat}&longitude=${C.lon}`
+    const u1 = `https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}`
       + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code`
       + `&hourly=temperature_2m,weather_code,precipitation_probability`
       + `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,uv_index_max,sunrise,sunset`
       + `&timezone=Asia%2FSeoul&forecast_days=7` + model;
-    const u2 = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${C.lat}&longitude=${C.lon}`
+    const u2 = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${L.lat}&longitude=${L.lon}`
       + `&current=pm10,pm2_5&timezone=Asia%2FSeoul`;
-    let j = await (await fetch(u1)).json();
-    /* 기상청 모델에 값이 비면 기본 모델로 한 번 더 */
-    if(model && (!j || !j.daily || j.daily.temperature_2m_max[0] == null))
-      j = await (await fetch(u1.replace(model, ''))).json();
+    /* 위치별로 저장·중복 방지 (같은 곳을 여러 번 부르지 않는다) */
+    const key = `wx:${L.lat.toFixed(3)}:${L.lon.toFixed(3)}`;
+    const r = await Net.get(key, async signal => {
+      let d = await (await fetch(u1, { signal })).json();
+      if(model && (!d || !d.daily || d.daily.temperature_2m_max[0] == null))
+        d = await (await fetch(u1.replace(model, ''), { signal })).json();
+      if(!d || !d.daily) throw new Error('형식 오류');
+      return d;
+    }, { ttl: 20*60*1000, timeout: 9000, force: !!force });
+    const j = r.data;
+    if(!j) throw (r.err || new Error('불러오지 못함'));
+    /* 받아온 값이 오래된 것이면 그 시각을 카드에 알려 준다 */
+    const staleAt = r.fresh ? 0 : r.at;
     const build = di => {
       const base = di*24, startH = di===0 ? now.getHours()+1 : 8, step = di===0 ? 2 : 3;
       const hourly = [];
@@ -2537,7 +2808,7 @@ async function loadWeather(force){
         rain: j.daily.precipitation_probability_max[di], uv: Math.round(j.daily.uv_index_max[di]),
         sunrise: (j.daily.sunrise[di]||'').slice(11), sunset: (j.daily.sunset[di]||'').slice(11) };
     };
-    C.wx = { date: today(), at: Date.now(), live:true, model: !!model,
+    C.wx = { date: today(), at: Date.now(), live:true, model: !!model, staleAt,
              today: build(0), tomorrow: build(1), days:{} };
     /* 날짜별 예보를 담아 달력에서 고른 날의 날씨를 보여준다 */
     const dayList = (j.daily && j.daily.time) || [];
@@ -2552,7 +2823,9 @@ async function loadWeather(force){
       };
     }
     try{
-      const a = await (await fetch(u2)).json();
+      const a = (await Net.get(`air:${L.lat.toFixed(2)}:${L.lon.toFixed(2)}`,
+      async signal => (await (await fetch(u2, { signal })).json()),
+      { ttl: 30*60*1000, timeout: 7000, force: !!force })).data || {};
       const p10 = a && a.current ? a.current.pm10 : null;
       const p25 = a && a.current ? a.current.pm2_5 : null;
       C.wx.air = {
@@ -2601,7 +2874,7 @@ Cards.register({
     const md = sel.slice(5).replace(/^0/,'').replace('-','월 ').replace(/-0?/,'') + '일';
     const tmr = ymd(new Date(now.getTime() + 86400000));
     const when = isToday ? T('today') : (sel === tmr ? T('tomorrow') : md);
-    setText(el.querySelector('#wxLab'), (C.place || T('wxPlace')) + ' · ' + when);
+    setText(el.querySelector('#wxLab'), (Geo.get().name || T('wxPlace')) + ' · ' + when);
 
     if(!isToday && !dayData){
       setHidden(el.querySelector('.wx-main'), true);
@@ -3059,8 +3332,11 @@ function toLocal(ev){
 }
 
 async function sdbFetch(path){
-  const key = (C.sdbKey || '123').trim();
-  const url = `https://www.thesportsdb.com/api/v1/json/${encodeURIComponent(key)}/${path}`;
+  /* 서버가 있으면 서버를 거친다 (키가 서버에만 있어 사용자끼리 한도를 나누지 않는다)
+     서버가 아직 없으면 예전처럼 공용 시험 키로 직접 부른다 */
+  const url = (typeof apiReady === 'function' && apiReady())
+    ? `${API_BASE}/sports?path=${encodeURIComponent(path)}`
+    : `https://www.thesportsdb.com/api/v1/json/${encodeURIComponent((C.sdbKey || '123').trim())}/${path}`;
   const ac = new AbortController(); const to = setTimeout(() => ac.abort(), 12000);
   try{ const r = await fetch(url, { signal: ac.signal }); clearTimeout(to);
        if(!r.ok) throw new Error('HTTP '+r.status);
@@ -3077,10 +3353,15 @@ async function loadGames(force){
   const push = arr => (arr||[]).forEach(e => list.push(e));
   try{
     /* 시즌 전체를 받아 두면 경기 누락과 최근 전적 부족이 함께 해결된다 */
+    /* 시즌 자료는 하루, 다음·최근 경기는 세 시간 단위로 저장 */
     const [se, nx, lt] = await Promise.all([
-      sdbFetch(`eventsseason.php?id=${KBO_LEAGUE}&s=${now.getFullYear()}`).catch(() => null),
-      sdbFetch('eventsnext.php?id=' + C.teamId).catch(() => null),
-      sdbFetch('eventslast.php?id=' + C.teamId).catch(() => null)
+      Net.get(`kbo:season:${now.getFullYear()}`,
+        () => sdbFetch(`eventsseason.php?id=${KBO_LEAGUE}&s=${now.getFullYear()}`),
+        { ttl: 12*3600000, timeout: 9000, force: !!force }).then(r => r.data).catch(() => null),
+      Net.get(`kbo:next:${C.teamId}`, () => sdbFetch('eventsnext.php?id=' + C.teamId),
+        { ttl: 3*3600000, timeout: 8000, force: !!force }).then(r => r.data).catch(() => null),
+      Net.get(`kbo:last:${C.teamId}`, () => sdbFetch('eventslast.php?id=' + C.teamId),
+        { ttl: 3*3600000, timeout: 8000, force: !!force }).then(r => r.data).catch(() => null)
     ]);
     if(se) (se.events || []).forEach(e => {
       if(e.idHomeTeam === C.teamId || e.idAwayTeam === C.teamId) list.push(e);
@@ -3213,6 +3494,7 @@ const NEWS_SOURCES = [
   { n:'jina',       f: u => 'https://r.jina.ai/' + u }
 ];
 let NEWS_ERR = '';
+let NEWS_FORCE = false;
 
 function splitTitle(raw){
   const m = String(raw||'').match(/^(.*?)\s+-\s+([^-]+)$/);
@@ -3220,6 +3502,32 @@ function splitTitle(raw){
 }
 
 async function rssFirst(url){
+  /* 같은 주소는 한 번만 — 새로고침을 여러 번 눌러도 요청은 하나 */
+  return (await Net.get('rss:' + url, () => rssFetch(url),
+    { ttl: 30*60*1000, timeout: 12000, force: NEWS_FORCE })).data;
+}
+async function rssFetch(url){
+  /* 서버가 있으면 서버가 RSS 를 JSON 으로 바꿔 준다 — 공개 프록시가 필요 없다 */
+  if(typeof apiReady === 'function' && apiReady()){
+    const ac = new AbortController();
+    const to = setTimeout(() => ac.abort(), 11000);
+    try{
+      const r = await fetch(`${API_BASE}/news?url=${encodeURIComponent(url)}`, { signal: ac.signal });
+      clearTimeout(to);
+      const j = await r.json();
+      const it = j && j.items && j.items[0];
+      if(it && it.title){
+        const t = splitTitle(it.title);
+        return { text: t.text, src: t.src, url: it.link || '' };
+      }
+      NEWS_ERR = (j && j.error) || '뉴스 없음';
+      return null;
+    }catch(e){ clearTimeout(to); NEWS_ERR = '서버 연결 실패'; return null; }
+  }
+  return rssViaProxy(url);
+}
+
+async function rssViaProxy(url){
   const errs = [];
   for(const p of NEWS_SOURCES){
     const ac = new AbortController();
@@ -3258,6 +3566,8 @@ async function rssFirst(url){
   return null;
 }
 async function loadNews(force){
+  NEWS_FORCE = !!force;
+  if(force && Net.tooSoon('news', 5000)) return paintCard('news');
   if(!Cards.isOn('news')) return;
   if(!force && C.news && Date.now() - (C.newsAt||0) < 2*3600000) return;
   const picks = (C.newsTopics && C.newsTopics.length ? C.newsTopics : ['NATION','WORLD','SCIENCE'])
@@ -4106,27 +4416,25 @@ const OB = {
       const r = e.target.closest('[data-lat]'); if(!r) return;
       res.querySelectorAll('.result').forEach(x => x.setAttribute('aria-selected','false'));
       r.setAttribute('aria-selected','true');
-      C.place = r.dataset.nm; C.lat = +r.dataset.lat; C.lon = +r.dataset.lon;
-      C.wx = null; save();
+      Geo.set({ lat:+r.dataset.lat, lon:+r.dataset.lon,
+        name: r.dataset.nm, sido:'', sigungu:'', dong:'', src:'search' });
     });
     if(btn) btn.addEventListener('click', () => {
-      if(!navigator.geolocation) return;
       btn.classList.add('busy');
-      const ok = p => {
-        this.myPos = [p.coords.latitude, p.coords.longitude];
-        C.lat = +p.coords.latitude.toFixed(4); C.lon = +p.coords.longitude.toFixed(4);
-        C.wx = null; save();
+      Geo.locate((state, loc) => {
+        if(state === 'ing') return;
         btn.classList.remove('busy');
-        setHTML(res, `<div class="result" aria-selected="true"><span class="r-main">현재 위치</span>
-          <span class="r-sub">${C.lat}, ${C.lon}</span>
+        if(state !== 'ok'){
+          setHTML(res, `<div class="result"><span class="r-main">${
+            state === 'denied' ? T('locDenied') : T('locFail')}</span></div>`);
+          return;
+        }
+        this.myPos = [loc.lat, loc.lon];
+        setHTML(res, `<div class="result" aria-selected="true"><span class="r-main">${esc(loc.name)}</span>
+          <span class="r-sub">${loc.lat.toFixed(4)}, ${loc.lon.toFixed(4)}</span>
           <svg class="r-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></div>`);
-      };
-      navigator.geolocation.getCurrentPosition(ok,
-        () => navigator.geolocation.getCurrentPosition(ok,
-          () => { btn.classList.remove('busy'); },
-          { enableHighAccuracy:true, timeout:30000, maximumAge:3600000 }),
-        { enableHighAccuracy:false, timeout:15000, maximumAge:3600000 });
+      });
     });
   },
 
@@ -4415,10 +4723,25 @@ function bindLiveSave(){
   document.querySelectorAll('#setBody [data-k]').forEach(inp => {
     if(inp.dataset.live) return;
     inp.dataset.live = '1';
-    inp.addEventListener('change', () => {
+    inp.addEventListener('change', async () => {
+      const k = inp.dataset.k;
       saveSettingsInputs();
+      /* 좌표를 직접 고쳤으면 그 자리의 이름도 다시 찾는다
+         (좌표와 이름이 어긋나지 않게) */
+      if(k === 'lat' || k === 'lon'){
+        Geo.set({ lat: +C.lat, lon: +C.lon, src:'manual' });
+        try{
+          const nm = await Geo.name(+C.lat, +C.lon);
+          if(nm){
+            Geo.set(nm);
+            const pn = document.querySelector('#setBody [data-k="place"]');
+            if(pn) pn.value = nm.name;
+          }
+        }catch(e){}
+        loadWeather(true);
+      }
+      if(k === 'place'){ Geo.set({ name: inp.value, src:'manual' }); }
       paintHeader();
-      /* 설정 화면 자체는 다시 만들지 않는다 (입력 포커스·스크롤 보존) */
       paint(true);
     });
   });
@@ -4520,6 +4843,7 @@ function renderSettings(){
       <div id="ttSetting" ${Cards.isOn('timetable')?'':'hidden'}>
         <h3 class="sectitle" style="margin-top:26px">${T('stTtTitle')}</h3>
         <p class="sechelp">${T('stTtHint')}</p>
+        ${apiReady() ? '' : `<p class="sechelp" style="color:var(--amber)">${T('stTtNoServer')}</p>`}
         <div class="segbar" id="ttMode">
           <button class="${C.school&&C.school.code?'on':''}" data-tt="auto">${T('stTtAuto')}</button>
           <button class="${C.school&&C.school.code?'':'on'}" data-tt="manual">${T('stTtManual')}</button>
@@ -4533,9 +4857,7 @@ function renderSettings(){
             <div class="fld"><label>${T('stTtGrade')}</label><input data-k="__grade" id="ttGrade" type="number" min="1" max="6" value="${(C.school&&C.school.grade)||''}"></div>
             <div class="fld"><label>${T('stTtClass')}</label><input data-k="__cls" id="ttCls" type="number" min="1" max="20" value="${(C.school&&C.school.cls)||''}"></div>
           </div>
-          <div class="fld"><label>${T('stTtKey')}</label>
-            <input id="ttKey" value="${esc(C.neisKey||'')}" placeholder="${T('stTtKeyPh')}">
-            <span class="hint">${T('stTtKeyHint')}</span></div>
+          
           <button class="btn primary" id="ttFetch">${T('stTtFetch')}</button>
           <div class="lk-msg" id="ttMsg"></div>
         </div>
@@ -4558,9 +4880,9 @@ function renderSettings(){
             <option value="">${T('stBbNone')}</option>
             ${KBO_TEAMS.map(t => `<option value="${t.id}"${C.teamId===t.id?' selected':''}>${t.kr}</option>`).join('')}
           </select></div>
-        <div class="fld"><label>${T('stBbKey')}</label>
+        ${apiReady() ? '' : `<div class="fld"><label>${T('stBbKey')}</label>
           <input data-k="sdbKey" value="${esc(C.sdbKey)}" placeholder="${T('stBbKeyPh')}">
-          <span class="hint">${T('stBbKeyHint')}</span></div>
+          <span class="hint">${T('stBbKeyHint')}</span></div>`}
         <p class="sechelp">${T('stBbSource')}</p>
       </div>`);
     /* 꺼진 카드 구역은 흐리게 두고, 누르면 안내 */
@@ -4629,10 +4951,11 @@ function renderSettings(){
         tq = setTimeout(async () => {
           const r = await neisSchools(v);
           if(r.err){ setHTML(res, `<span class="hint">${esc(r.err)}</span>`); return; }
+          if(!r.list){ setHTML(res, `<span class="hint">${T('schFail')}</span>`); return; }
           setHTML(res, r.list.length ? r.list.map(s =>
             `<button data-code="${esc(s.code)}" data-office="${esc(s.office)}" data-nm="${esc(s.name)}" data-kind="${esc(s.kind)}">
               <b>${esc(s.name)}</b><span class="tiny">${esc(s.addr)} · ${esc(s.kind)}</span></button>`).join('')
-            : '<span class="hint">검색 결과가 없습니다.</span>');
+            : `<span class="hint">${T('schNone')}</span>`);
         }, 400);
       });
       const _ttRes = B.querySelector('#ttRes');
@@ -4652,7 +4975,6 @@ function renderSettings(){
       const msg = B.querySelector('#ttMsg');
       const g = B.querySelector('#ttGrade').value.trim();
       const cl = B.querySelector('#ttCls').value.trim();
-      C.neisKey = B.querySelector('#ttKey').value.trim();
       if(!C.school || !C.school.code){ setText(msg, '학교를 먼저 골라 주세요.'); msg.className='lk-msg err'; return; }
       if(!g || !cl){ setText(msg, '학년과 반을 넣어 주세요.'); msg.className='lk-msg err'; return; }
       C.school = Object.assign({}, C.school, { grade:g, cls:cl });
@@ -4863,8 +5185,14 @@ function renderSettings(){
       r.onload = () => { try{ C = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), JSON.parse(r.result)); save(); location.reload(); }catch(err){ alert('파일을 읽지 못했습니다.'); } };
       r.readAsText(f);
     };
-    $('rstBtn').onclick = () => {
+    $('rstBtn').onclick = async () => {
       if(!confirm(T('stResetAsk'))) return;
+      /* 동기화를 쓰고 있었다면 서버 자료도 지운다 */
+      let cloudFail = false;
+      if(C.sync && C.sync.on && C.sync.uid){
+        try{ await syncWipe(); }catch(e){ cloudFail = true; }
+      }
+      if(cloudFail) alert(T('stResetPartial'));
       C = JSON.parse(JSON.stringify(DEFAULTS)); save(); location.reload();
     };
   }
@@ -4939,31 +5267,36 @@ function bindGeo(root){
 
   res.onclick = e => {
     const btn = e.target.closest('[data-lat]'); if(!btn) return;
-    C.place = btn.dataset.nm; C.lat = +btn.dataset.lat; C.lon = +btn.dataset.lon;
-    C.wx = null; save();
-    const p = R.querySelector('#obPlace'); if(p) setText(p, C.place);
+    /* 검색으로 고른 곳도 같은 상태에 넣는다 */
+    const loc = Geo.set({ lat:+btn.dataset.lat, lon:+btn.dataset.lon,
+      name: btn.dataset.nm, sido:'', sigungu:'', dong:'', src:'search' });
+    const p = R.querySelector('#obPlace'); if(p) setText(p, loc.name);
     if($('setBody') && $('setBody').contains(res)) renderSettings();
-    else { setHTML(res, `<span class="hint">선택: <b>${esc(C.place)}</b></span>`); }
+    else { setHTML(res, `<span class="hint">${esc(loc.name)}</span>`); }
     loadWeather(true);
+    paintCard('weather');
   };
 
   const gb = R.querySelector('#geoBtn');
   if(gb) gb.onclick = () => {
-    if(!navigator.geolocation) return alert('이 기기에서는 위치를 쓸 수 없어요.');
-    setText(gb, '찾는 중…');
-    const ok = p => {
-      myPos = [p.coords.latitude, p.coords.longitude];
-      C.lat = +p.coords.latitude.toFixed(4); C.lon = +p.coords.longitude.toFixed(4);
-      C.wx = null; save();
-      setText(gb, '현재 위치로 맞췄어요');
-      const pl = R.querySelector('#obPlace'); if(pl) setText(pl, C.place || '현재 위치');
+    /* 위치는 Geo 한 곳에서 정한다. 좌표와 이름이 항상 함께 바뀐다. */
+    Geo.locate((state, loc) => {
+      if(state === 'ing'){ setText(gb, T('locFinding')); return; }
+      if(state === 'denied'){ setText(gb, T('locDenied')); return; }
+      if(state === 'fail'){
+        setText(gb, T('locFail') + (Geo.get().name ? ' · ' + T('locKeep') : ''));
+        return;
+      }
+      /* 찾음 — 화면의 이름과 좌표칸을 함께 맞춘다 */
+      myPos = [loc.lat, loc.lon];
+      setText(gb, T('locDone') + (loc.name ? ' · ' + loc.name : ''));
+      const pl = R.querySelector('#obPlace'); if(pl) setText(pl, loc.name);
+      const nm = R.querySelector('[data-k="place"]'); if(nm) nm.value = loc.name;
+      const la = R.querySelector('[data-k="lat"]'); if(la) la.value = loc.lat;
+      const lo = R.querySelector('[data-k="lon"]'); if(lo) lo.value = loc.lon;
       loadWeather(true);
-    };
-    navigator.geolocation.getCurrentPosition(ok,
-      () => navigator.geolocation.getCurrentPosition(ok,
-        () => { setText(gb, '위치를 찾지 못했어요 · 다시 시도'); },
-        { enableHighAccuracy:true, timeout:30000, maximumAge:3600000 }),
-      { enableHighAccuracy:false, timeout:15000, maximumAge:3600000 });
+      paintCard('weather');
+    });
   };
 }
 
@@ -5092,6 +5425,28 @@ async function handleJoinLink(){
   return true;
 }
 
+/* 저장 구조가 바뀌어도 기존 자료를 잃지 않게 한 단계씩 옮긴다 */
+function migrateSchema(){
+  /* 판번호가 없던 시절 자료는 1 로 본다 */
+  const v = C.schemaVersion || 1;
+  if(v < 2){
+    /* 1 → 2 : 배치가 cardOrder + cardCol 두 곳에 나뉘어 있던 것을 layout 하나로 */
+    if(C.layoutMode === 'manual' && (!C.layout || !Object.keys(C.layout).length)){
+      const map = {};
+      const order = (C.cardOrder && C.cardOrder.length) ? C.cardOrder : Cards.list.map(c => c.id);
+      const per = {};
+      order.forEach(id => {
+        const x = (C.cardCol && C.cardCol[id] != null) ? +C.cardCol[id] : 0;
+        per[x] = per[x] || 0;
+        map[id] = { x, y: per[x]++, w:1 };
+      });
+      C.layout = map;
+    }
+    C.schemaVersion = 2;
+    save();
+  }
+}
+
 async function boot(){
   const saved = await Store.load();
   if(saved) C = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), saved);
@@ -5129,6 +5484,7 @@ async function boot(){
   }, true);
   document.addEventListener('submit', e => e.preventDefault(), true);
 
+  migrateSchema();      // 카드 목록이 준비된 뒤에 배치 구조를 옮긴다
   fit(); build(); paint();
   Drag.init();
   loadWeather(false);

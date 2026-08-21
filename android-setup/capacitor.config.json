@@ -1,0 +1,24 @@
+{
+  "appId": "io.github.feelrun.briefing",
+  "appName": "Briefing",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#0B0E18"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 600,
+      "backgroundColor": "#0B0E18",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_briefing",
+      "iconColor": "#7FE7C4"
+    },
+    "Keyboard": {
+      "resize": "none"
+    }
+  }
+}

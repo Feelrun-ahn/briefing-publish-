@@ -1,87 +1,62 @@
-# Briefing (가칭)
-
-앱 `https://feelrun-ahn.github.io/briefing-publish-/` ·
-관리자 `.../admin.html` · 방침 `.../privacy.html` · 문의 `feelrun@kakao.com`
-
-## 업로드 파일 (11개)
-index.html · app.css · onboard.css · app.js · manifest.json · sw.js ·
-admin.html · privacy.html · icon-192/512/maskable-512.png
-
----
-
-# 타일 배치 (v34에서 전면 개편)
-
-## 배치 상태는 한 곳에서만 — `js/layout.js`
-
-```js
-C.layout = { weather: { x:1, y:0, w:1 }, ... }
-C.layoutMode = 'auto' | 'manual'
-```
-
-- `x` 열 번호, `y` 그 열 안의 순서, `w` 는 항상 1
-- **높이·너비는 저장하지 않습니다.** 높이를 고정하면 내용이 잘리고,
-  너비를 여러 열로 늘리면 열마다 높이가 다른 이 구조에서 카드가 겹칩니다
-- 화면이 좁아 열이 줄면 `x` 를 그 범위로 접습니다 (폰 1열 ↔ 태블릿 3열 호환)
-
-예전에는 `cardOrder`(순서)와 `cardCol`(열)로 **나뉘어 있었고**,
-드래그는 DOM 을 직접 옮긴 뒤 DOM 에서 위치를 역산해 저장했습니다.
-그래서 다시 그릴 때마다 값이 어긋났습니다. 지금은 그 둘을 쓰지 않습니다.
-
-## 자동과 수동을 완전히 분리 — `js/core.js`
+# Briefing (v41) — 서버 연결 완료
 
 | | |
 |---|---|
-| `buildAuto()` | 열마다 높이를 맞춰 채움 (예전 방식) |
-| `buildManual()` | 저장된 x·y 그대로 |
-| `applyManual()` | 카드를 다시 만들지 않고 자리만 옮김 |
+| 앱 | `https://feelrun-ahn.github.io/briefing-publish-/` |
+| **서버** | **`https://briefing-api.feelrun.workers.dev`** |
+| 상태 보기 | `.../admin?key=내가정한비밀번호` |
+| 문의 | `feelrun@kakao.com` |
 
-**수동 모드에서는 `rebalance()`와 `fitStage()`의 자동 재배치가 실행되지 않습니다.**
-(자동 배치가 사용자가 정한 자리를 덮어쓰던 것이 예전 불안정의 핵심 원인)
+## 이번 판에서 바뀐 것
 
-## 편집 흐름 — `js/drag.js`
+`js/neis.js` 의 `API_BASE` 에 서버 주소를 넣었습니다. **이 한 줄이 전부입니다.**
 
-```
-평소 → 카드 길게 누르기(0.45초) → 편집 모드(흔들림)
-     → 끌기 → 놓일 자리 미리보기 → 손 떼면 확정·저장 → 완료
-```
-
-- 평소에는 드래그가 **없습니다.** 클릭·스크롤·입력을 방해하지 않습니다
-- 버튼·입력칸 위에서는 길게 눌러도 편집으로 가지 않습니다
-- 편집 전 손가락이 10px 이상 움직이면 스크롤로 봅니다
-- 포인터 이벤트 하나로 마우스·터치·펜 처리, `setPointerCapture` 로
-  손가락이 카드 밖으로 나가도 끊기지 않습니다
-- 편집 모드 카드에 `touch-action:none` — 브라우저 스크롤과 충돌하지 않습니다
-- `pointercancel` 에서 원래 배치로 되돌립니다
-
-## 드래그 중에는 저장하지 않습니다
-
-```
-pointerdown → base = 지금 배치 (기준)
-pointermove → preview = Layout.place(base, id, x, y)  ← 화면만
-pointerup   → Layout.set(preview)                     ← 여기서 한 번만 저장
+```js
+let API_BASE = 'https://briefing-api.feelrun.workers.dev';
 ```
 
-`Layout.place()` 는 열 안의 순서를 다시 세워 넣으므로 **겹침이 구조적으로 불가능**합니다.
+이제 이렇게 동작합니다.
 
-## 크기 변경은 넣지 않았습니다
+| | 어디를 거치나 |
+|---|---|
+| 시간표 · 학교 검색 | **서버** (인증키가 서버에만 있음) |
+| 야구 | **서버** (사용자끼리 한도를 나누지 않음) |
+| 뉴스 | **서버** (공개 프록시를 쓰지 않음) |
+| 날씨 | 앱에서 직접 (부하가 분산되어 이쪽이 안전) |
 
-열마다 높이가 다른 이 구조(잘림 없는 배치)에서 카드를 2~3열로 넓히면
-아래 카드와 겹쳐 클릭이 막힙니다. 실제로 구현해 보고 확인했습니다.
-크기 변경을 넣으려면 격자 전체를 고정 행 높이로 바꿔야 하는데,
-그러면 내용이 잘립니다. 잘리지 않는 쪽을 택했습니다.
+## 올린 뒤 확인할 것
 
----
+1. 설정 → 카드 구성에서 **시간표** 켜기
+2. 설정 → 카드 설정 → 시간표 → **학교 연결**
+3. `목운중` 검색 → 목운중학교 선택 → 학년 `3`, 반 `15`
+4. **시간표 가져오기**
 
-## 렌더링 (`js/render.js`)
-`setHTML`/`setText`/`setValue`/`setHidden` — 값이 같으면 DOM 을 건드리지 않습니다.
-`paintTick`(매초·시계만) / `paintCard`(카드 하나) / `paint`(전체 재계산).
+시간표가 뜨면 서버가 제대로 붙은 것입니다.
 
-## 그 밖의 규칙
-- body 에 `overflow-x:hidden` 금지 (세로 스크롤이 막힘)
-- 목록 `max-height` · `line-clamp` 금지
-- 새 문구는 4개 언어 모두에
+## 서버 상태 보기
 
-## 남은 작업
-- [ ] 나이스 인증키 · Firebase 설정 · 패키지 ID
-- [ ] Capacitor 패키징 · Cloudflare Workers 중계
+```
+https://briefing-api.feelrun.workers.dev/admin?key=비밀번호
+```
+
+오늘 나이스 호출 수, 캐시로 아낀 비율, 막은 요청 수를 볼 수 있습니다.
+나중에 나이스에 증설을 요청할 때 이 숫자가 근거가 됩니다.
+
+## 다음에 할 것
+
+- [ ] 급식 카드 (`/meal` 추가 + 카드 하나) — 시간표 확인되면 바로
+- [ ] Capacitor 패키징 (`android-setup/`)
+- [ ] 알림을 Capacitor Local Notifications 로
+- [ ] Firebase 충돌 처리 (`updatedAt` 비교)
 - [ ] 폐쇄 테스트 12명 × 14일
+
+## 절대 어기면 안 되는 규칙
+
+- 위치는 `Geo.set()` 으로만 바꿀 것
+- `innerHTML =` 대신 `setHTML()`
+- body 에 `overflow-x:hidden` 금지
+- 목록 `max-height` · `line-clamp` 금지
+- 1초 주기에서 `paint()` 금지 → `paintTick()`
+- 수동 배치일 때 자동 재배치 금지
+- 오류 문구에 추측을 넣지 말 것
+- 새 문구는 4개 언어 모두에
