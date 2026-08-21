@@ -19,6 +19,9 @@
 
 const NEIS = 'https://open.neis.go.kr/hub';
 
+/* 캐시 판번호 — 조회 방식이 바뀌면 올린다. 옛 캐시를 자연히 버리게 된다. */
+const CACHE_V = 'v2';
+
 /* 지금 진행 중인 요청 — 같은 키는 하나로 묶는다 */
 const inflight = new Map();
 
@@ -142,6 +145,26 @@ export default {
       }), ctx, ttl));
     }
 
+    /* 급식 — /meal?office=B10&school=7081492&from=20260821&to=20260821
+       급식은 학교 전체가 같아서 캐시가 아주 잘 듣는다.
+       같은 학교 학생이 100명이어도 나이스에는 하루 한 번이면 된다. */
+    if (url.pathname === '/meal') {
+      const p = url.searchParams;
+      for (const k of ['office', 'school', 'from']) if (!p.get(k))
+        return cors(json({ error: `${k} 없음` }, 400));
+      const from = p.get('from'), to = p.get('to') || from;
+      const key = `meal:${p.get('office')}:${p.get('school')}:${from}:${to}`;
+      /* 오늘 것은 30분, 지난 날짜는 하루 저장 */
+      const ttl = isPastDay(to) ? 86400 : 1800;
+      return cors(await dedup(key, () => callNeis(env, 'mealServiceDietInfo', {
+        ATPT_OFCDC_SC_CODE: p.get('office'),
+        SD_SCHUL_CODE: p.get('school'),
+        MLSV_FROM_YMD: from,
+        MLSV_TO_YMD: to,
+        pSize: '50'
+      }), ctx, ttl));
+    }
+
     /* 야구 — /sports?path=eventsnext.php%3Fid%3D139825
        키가 서버에만 있으므로 사용자끼리 한도를 나눠 쓰지 않는다 */
     if (url.pathname === '/sports') {
@@ -192,7 +215,7 @@ export default {
 /* ── 같은 요청 묶기 + 캐시 ── */
 async function dedup(key, run, ctx, ttl) {
   const cache = caches.default;
-  const cacheKey = new Request('https://cache.local/' + encodeURIComponent(key));
+  const cacheKey = new Request('https://cache.local/' + CACHE_V + '/' + encodeURIComponent(key));
 
   const hit = await cache.match(cacheKey);
   if (hit) { bump('cacheHit'); return hit; }
@@ -262,6 +285,12 @@ function svcOf(kind) {
   if (kind.includes('초')) return 'elsTimetable';
   if (kind.includes('고')) return 'hisTimetable';
   return 'misTimetable';
+}
+
+/* 지나간 날짜인가 (오늘보다 이전) */
+function isPastDay(ymd) {
+  const t = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10).replace(/-/g,'');
+  return ymd < t;
 }
 
 function isThisWeek(ymd) {

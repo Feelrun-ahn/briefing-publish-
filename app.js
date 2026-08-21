@@ -189,7 +189,8 @@ const I18N = {
 };
 /* 카드 이름·설명 번역 (없으면 한국어) */
 const CARD_I18N = {
-  en:{ clock:['Clock · Date','Time, date and upcoming D-days'],
+  en:{ meal:['School meal','Cafeteria menu for the day'],
+       clock:['Clock · Date','Time, date and upcoming D-days'],
        weather:['Weather','Temperature, air quality, hourly and tomorrow'],
        calendar:['Calendar','Month view with events, exams and D-days'],
        todo:['To-do','Today and tomorrow, separately'],
@@ -204,7 +205,7 @@ const CARD_I18N = {
        timetable:['Timetable','Shows only today\u2019s classes'],
        countdown:['Big D-day','The nearest D-day, large'],
        whitenoise:['Sleep sounds','White noise, rain and waves with a timer'] },
-  ja:{ clock:['時計・日付','時刻と直近のDデー'], weather:['天気','気温・大気質・時間別・明日'],
+  ja:{ meal:['給食','その日の給食献立'], clock:['時計・日付','時刻と直近のDデー'], weather:['天気','気温・大気質・時間別・明日'],
        calendar:['カレンダー','予定・課題・Dデー'], todo:['やること','今日と明日を分けて'],
        exam:['課題','カレンダーの課題をまとめて'], baseball:['野球','応援チームの試合と結果'],
        news:['ニュース','分野ごとに1本'], fortune:['今日の運勢','生年月日から四柱推命（娯楽用）'],
@@ -212,7 +213,7 @@ const CARD_I18N = {
        habit:['毎日の習慣','チェックと連続日数'], water:['水を飲む','1日の目標杯数'],
        timetable:['時間割','今日の分だけ表示'], countdown:['大きなDデー','一番近いDデーを大きく'],
        whitenoise:['睡眠サウンド','ホワイトノイズ・雨・波'] },
-  zh:{ clock:['时钟 · 日期','时间、日期与最近的倒数日'], weather:['天气','气温、空气质量、逐时与明天'],
+  zh:{ meal:['营养午餐','当天的供餐菜单'], clock:['时钟 · 日期','时间、日期与最近的倒数日'], weather:['天气','气温、空气质量、逐时与明天'],
        calendar:['日历','日程、作业与倒数日'], todo:['待办','今天与明天分开'],
        exam:['作业提醒','汇总日历中的作业'], baseball:['棒球','球队今日比赛与近期战绩'],
        news:['新闻简报','每个分类一条'], fortune:['今日运势','根据生日的四柱推算（娱乐向）'],
@@ -750,6 +751,8 @@ const I18N3 = {"ko": {"tagStudent": "학생", "tagSport": "스포츠", "colGreen
 (function(){ const D={"ko": {"ttErrNoSchool": "학교·학년·반을 먼저 설정해 주세요", "ttErrNoServer": "시간표를 불러올 수 없습니다", "ttErrNone": "시간표를 찾지 못했습니다", "ttErrFail": "오류가 발생했습니다", "schNone": "검색되지 않습니다", "schFail": "오류가 발생했습니다"}, "en": {"ttErrNoSchool": "Set your school, grade and class first", "ttErrNoServer": "Could not load the timetable", "ttErrNone": "No timetable found", "ttErrFail": "Something went wrong", "schNone": "No results", "schFail": "Something went wrong"}, "ja": {"ttErrNoSchool": "学校・学年・組を先に設定してください", "ttErrNoServer": "時間割を読み込めません", "ttErrNone": "時間割が見つかりません", "ttErrFail": "エラーが発生しました", "schNone": "見つかりません", "schFail": "エラーが発生しました"}, "zh": {"ttErrNoSchool": "请先设置学校、年级和班级", "ttErrNoServer": "无法加载课表", "ttErrNone": "未找到课表", "ttErrFail": "发生错误", "schNone": "未找到结果", "schFail": "发生错误"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
 
 (function(){ const D={"ko": {"locHere": "현재 위치", "locFinding": "위치를 찾는 중…", "locDone": "현재 위치로 맞췄어요", "locDenied": "위치 권한이 필요합니다. 브라우저 설정에서 허용해 주세요.", "locFail": "위치를 찾지 못했습니다", "locKeep": "이전 위치를 그대로 씁니다"}, "en": {"locHere": "Current location", "locFinding": "Finding your location…", "locDone": "Set to your location", "locDenied": "Location permission is needed. Please allow it in your browser settings.", "locFail": "Could not find your location", "locKeep": "Keeping the previous location"}, "ja": {"locHere": "現在地", "locFinding": "現在地を取得中…", "locDone": "現在地に合わせました", "locDenied": "位置情報の許可が必要です。ブラウザの設定で許可してください。", "locFail": "現在地を取得できませんでした", "locKeep": "以前の位置をそのまま使います"}, "zh": {"locHere": "当前位置", "locFinding": "正在获取位置…", "locDone": "已设为当前位置", "locDenied": "需要位置权限，请在浏览器设置中允许。", "locFail": "未能获取位置", "locKeep": "继续使用之前的位置"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
+
+(function(){ const D={"ko": {"mlLab": "급식", "mlNeedSchool": "설정에서 학교를 연결하면 급식이 표시됩니다.", "mlNone": "급식 정보가 없습니다", "mlLoading": "불러오는 중…", "mlCard": "급식", "mlDesc": "학교 급식 식단"}, "en": {"mlLab": "School meal", "mlNeedSchool": "Link your school in Settings to see meals.", "mlNone": "No meal information", "mlLoading": "Loading…", "mlCard": "School meal", "mlDesc": "Cafeteria menu"}, "ja": {"mlLab": "給食", "mlNeedSchool": "設定で学校を連携すると給食が表示されます。", "mlNone": "給食情報がありません", "mlLoading": "読み込み中…", "mlCard": "給食", "mlDesc": "学校給食の献立"}, "zh": {"mlLab": "营养午餐", "mlNeedSchool": "在设置中连接学校后可查看菜单。", "mlNone": "暂无供餐信息", "mlLoading": "加载中…", "mlCard": "营养午餐", "mlDesc": "学校供餐菜单"}}; for(const l in D) Object.assign(I18N[l], D[l]); })();
 
 
 /* ══════ js/render.js ══════ */
@@ -1423,7 +1426,7 @@ const DEFAULTS = {
   news:null, newsAt:0, newsTopics:['NATION','WORLD','SCIENCE'],
   habits:[], habitLog:{}, waterGoal:8, waterLog:{}, timetable:{},
   nzMin:30, nzVol:45, seenSplash:false,
-  school:null, neisKey:'', ttCache:null,
+  school:null, neisKey:'', ttCache:null, meal:null,
   notifyOn:false, notifyDaily:'08:00', notifyPre:'21:00', notifyLead:10,
   sync:{ on:false, uid:'', code:'', at:0 },
   wx:null, phoneAll:true, day:'',
@@ -2322,9 +2325,10 @@ async function neisTimetable(force){
   let newest = '';
   let lastErr = '';
 
-  /* 최근 8주를 거슬러 보며 요일을 채운다.
-     개학 직후처럼 이번 주에 하루치만 있어도, 지난주 것으로 나머지 요일을 채운다. */
-  for(let back = 0; back < 8; back++){
+  /* 이번 주부터 거슬러 보며 요일을 채운다.
+     나이스는 학년도·학기를 넘기지 않아도 날짜만으로 찾아 준다.
+     (학기를 잘못 넘기면 개학 직후처럼 학기가 바뀐 시기에 빈손으로 온다) */
+  for(let back = 0; back < 6; back++){
     if([1,2,3,4,5].every(d => table[d])) break;      // 월~금이 다 찼으면 그만
     const start = new Date(thisWeek + 'T00:00:00');
     start.setDate(start.getDate() - back*7);
@@ -2332,35 +2336,34 @@ async function neisTimetable(force){
     const endD = new Date(start); endD.setDate(endD.getDate() + 6);
     const to = ymd(endD);
 
-    for(const sem of [semOf(start), semOf(start) === 1 ? 2 : 1]){
-      const r = await neisApi('/timetable', {
-        office: s.office, school: s.code, grade: s.grade, class: s.cls,
-        from: from.replace(/-/g,''), to: to.replace(/-/g,''),
-        kind: s.kind || '', ay: ayOf(start), sem
-      }, { ttl: back === 0 ? 25*60*1000 : 12*3600000, timeout: 11000, force: !!force && back === 0 });
-      if(r.err){
-        if(r.limit) return { err: r.err, limit:true, table: (cache && cache.table) || null };
-        lastErr = r.err; continue;
-      }
-      const rows = r.rows;
-      if(!rows.length) continue;
+    const r = await neisApi('/timetable', {
+      office: s.office, school: s.code, grade: s.grade, class: s.cls,
+      from: from.replace(/-/g,''), to: to.replace(/-/g,''),
+      kind: s.kind || ''
+    }, { ttl: back === 0 ? 25*60*1000 : 12*3600000, timeout: 11000,
+         force: !!force && back === 0 });
 
-      rows.forEach(x => {
-        const d = String(x.ALL_TI_YMD || '');
-        if(d.length < 8) return;
-        const ds = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
-        const dow = new Date(ds + 'T00:00:00').getDay();
-        const no = parseInt(x.PERIO, 10);
-        const subj = (x.ITRT_CNTNT || '').trim();
-        if(!no || !subj) return;
-        /* 이미 더 최근 자료로 채운 요일은 덮어쓰지 않는다 */
-        if(src[dow] && src[dow] > ds) return;
-        if(src[dow] !== ds){ table[dow] = []; src[dow] = ds; }
-        table[dow][no - 1] = subj;
-      });
-      if(!newest) newest = from;
-      break;                                        // 이 주는 처리 완료
+    if(r.err){
+      if(r.limit) return { err: r.err, limit:true, table: (cache && cache.table) || null };
+      lastErr = r.err; continue;
     }
+    const rows = r.rows;
+    if(!rows.length) continue;
+
+    rows.forEach(x => {
+      const d = String(x.ALL_TI_YMD || '');
+      if(d.length < 8) return;
+      const ds = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+      const dow = new Date(ds + 'T00:00:00').getDay();
+      const no = parseInt(x.PERIO, 10);
+      const subj = (x.ITRT_CNTNT || '').trim();
+      if(!no || !subj) return;
+      if(isNoClass(subj)) return;          // 방학·휴업일은 수업으로 치지 않는다
+      if(src[dow] && src[dow] > ds) return;
+      if(src[dow] !== ds){ table[dow] = []; src[dow] = ds; }
+      table[dow][no - 1] = subj;
+    });
+    if(!newest && Object.keys(table).length) newest = from;
   }
 
   const got = Object.keys(table);
@@ -2373,6 +2376,12 @@ async function neisTimetable(force){
   return { table, weekOf: newest || thisWeek, days: src, count: got.length,
            old: (newest || thisWeek) !== thisWeek };
 }
+/* 수업이 아닌 것 (방학·휴업일·재량휴업 등)
+   나이스에는 이런 날에도 '여름방학' 같은 값이 과목처럼 들어온다 */
+function isNoClass(s){
+  return /방학|휴업|휴일|재량|개교기념|연휴|자율화/.test(String(s || ''));
+}
+
 /* 학년도·학기 계산 — 3~8월 1학기, 9~2월 2학기 */
 function ayOf(d){ return (d.getMonth() + 1) >= 3 ? d.getFullYear() : d.getFullYear() - 1; }
 function semOf(d){ const m = d.getMonth() + 1; return (m >= 3 && m <= 8) ? 1 : 2; }
@@ -2665,6 +2674,12 @@ const OpenLink = {
       }
       case 'news':      return 'https://news.naver.com/';
       case 'timetable': return 'https://open.neis.go.kr/';
+      case 'meal': {
+        const s = C.school;
+        return s && s.name
+          ? `https://search.naver.com/search.naver?query=${enc(s.name + ' 급식')}`
+          : 'https://open.neis.go.kr/';
+      }
       case 'fortune':   return `https://search.naver.com/search.naver?query=${enc('오늘의 운세')}`;
       case 'sleep':     return 'https://www.mi.com/global/support/';
       case 'calendar':  return `https://search.naver.com/search.naver?query=${enc('달력')}`;
@@ -2676,6 +2691,7 @@ const OpenLink = {
          : id === 'baseball' ? '경기 일정'
          : id === 'news'     ? '네이버 뉴스'
          : id === 'timetable'? '나이스'
+         : id === 'meal'     ? '급식 정보'
          : id === 'fortune'  ? '더 보기'
          : '열기';
   },
@@ -4169,6 +4185,112 @@ async function ttRefresh(force){
 }
 
 
+/* ══════ js/cards/meal.js ══════ */
+
+/* ═══════════ 급식 ═══════════
+
+   시간표에서 이미 학교를 연결했다면 따로 설정할 게 없습니다.
+   급식은 학교 전체가 같아서 서버 캐시가 잘 들어 나이스 호출이 적습니다.
+
+   밤에는 내일 급식을 보여 줍니다 (날씨·운세와 같은 기준). */
+
+const MEAL_KIND = { '조식':'breakfast', '중식':'lunch', '석식':'dinner' };
+
+async function loadMeal(force){
+  if(!Cards.isOn('meal')) return;
+  const s = C.school;
+  if(!s || !s.code) return paintCard('meal');
+  if(typeof apiReady !== 'function' || !apiReady()) return paintCard('meal');
+
+  const d = ymd(baseDate()).replace(/-/g, '');
+  const key = `meal:${s.code}:${d}`;
+  if(force && Net.tooSoon('meal', 4000)) return paintCard('meal');
+
+  const r = await Net.get(key, async signal => {
+    const q = `office=${encodeURIComponent(s.office)}&school=${encodeURIComponent(s.code)}&from=${d}&to=${d}`;
+    const res = await fetch(`${API_BASE}/meal?${q}`, { signal });
+    const j = await res.json();
+    if(res.status === 429){ const e = new Error('한도'); e.limit = true; throw e; }
+    if(!res.ok) throw new Error(j.error || '오류');
+    return j.rows || [];
+  }, { ttl: 30*60*1000, timeout: 11000, force: !!force });
+
+  C.meal = { date: d, rows: r.data || [], at: r.at || Date.now(),
+             stale: !r.fresh, err: r.data ? null : true };
+  save();
+  paintCard('meal');
+}
+
+/* 나이스가 주는 급식 글을 줄 단위로 다듬는다
+   '기장밥<br/>된장찌개 (5.6)<br/>...' → ['기장밥','된장찌개',...] */
+function mealLines(txt){
+  return String(txt || '')
+    .split(/<br\s*\/?>/i)
+    .map(x => x.replace(/\([^)]*\)/g, '')      // 알레르기 번호 제거
+               .replace(/[0-9.]+$/g, '')
+               .replace(/&amp;/g, '&').trim())
+    .filter(Boolean);
+}
+
+Cards.register({
+  id:'meal', name:'급식', size:'M', def:false, tag:'tagStudent',
+  desc:'학교 급식 식단 (학교 연결 필요)',
+
+  init(el){
+    setHTML(el, `
+      <div class="chead"><span class="clab" id="mlLab">${T('mlLab')}</span>
+        <span class="cmeta" id="mlMeta"></span></div>
+      <div id="mlBody"></div>`);
+    el.querySelector('#mlMeta').onclick = () => {
+      if(C.school && C.school.code) loadMeal(true);
+      else openSettings('cards');
+    };
+  },
+
+  render(el){
+    const s = C.school;
+    const lab = el.querySelector('#mlLab');
+    const meta = el.querySelector('#mlMeta');
+    const body = el.querySelector('#mlBody');
+
+    setText(lab, T('mlLab') + (dayOff() ? ' · ' + T('tdTomorrow') : ''));
+
+    if(!s || !s.code){
+      setText(meta, T('ttSetHint'));
+      setHTML(body, `<div class="empty">${T('mlNeedSchool')}</div>`);
+      return;
+    }
+    setText(meta, s.name);
+
+    const m = C.meal;
+    const want = ymd(baseDate()).replace(/-/g, '');
+    if(!m || m.date !== want){
+      setHTML(body, `<div class="empty">${T('mlLoading')}</div>`);
+      return;
+    }
+    if(!m.rows || !m.rows.length){
+      setHTML(body, `<div class="empty">${T('mlNone')}</div>`);
+      return;
+    }
+
+    /* 조식·중식·석식 순서로 */
+    const order = ['조식','중식','석식'];
+    const rows = m.rows.slice().sort((a, b) =>
+      order.indexOf(a.MMEAL_SC_NM) - order.indexOf(b.MMEAL_SC_NM));
+
+    setHTML(body, rows.map(r => {
+      const items = mealLines(r.DDISH_NM);
+      const kcal = String(r.CAL_INFO || '').replace(/\s*Kcal/i, '');
+      return `<div class="ml-set">
+        <div class="ml-head"><b>${esc(r.MMEAL_SC_NM || '')}</b>
+          ${kcal ? `<i>${esc(kcal)} kcal</i>` : ''}</div>
+        <ul class="ml-list">${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+      </div>`;
+    }).join(''));
+  }
+});
+
+
 /* ══════ js/cards/countdown.js ══════ */
 
 /* 큰 D-day — 가장 가까운 하나를 크게 */
@@ -5513,10 +5635,12 @@ async function boot(){
   setInterval(() => { if(!typing()) loadGames(false); }, 60*60*1000);
   setInterval(() => { if(!typing()) loadNews(false); }, 60*60*1000);
   if(Cards.isOn('timetable') && C.school && C.school.code) ttRefresh(false);
-  /* 개학 직후처럼 시간표가 새로 올라오는 시기를 놓치지 않도록 주기적으로 확인 */
+  if(Cards.isOn('meal')) loadMeal(false);
+  /* 시간표·급식은 새로 올라올 수 있으니 주기적으로 확인 */
   setInterval(() => {
     if(typing()) return;
     if(Cards.isOn('timetable') && C.school && C.school.code) ttRefresh(false);
+    if(Cards.isOn('meal')) loadMeal(false);
   }, 3*3600000);
   setInterval(() => { if(syncReady() && !typing()) syncPull(); }, 45000);
 
